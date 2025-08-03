@@ -7,8 +7,15 @@ build:
 	@mkdir -p build
 	@cd build && cmake .. && make
 	@./generate_styles
-	@./dx-styles
 	@echo "✅ Build successful. Executables are in the root directory."
+
+forge:
+	@echo "Forge is on..."
+	@mkdir -p build
+	@cd build && cmake .. && make
+	@./generate_styles
+	@./dx-styles
+	@echo "Thanks for using Forge! Your styles have been generated and the dx-styles executable is ready."
 
 clean:
 	@echo "🧹 Cleaning up build artifacts..."
