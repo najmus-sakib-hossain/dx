@@ -4,8 +4,8 @@
 #include <uv.h>
 #include <tree_sitter/api.h>
 #include <flatcc/flatcc.h>
-#include <flatcc/flatcc_builder.h> // Add this include for flatcc_buffer_t
-#include "styles_reader.h" // Generated from styles.fbs
+#include <flatcc/flatcc_builder.h>
+#include "styles_reader.h"
 #include "styles_verifier.h"
 
 // Tree-sitter language for TypeScript/TSX
@@ -71,19 +71,20 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
         for (uint32_t i = 0; i < match.capture_count; i++) {
             const char *capture_name;
             uint32_t capture_length;
-            if (ts_query_capture_name_for_id(query, match.captures[i].index, &capture_name, &capture_length)) {
-                if (strcmp(capture_name, "value") == 0) {
-                    TSNode node = match.captures[i].node;
-                    uint32_t start = ts_node_start_byte(node);
-                    uint32_t end = ts_node_end_byte(node);
-                    size_t len = end - start;
-                    char *value = malloc(len + 1);
-                    strncpy(value, source + start, len);
-                    value[len] = '\0';
-                    *class_names = realloc(*class_names, (*count + 1) * sizeof(char *));
-                    (*class_names)[*count] = value;
-                    (*count)++;
-                }
+            
+            // Fix: correct API usage
+            capture_name = ts_query_capture_name_for_id(query, match.captures[i].index, &capture_length);
+            if (capture_name && strcmp(capture_name, "value") == 0) {
+                TSNode node = match.captures[i].node;
+                uint32_t start = ts_node_start_byte(node);
+                uint32_t end = ts_node_end_byte(node);
+                size_t len = end - start;
+                char *value = malloc(len + 1);
+                strncpy(value, source + start, len);
+                value[len] = '\0';
+                *class_names = realloc(*class_names, (*count + 1) * sizeof(char *));
+                (*class_names)[*count] = value;
+                (*count)++;
             }
         }
     }
@@ -102,51 +103,65 @@ void generate_css(const char *filename, void *buffer) {
     size_t class_count;
     extract_class_names(filename, &class_names, &class_count);
 
-    // Load styles.bin
-    Styles_Styles_table_t styles = Styles_Styles_as_root(buffer);
+    // Load styles.bin - Fixed: removed extra "Styles_" prefix
+    Styles_table_t styles = Styles_as_root(buffer);
     CHECK(styles);
 
     // Open styles.css for writing
     css_file = fopen("styles.css", "w");
     CHECK(css_file);
 
-    // Process static rules
-    flatbuffers_string_vec_t static_rules = Styles_Styles_static_rules(styles);
+    // Process static rules - Fixed: correct function names
+    StaticRule_vec_t static_rules = Styles_static_rules(styles);
+    size_t static_rules_len = StaticRule_vec_len(static_rules);
+    
     for (size_t i = 0; i < class_count; i++) {
-        for (size_t j = 0; j < flatbuffers_string_vec_len(static_rules); j++) {
-            Styles_StaticRule_table_t rule = flatbuffers_string_vec_at(static_rules, j);
-            const char *rule_name = Styles_StaticRule_name(rule);
+        for (size_t j = 0; j < static_rules_len; j++) {
+            StaticRule_table_t rule = StaticRule_vec_at(static_rules, j);
+            const char *rule_name = StaticRule_name(rule);
             if (strcmp(class_names[i], rule_name) == 0) {
                 fprintf(css_file, ".%s {\n", rule_name);
-                flatbuffers_string_vec_t props = Styles_StaticRule_properties(rule);
-                for (size_t k = 0; k < flatbuffers_string_vec_len(props); k++) {
-                    Styles_Property_table_t prop = flatbuffers_string_vec_at(props, k);
-                    fprintf(css_file, "  %s: %s;\n", Styles_Property_key(prop), Styles_Property_value(prop));
+                Property_vec_t props = StaticRule_properties(rule);
+                size_t props_len = Property_vec_len(props);
+                
+                for (size_t k = 0; k < props_len; k++) {
+                    Property_table_t prop = Property_vec_at(props, k);
+                    fprintf(css_file, "  %s: %s;\n", Property_key(prop), Property_value(prop));
                 }
                 fprintf(css_file, "}\n");
             }
         }
     }
 
-    // Process dynamic rules
-    flatbuffers_string_vec_t dynamic_rules = Styles_Styles_dynamic_rules(styles);
+    // Process dynamic rules - Fixed: correct function names and types
+    DynamicRule_vec_t dynamic_rules = Styles_dynamic_rules(styles);
+    size_t dynamic_rules_len = DynamicRule_vec_len(dynamic_rules);
+    
     for (size_t i = 0; i < class_count; i++) {
-        for (size_t j = 0; j < flatbuffers_string_vec_len(dynamic_rules); j++) {
-            Styles_DynamicRule_table_t rule = flatbuffers_string_vec_at(dynamic_rules, j);
-            const char *prefix = Styles_DynamicRule_prefix(rule);
-            flatbuffers_string_vec_t values = Styles_DynamicRule_values(rule);
-            for (size_t k = 0; k < flatbuffers_string_vec_len(values); k++) {
+        for (size_t j = 0; j < dynamic_rules_len; j++) {
+            DynamicRule_table_t rule = DynamicRule_vec_at(dynamic_rules, j);
+            const char *prefix = DynamicRule_prefix(rule);
+            flatbuffers_string_vec_t values = DynamicRule_values(rule);
+            size_t values_len = flatbuffers_string_vec_len(values);
+            
+            for (size_t k = 0; k < values_len; k++) {
                 const char *value = flatbuffers_string_vec_at(values, k);
                 char expected_class[256];
                 snprintf(expected_class, sizeof(expected_class), "%s-%s", prefix, value);
+                
                 if (strcmp(class_names[i], expected_class) == 0) {
                     fprintf(css_file, ".%s {\n", expected_class);
-                    flatbuffers_string_vec_t props = Styles_DynamicRule_properties(rule);
-                    Styles_DynamicProperty_table_t dyn_prop = flatbuffers_string_vec_at(props, k);
-                    flatbuffers_string_vec_t prop_pairs = Styles_DynamicProperty_properties(dyn_prop);
-                    for (size_t m = 0; m < flatbuffers_string_vec_len(prop_pairs); m++) {
-                        Styles_Property_table_t prop = flatbuffers_string_vec_at(prop_pairs, m);
-                        fprintf(css_file, "  %s: %s;\n", Styles_Property_key(prop), Styles_Property_value(prop));
+                    DynamicProperty_vec_t props = DynamicRule_properties(rule);
+                    
+                    if (k < DynamicProperty_vec_len(props)) {
+                        DynamicProperty_table_t dyn_prop = DynamicProperty_vec_at(props, k);
+                        Property_vec_t prop_pairs = DynamicProperty_properties(dyn_prop);
+                        size_t prop_pairs_len = Property_vec_len(prop_pairs);
+                        
+                        for (size_t m = 0; m < prop_pairs_len; m++) {
+                            Property_table_t prop = Property_vec_at(prop_pairs, m);
+                            fprintf(css_file, "  %s: %s;\n", Property_key(prop), Property_value(prop));
+                        }
                     }
                     fprintf(css_file, "}\n");
                 }

@@ -2,6 +2,10 @@ file(REMOVE_RECURSE
   "/workspaces/dx/styles_generated.h"
   "CMakeFiles/dx-styles.dir/dx-styles.c.o"
   "CMakeFiles/dx-styles.dir/dx-styles.c.o.d"
+  "CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o"
+  "CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o.d"
+  "CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o"
+  "CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o.d"
   "dx-styles"
   "dx-styles.pdb"
 )

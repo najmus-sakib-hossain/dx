@@ -9,6 +9,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/workspaces/dx/dx-styles.c" "CMakeFiles/dx-styles.dir/dx-styles.c.o" "gcc" "CMakeFiles/dx-styles.dir/dx-styles.c.o.d"
+  "/workspaces/dx/tree-sitter-typescript/typescript/src/parser.c" "CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o" "gcc" "CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o.d"
+  "/workspaces/dx/tree-sitter-typescript/typescript/src/scanner.c" "CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o" "gcc" "CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.
