@@ -37,6 +37,8 @@ The program demonstrates high-performance file I/O using:
 
 Platform-specific optimizations are automatically selected at compile time.
 
+### C Code
+
 ```c
 #include <stdio.h>
 #include <stdlib.h>
