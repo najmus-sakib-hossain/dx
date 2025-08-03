@@ -172,4 +172,16 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
  /usr/local/include/flatcc/flatcc_epilogue.h \
  /usr/local/include/flatcc/portable/pdiagnostic_pop.h \
  /workspaces/dx/build/styles_verifier.h \
- /usr/local/include/flatcc/flatcc_verifier.h /usr/include/ctype.h
+ /usr/local/include/flatcc/flatcc_verifier.h /usr/include/ctype.h \
+ /usr/include/x86_64-linux-gnu/sys/mman.h \
+ /usr/include/x86_64-linux-gnu/bits/mman.h \
+ /usr/include/x86_64-linux-gnu/bits/mman-map-flags-generic.h \
+ /usr/include/x86_64-linux-gnu/bits/mman-linux.h \
+ /usr/include/x86_64-linux-gnu/bits/mman-shared.h \
+ /usr/include/x86_64-linux-gnu/bits/mman_ext.h /usr/include/unistd.h \
+ /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
+ /usr/include/x86_64-linux-gnu/bits/environments.h \
+ /usr/include/x86_64-linux-gnu/bits/confname.h \
+ /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+ /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
+ /usr/include/x86_64-linux-gnu/bits/unistd_ext.h

@@ -9,9 +9,15 @@
 #include "styles_verifier.h"
 #include <ctype.h>
 
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
 TSLanguage *tree_sitter_typescript(void);
 
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "Error at %s:%d\n", __FILE__, __LINE__); exit(1); } } while (0)
+
 
 uv_loop_t *loop;
 uv_fs_event_t fs_event;
@@ -20,6 +26,7 @@ FILE *css_file;
 uv_tty_t tty_stdin;
 int tty_inited = 0;
 uv_signal_t signal_handle;
+size_t styles_bin_size = 0;
 
 void alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf) {
     buf->base = (char*) malloc(suggested_size);
@@ -29,6 +36,7 @@ void alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf) {
     }
     buf->len = suggested_size;
 }
+
 
 void on_tty_read(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
     if (nread < 0) {
@@ -55,24 +63,29 @@ void on_signal(uv_signal_t *handle, int signum) {
     uv_stop(loop);
 }
 
-void *load_styles_bin(const char *filename) {
-    FILE *fp = fopen(filename, "rb");
-    if (!fp) {
+void *load_styles_bin(const char *filename, size_t *size) {
+    int fd = open(filename, O_RDONLY);
+    if (fd == -1) {
         fprintf(stderr, "Warning: Could not open file %s\n", filename);
         return NULL;
     }
-    
-    fseek(fp, 0, SEEK_END);
-    size_t size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    void *buf = malloc(size);
-    if (!buf) {
-        fprintf(stderr, "Error: Memory allocation failed\n");
-        fclose(fp);
+
+    struct stat st;
+    if (fstat(fd, &st) == -1) {
+        fprintf(stderr, "Warning: Could not get file size for %s\n", filename);
+        close(fd);
         return NULL;
     }
-    fread(buf, 1, size, fp);
-    fclose(fp);
+    *size = st.st_size;
+
+    void *buf = mmap(NULL, *size, PROT_READ, MAP_PRIVATE, fd, 0);
+    if (buf == MAP_FAILED) {
+        fprintf(stderr, "Error: Memory mapping failed\n");
+        close(fd);
+        return NULL;
+    }
+
+    close(fd);
     return buf;
 }
 
@@ -149,12 +162,18 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
                 uint32_t start = ts_node_start_byte(node);
                 uint32_t end = ts_node_end_byte(node);
                 size_t len = end - start;
-                char *value = malloc(len + 1);
-                strncpy(value, source + start, len);
-                value[len] = '\0';
-                *class_names = realloc(*class_names, (*count + 1) * sizeof(char *));
-                (*class_names)[*count] = value;
-                (*count)++;
+                char *value_str = malloc(len + 1);
+                strncpy(value_str, source + start, len);
+                value_str[len] = '\0';
+
+                char *token = strtok(value_str, " ");
+                while (token) {
+                    *class_names = realloc(*class_names, (*count + 1) * sizeof(char *));
+                    (*class_names)[*count] = strdup(token);
+                    (*count)++;
+                    token = strtok(NULL, " ");
+                }
+                free(value_str);
             }
         }
     }
@@ -164,6 +183,8 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     ts_tree_delete(tree);
     free(source);
 }
+
+
 
 void generate_css(const char *filename, void *buffer) {
     if (!buffer) {
@@ -271,10 +292,10 @@ void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int
         printf("Detected change in %s\n", filename);
         char full_path[512];
         snprintf(full_path, sizeof(full_path), "./src/%s", filename);
-        void *buffer = load_styles_bin("styles.bin");
+        void *buffer = load_styles_bin("styles.bin", &styles_bin_size);
         if (buffer) {
             generate_css(full_path, buffer);
-            free(buffer);
+            munmap(buffer, styles_bin_size);
         }
     }
 }
@@ -294,7 +315,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    void *buffer = load_styles_bin("styles.bin");
+    void *buffer = load_styles_bin("styles.bin", &styles_bin_size);
     if (!buffer) {
         fprintf(stderr, "Error: Failed to load styles.bin\n");
         ts_parser_delete(parser);
@@ -333,7 +354,7 @@ int main(int argc, char *argv[]) {
 
     uv_run(loop, UV_RUN_DEFAULT);
 
-    free(buffer);
+    munmap(buffer, styles_bin_size);
     ts_parser_delete(parser);
     uv_fs_event_stop(&fs_event);
     if (tty_inited) {
