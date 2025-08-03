@@ -4,7 +4,7 @@
 # compile C with /usr/bin/cc
 C_DEFINES = 
 
-C_INCLUDES = -I/usr/local/include/tomlc99 -I/usr/local/include/flatcc
+C_INCLUDES = -I/usr/local/include/tomlc99 -I/workspaces/dx
 
 C_FLAGS = 
 

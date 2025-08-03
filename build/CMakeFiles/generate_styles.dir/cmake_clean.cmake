@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "/workspaces/dx/styles_generated.h"
   "CMakeFiles/generate_styles.dir/styles.c.o"
   "CMakeFiles/generate_styles.dir/styles.c.o.d"
   "generate_styles"

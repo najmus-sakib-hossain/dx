@@ -190,7 +190,7 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
 //Path to a file.
-FLATCC_INCLUDE_DIR:PATH=/usr/local/include/flatcc
+FLATCC_INCLUDE_DIR:PATH=/usr/local/include
 
 //Path to a library.
 FLATCC_LIBRARY:FILEPATH=/usr/local/lib/libflatccrt.a
@@ -199,7 +199,7 @@ FLATCC_LIBRARY:FILEPATH=/usr/local/lib/libflatccrt.a
 TOML_INCLUDE_DIR:PATH=/usr/local/include/tomlc99
 
 //Path to a library.
-TOML_LIBRARY:FILEPATH=TOML_LIBRARY-NOTFOUND
+TOML_LIBRARY:FILEPATH=/usr/local/lib/libtoml.a
 
 //Value Computed by CMake
 dx-styles_BINARY_DIR:STATIC=/workspaces/dx/build
