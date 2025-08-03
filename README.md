@@ -19,7 +19,7 @@ sudo apt update && sudo apt install -y \
 ```bash
 # Compile with io_uring support on Linux
 gcc -o main main.c -O2 -Wall -lpthread
-gcc -o main main.c -O2 -Wall -luring
+gcc -O3 -o main main.c -lpthread
 
 # Run the program
 ./main
