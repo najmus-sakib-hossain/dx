@@ -24,3 +24,4 @@ values = ["0", "1", "2"]
 properties."0" = { "margin" = "0px" }
 properties."1" = { "margin" = "8px" }
 properties."2" = { "margin" = "16px" }
+properties."3" = { "margin" = "24px" }

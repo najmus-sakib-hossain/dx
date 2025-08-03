@@ -2,6 +2,12 @@
 
 Dx cli
 
+CMakeLists.txt  flatbuffers_common_builder.h  main      styles.fbs        styles_generated.h  tomlc99
+README.md       flatbuffers_common_reader.h   main.c    styles.toml       styles_reader.h
+build           flatcc_output.log             styles.c  styles_builder.h  styles_verifier.h
+
+
+sudo apt install -y inotify-tools
 
 sudo apt update
 sudo apt install -y git cmake make gcc
