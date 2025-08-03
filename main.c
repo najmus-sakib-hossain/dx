@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,6 +27,9 @@
     #include <unistd.h>
     #include <sys/stat.h>
     #include <sys/mman.h>
+    #ifndef O_DIRECTORY
+        #define O_DIRECTORY 0200000  /* Linux-specific value */
+    #endif
     #define MKDIR(path) mkdir(path, 0755)
 #endif
 
