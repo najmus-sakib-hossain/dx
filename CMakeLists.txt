@@ -20,8 +20,11 @@ add_custom_command(
     COMMENT "Generating FlatBuffers headers"
 )
 
+# Copy styles.toml to build directory
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/styles.toml
+               ${CMAKE_CURRENT_BINARY_DIR}/styles.toml COPYONLY)
+
 # Build executable
 add_executable(generate_styles styles.c ${FBS_OUTPUT})
 target_include_directories(generate_styles PRIVATE ${TOML_INCLUDE_DIR} ${FLATCC_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(generate_styles PRIVATE ${TOML_LIBRARY} ${FLATCC_LIBRARY})
 target_link_libraries(generate_styles PRIVATE ${TOML_LIBRARY} ${FLATCC_LIBRARY})

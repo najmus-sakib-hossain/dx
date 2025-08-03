@@ -98,8 +98,6 @@ generate_styles: CMakeFiles/generate_styles.dir/styles.c.o
 generate_styles: CMakeFiles/generate_styles.dir/build.make
 generate_styles: /usr/local/lib/libtoml.a
 generate_styles: /usr/local/lib/libflatccrt.a
-generate_styles: /usr/local/lib/libtoml.a
-generate_styles: /usr/local/lib/libflatccrt.a
 generate_styles: CMakeFiles/generate_styles.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable generate_styles"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/generate_styles.dir/link.txt --verbose=$(VERBOSE)

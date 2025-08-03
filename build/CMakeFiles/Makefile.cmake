@@ -85,6 +85,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/workspaces/dx/CMakeLists.txt"
   "CMakeFiles/3.28.3/CMakeCCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeSystem.cmake"
+  "/workspaces/dx/styles.toml"
   )
 
 # The corresponding makefile is:
@@ -98,6 +99,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/3.28.3/CMakeSystem.cmake"
   "CMakeFiles/3.28.3/CMakeCCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeCCompiler.cmake"
+  "styles.toml"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 

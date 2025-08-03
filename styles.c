@@ -9,9 +9,16 @@
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "Error at %s:%d\n", __FILE__, __LINE__); exit(1); } } while (0)
 
 int main(int argc, char *argv[]) {
+    // Determine the path to styles.toml
+    const char *toml_path = (argc > 1) ? argv[1] : "styles.toml";
+    
     // Initialize TOML parser
-    FILE *fp = fopen("styles.toml", "r");
-    CHECK(fp);
+    FILE *fp = fopen(toml_path, "r");
+    if (!fp) {
+        fprintf(stderr, "Error: Cannot open file '%s'\n", toml_path);
+        fprintf(stderr, "Usage: %s [path_to_styles.toml]\n", argv[0]);
+        return 1;
+    }
     
     char errbuf[200];
     toml_table_t *conf = toml_parse_file(fp, errbuf, sizeof(errbuf));
