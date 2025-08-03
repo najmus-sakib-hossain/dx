@@ -3,9 +3,9 @@
 Dx cli
 
 
-git clone https://github.com/libuv/libuv && cd libuv && rm -rf .git
-git clone https://github.com/dvidelabs/flatcc.git && cd flatcc && rm -rf .git
-git clone https://github.com/cktan/tomlc99.git && cd tomlc99 && rm -rf .git
+git clone https://github.com/libuv/libuv && cd libuv && rm -rf .git && cd ..
+git clone https://github.com/dvidelabs/flatcc.git && cd flatcc && rm -rf .git && cd ..
+git clone https://github.com/cktan/tomlc99.git && cd tomlc99 && rm -rf .git && cd ..
 
 
 git clone https://github.com/tree-sitter/tree-sitter-typescript.git
