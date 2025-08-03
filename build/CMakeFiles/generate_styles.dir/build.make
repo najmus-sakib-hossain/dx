@@ -77,15 +77,15 @@ CMakeFiles/generate_styles.dir/styles.c.o: CMakeFiles/generate_styles.dir/flags.
 CMakeFiles/generate_styles.dir/styles.c.o: /workspaces/dx/styles.c
 CMakeFiles/generate_styles.dir/styles.c.o: CMakeFiles/generate_styles.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/generate_styles.dir/styles.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/generate_styles.dir/styles.c.o -MF CMakeFiles/generate_styles.dir/styles.c.o.d -o CMakeFiles/generate_styles.dir/styles.c.o -c /workspaces/dx/styles.c
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/generate_styles.dir/styles.c.o -MF CMakeFiles/generate_styles.dir/styles.c.o.d -o CMakeFiles/generate_styles.dir/styles.c.o -c /workspaces/dx/styles.c
 
 CMakeFiles/generate_styles.dir/styles.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/generate_styles.dir/styles.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspaces/dx/styles.c > CMakeFiles/generate_styles.dir/styles.c.i
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspaces/dx/styles.c > CMakeFiles/generate_styles.dir/styles.c.i
 
 CMakeFiles/generate_styles.dir/styles.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/generate_styles.dir/styles.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspaces/dx/styles.c -o CMakeFiles/generate_styles.dir/styles.c.s
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspaces/dx/styles.c -o CMakeFiles/generate_styles.dir/styles.c.s
 
 # Object files for target generate_styles
 generate_styles_OBJECTS = \

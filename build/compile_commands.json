@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/workspaces/dx/build",
+  "command": "/usr/bin/gcc  -I/usr/local/include/tomlc99 -I/usr/local/include/flatcc -I/workspaces/dx/build -g -o CMakeFiles/generate_styles.dir/styles.c.o -c /workspaces/dx/styles.c",
+  "file": "/workspaces/dx/styles.c",
+  "output": "CMakeFiles/generate_styles.dir/styles.c.o"
+},
+{
+  "directory": "/workspaces/dx/build",
+  "command": "/usr/bin/gcc  -I/usr/local/include/tomlc99 -I/usr/local/include/flatcc -I/workspaces/dx/build -g -o CMakeFiles/dx-styles.dir/dx-styles.c.o -c /workspaces/dx/dx-styles.c",
+  "file": "/workspaces/dx/dx-styles.c",
+  "output": "CMakeFiles/dx-styles.dir/dx-styles.c.o"
+}
+]

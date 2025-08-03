@@ -77,15 +77,15 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: CMakeFiles/dx-styles.dir/flags.make
 CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c
 CMakeFiles/dx-styles.dir/dx-styles.c.o: CMakeFiles/dx-styles.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/dx-styles.dir/dx-styles.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/dx-styles.dir/dx-styles.c.o -MF CMakeFiles/dx-styles.dir/dx-styles.c.o.d -o CMakeFiles/dx-styles.dir/dx-styles.c.o -c /workspaces/dx/dx-styles.c
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/dx-styles.dir/dx-styles.c.o -MF CMakeFiles/dx-styles.dir/dx-styles.c.o.d -o CMakeFiles/dx-styles.dir/dx-styles.c.o -c /workspaces/dx/dx-styles.c
 
 CMakeFiles/dx-styles.dir/dx-styles.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/dx-styles.dir/dx-styles.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspaces/dx/dx-styles.c > CMakeFiles/dx-styles.dir/dx-styles.c.i
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspaces/dx/dx-styles.c > CMakeFiles/dx-styles.dir/dx-styles.c.i
 
 CMakeFiles/dx-styles.dir/dx-styles.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/dx-styles.dir/dx-styles.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspaces/dx/dx-styles.c -o CMakeFiles/dx-styles.dir/dx-styles.c.s
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspaces/dx/dx-styles.c -o CMakeFiles/dx-styles.dir/dx-styles.c.s
 
 # Object files for target dx-styles
 dx__styles_OBJECTS = \
