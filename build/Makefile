@@ -190,54 +190,6 @@ styles.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/generate_styles.dir/build.make CMakeFiles/generate_styles.dir/styles.c.s
 .PHONY : styles.c.s
 
-tree-sitter-typescript/typescript/src/parser.o: tree-sitter-typescript/typescript/src/parser.c.o
-.PHONY : tree-sitter-typescript/typescript/src/parser.o
-
-# target to build an object file
-tree-sitter-typescript/typescript/src/parser.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o
-.PHONY : tree-sitter-typescript/typescript/src/parser.c.o
-
-tree-sitter-typescript/typescript/src/parser.i: tree-sitter-typescript/typescript/src/parser.c.i
-.PHONY : tree-sitter-typescript/typescript/src/parser.i
-
-# target to preprocess a source file
-tree-sitter-typescript/typescript/src/parser.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.i
-.PHONY : tree-sitter-typescript/typescript/src/parser.c.i
-
-tree-sitter-typescript/typescript/src/parser.s: tree-sitter-typescript/typescript/src/parser.c.s
-.PHONY : tree-sitter-typescript/typescript/src/parser.s
-
-# target to generate assembly for a file
-tree-sitter-typescript/typescript/src/parser.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.s
-.PHONY : tree-sitter-typescript/typescript/src/parser.c.s
-
-tree-sitter-typescript/typescript/src/scanner.o: tree-sitter-typescript/typescript/src/scanner.c.o
-.PHONY : tree-sitter-typescript/typescript/src/scanner.o
-
-# target to build an object file
-tree-sitter-typescript/typescript/src/scanner.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o
-.PHONY : tree-sitter-typescript/typescript/src/scanner.c.o
-
-tree-sitter-typescript/typescript/src/scanner.i: tree-sitter-typescript/typescript/src/scanner.c.i
-.PHONY : tree-sitter-typescript/typescript/src/scanner.i
-
-# target to preprocess a source file
-tree-sitter-typescript/typescript/src/scanner.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.i
-.PHONY : tree-sitter-typescript/typescript/src/scanner.c.i
-
-tree-sitter-typescript/typescript/src/scanner.s: tree-sitter-typescript/typescript/src/scanner.c.s
-.PHONY : tree-sitter-typescript/typescript/src/scanner.s
-
-# target to generate assembly for a file
-tree-sitter-typescript/typescript/src/scanner.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.s
-.PHONY : tree-sitter-typescript/typescript/src/scanner.c.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -254,12 +206,6 @@ help:
 	@echo "... styles.o"
 	@echo "... styles.i"
 	@echo "... styles.s"
-	@echo "... tree-sitter-typescript/typescript/src/parser.o"
-	@echo "... tree-sitter-typescript/typescript/src/parser.i"
-	@echo "... tree-sitter-typescript/typescript/src/parser.s"
-	@echo "... tree-sitter-typescript/typescript/src/scanner.o"
-	@echo "... tree-sitter-typescript/typescript/src/scanner.i"
-	@echo "... tree-sitter-typescript/typescript/src/scanner.s"
 .PHONY : help
 
 

@@ -69,9 +69,9 @@ include CMakeFiles/generate_styles.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/generate_styles.dir/flags.make
 
-/workspaces/dx/styles_generated.h: /workspaces/dx/styles.fbs
+styles_generated.h: /workspaces/dx/styles.fbs
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating FlatBuffers headers"
-	cd /workspaces/dx && /usr/local/bin/flatcc -a /workspaces/dx/styles.fbs
+	/usr/local/bin/flatcc -a -o /workspaces/dx/build /workspaces/dx/styles.fbs
 
 CMakeFiles/generate_styles.dir/styles.c.o: CMakeFiles/generate_styles.dir/flags.make
 CMakeFiles/generate_styles.dir/styles.c.o: /workspaces/dx/styles.c
@@ -110,7 +110,7 @@ CMakeFiles/generate_styles.dir/clean:
 	$(CMAKE_COMMAND) -P CMakeFiles/generate_styles.dir/cmake_clean.cmake
 .PHONY : CMakeFiles/generate_styles.dir/clean
 
-CMakeFiles/generate_styles.dir/depend: /workspaces/dx/styles_generated.h
+CMakeFiles/generate_styles.dir/depend: styles_generated.h
 	cd /workspaces/dx/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /workspaces/dx /workspaces/dx /workspaces/dx/build /workspaces/dx/build /workspaces/dx/build/CMakeFiles/generate_styles.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/generate_styles.dir/depend
 

@@ -69,9 +69,9 @@ include CMakeFiles/dx-styles.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/dx-styles.dir/flags.make
 
-/workspaces/dx/styles_generated.h: /workspaces/dx/styles.fbs
+styles_generated.h: /workspaces/dx/styles.fbs
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating FlatBuffers headers"
-	cd /workspaces/dx && /usr/local/bin/flatcc -a /workspaces/dx/styles.fbs
+	/usr/local/bin/flatcc -a -o /workspaces/dx/build /workspaces/dx/styles.fbs
 
 CMakeFiles/dx-styles.dir/dx-styles.c.o: CMakeFiles/dx-styles.dir/flags.make
 CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c
@@ -87,52 +87,21 @@ CMakeFiles/dx-styles.dir/dx-styles.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/dx-styles.dir/dx-styles.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspaces/dx/dx-styles.c -o CMakeFiles/dx-styles.dir/dx-styles.c.s
 
-CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o: CMakeFiles/dx-styles.dir/flags.make
-CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o: /workspaces/dx/tree-sitter-typescript/typescript/src/parser.c
-CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o: CMakeFiles/dx-styles.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o -MF CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o.d -o CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o -c /workspaces/dx/tree-sitter-typescript/typescript/src/parser.c
-
-CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspaces/dx/tree-sitter-typescript/typescript/src/parser.c > CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.i
-
-CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspaces/dx/tree-sitter-typescript/typescript/src/parser.c -o CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.s
-
-CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o: CMakeFiles/dx-styles.dir/flags.make
-CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o: /workspaces/dx/tree-sitter-typescript/typescript/src/scanner.c
-CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o: CMakeFiles/dx-styles.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o -MF CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o.d -o CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o -c /workspaces/dx/tree-sitter-typescript/typescript/src/scanner.c
-
-CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspaces/dx/tree-sitter-typescript/typescript/src/scanner.c > CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.i
-
-CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspaces/dx/tree-sitter-typescript/typescript/src/scanner.c -o CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.s
-
 # Object files for target dx-styles
 dx__styles_OBJECTS = \
-"CMakeFiles/dx-styles.dir/dx-styles.c.o" \
-"CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o" \
-"CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o"
+"CMakeFiles/dx-styles.dir/dx-styles.c.o"
 
 # External object files for target dx-styles
 dx__styles_EXTERNAL_OBJECTS =
 
 dx-styles: CMakeFiles/dx-styles.dir/dx-styles.c.o
-dx-styles: CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o
-dx-styles: CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o
 dx-styles: CMakeFiles/dx-styles.dir/build.make
 dx-styles: /usr/local/lib/libflatccrt.a
 dx-styles: /usr/lib/x86_64-linux-gnu/libuv.so
 dx-styles: /usr/lib/x86_64-linux-gnu/libtree-sitter.so
+dx-styles: /usr/local/lib/libtree-sitter-typescript.so
 dx-styles: CMakeFiles/dx-styles.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking C executable dx-styles"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable dx-styles"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/dx-styles.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -143,7 +112,7 @@ CMakeFiles/dx-styles.dir/clean:
 	$(CMAKE_COMMAND) -P CMakeFiles/dx-styles.dir/cmake_clean.cmake
 .PHONY : CMakeFiles/dx-styles.dir/clean
 
-CMakeFiles/dx-styles.dir/depend: /workspaces/dx/styles_generated.h
+CMakeFiles/dx-styles.dir/depend: styles_generated.h
 	cd /workspaces/dx/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /workspaces/dx /workspaces/dx /workspaces/dx/build /workspaces/dx/build /workspaces/dx/build/CMakeFiles/dx-styles.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/dx-styles.dir/depend
 

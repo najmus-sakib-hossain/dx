@@ -1,1 +1,1 @@
-/usr/bin/cc "CMakeFiles/dx-styles.dir/dx-styles.c.o" "CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/parser.c.o" "CMakeFiles/dx-styles.dir/tree-sitter-typescript/typescript/src/scanner.c.o" -o dx-styles  /usr/local/lib/libflatccrt.a /usr/lib/x86_64-linux-gnu/libuv.so /usr/lib/x86_64-linux-gnu/libtree-sitter.so 
+/usr/bin/cc "CMakeFiles/dx-styles.dir/dx-styles.c.o" -o dx-styles  -Wl,-rpath,/usr/local/lib /usr/local/lib/libflatccrt.a /usr/lib/x86_64-linux-gnu/libuv.so /usr/lib/x86_64-linux-gnu/libtree-sitter.so /usr/local/lib/libtree-sitter-typescript.so 

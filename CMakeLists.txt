@@ -17,45 +17,33 @@ find_path(TREE_SITTER_INCLUDE_DIR tree_sitter/api.h)
 find_library(TREE_SITTER_LIBRARY NAMES tree-sitter ts)
 
 # Find tree-sitter-typescript library
-find_library(TREE_SITTER_TYPESCRIPT_LIBRARY tree-sitter-typescript)
+find_library(TREE_SITTER_TYPESCRIPT_LIBRARY NAMES tree-sitter-typescript)
 
-if(NOT TREE_SITTER_TYPESCRIPT_LIBRARY)
-  message(STATUS "tree-sitter-typescript library not found, using source files directly")
-  # Add the source files directly to the target instead of linking the library
-  set(TREE_SITTER_TYPESCRIPT_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/tree-sitter-typescript/typescript/src/parser.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/tree-sitter-typescript/typescript/src/scanner.c
-  )
-  # Don't try to link the library that wasn't found
-  set(TREE_SITTER_TYPESCRIPT_LIBRARY "")
-else()
-  message(STATUS "Found tree-sitter-typescript library: ${TREE_SITTER_TYPESCRIPT_LIBRARY}")
-  set(TREE_SITTER_TYPESCRIPT_SOURCES "")
-endif()
 
 # Generate FlatBuffers headers
 set(FBS_SCHEMA "${CMAKE_CURRENT_SOURCE_DIR}/styles.fbs")
-set(FBS_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/styles_generated.h")
+set(GENERATED_HEADER_DIR "${CMAKE_BINARY_DIR}")
+set(FBS_OUTPUT "${GENERATED_HEADER_DIR}/styles_generated.h")
 add_custom_command(
     OUTPUT ${FBS_OUTPUT}
-    COMMAND /usr/local/bin/flatcc -a ${FBS_SCHEMA}
+    COMMAND /usr/local/bin/flatcc -a -o ${GENERATED_HEADER_DIR} ${FBS_SCHEMA}
     DEPENDS ${FBS_SCHEMA}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     COMMENT "Generating FlatBuffers headers"
 )
 
 # Build generate_styles
 add_executable(generate_styles styles.c ${FBS_OUTPUT})
-target_include_directories(generate_styles PRIVATE ${TOML_INCLUDE_DIR} ${FLATCC_INCLUDE_DIR})
+target_include_directories(generate_styles PRIVATE ${TOML_INCLUDE_DIR} ${FLATCC_INCLUDE_DIR} ${CMAKE_BINARY_DIR})
 target_link_libraries(generate_styles PRIVATE ${TOML_LIBRARY} ${FLATCC_LIBRARY})
 
 # Build dx-styles
-add_executable(dx-styles dx-styles.c ${FBS_OUTPUT} ${TREE_SITTER_TYPESCRIPT_SOURCES})
+add_executable(dx-styles dx-styles.c ${FBS_OUTPUT})
 target_include_directories(dx-styles PRIVATE 
     ${TOML_INCLUDE_DIR} 
     ${FLATCC_INCLUDE_DIR} 
     ${TREE_SITTER_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/tree-sitter-typescript/typescript/src)
+    ${GENERATED_HEADER_DIR})
 target_link_libraries(dx-styles PRIVATE 
     ${FLATCC_LIBRARY} 
     ${UV_LIBRARY} 
