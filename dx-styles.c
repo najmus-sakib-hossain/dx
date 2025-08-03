@@ -14,7 +14,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-TSLanguage *tree_sitter_typescript(void);
 TSLanguage *tree_sitter_tsx(void);
 
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "Fatal Error at %s:%d\n", __FILE__, __LINE__); exit(1); } } while (0)
@@ -126,24 +125,7 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     
     TSNode root = ts_tree_root_node(tree);
 
-    const char *query_str =
-        "["
-        "  (jsx_attribute"
-        "    name: (property_identifier) @name"
-        "    value: [ (string) (jsx_expression (string)) ] @value_container"
-        "    (#eq? @name \"className\")"
-        "  )"
-        "  (jsx_attribute"
-        "    name: (property_identifier) @name"
-        "    value: (jsx_expression (template_string)) @value_container"
-        "    (#eq? @name \"className\")"
-        "  )"
-        "]"
-        " @attr"
-        " "
-        "(string_fragment) @value"
-        " "
-        "((comment) @comment)";
+    const char *query_str = "(jsx_attribute (property_identifier) @name (string (string_fragment) @value))";
     uint32_t error_offset;
     TSQueryError error_type;
     TSQuery *query = ts_query_new(tree_sitter_tsx(), query_str, strlen(query_str), &error_offset, &error_type);
@@ -165,31 +147,57 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     *class_names = NULL;
     TSQueryMatch match;
     while (ts_query_cursor_next_match(cursor, &match)) {
+        bool is_classname = false;
+
         for (uint32_t i = 0; i < match.capture_count; i++) {
             uint32_t capture_index = match.captures[i].index;
             uint32_t capture_name_len;
             const char* capture_name = ts_query_capture_name_for_id(query, capture_index, &capture_name_len);
 
-            if (capture_name && strcmp(capture_name, "value") == 0) {
-                TSNode node = match.captures[i].node;
-                uint32_t start = ts_node_start_byte(node);
-                uint32_t end = ts_node_end_byte(node);
+            if (capture_name && strcmp(capture_name, "name") == 0) {
+                TSNode name_node = match.captures[i].node;
+                uint32_t start = ts_node_start_byte(name_node);
+                uint32_t end = ts_node_end_byte(name_node);
                 size_t len = end - start;
-                char *value_str = malloc(len + 1);
-                CHECK(value_str);
-                strncpy(value_str, source + start, len);
-                value_str[len] = '\0';
-
-                char *token = strtok(value_str, " ");
-                while (token) {
-                    *class_names = realloc(*class_names, (*count + 1) * sizeof(char *));
-                    CHECK(*class_names);
-                    (*class_names)[*count] = strdup(token);
-                    CHECK((*class_names)[*count]);
-                    (*count)++;
-                    token = strtok(NULL, " ");
+                char *temp_name_str = malloc(len + 1);
+                CHECK(temp_name_str);
+                strncpy(temp_name_str, source + start, len);
+                temp_name_str[len] = '\0';
+                if (strcmp(temp_name_str, "className") == 0) {
+                    is_classname = true;
                 }
-                free(value_str);
+                free(temp_name_str);
+            }
+        }
+
+        if (is_classname) {
+            for (uint32_t i = 0; i < match.capture_count; i++) {
+                uint32_t capture_index = match.captures[i].index;
+                uint32_t capture_name_len;
+                const char* capture_name = ts_query_capture_name_for_id(query, capture_index, &capture_name_len);
+
+                if (capture_name && strcmp(capture_name, "value") == 0) {
+                    TSNode node = match.captures[i].node;
+                    uint32_t start = ts_node_start_byte(node);
+                    uint32_t end = ts_node_end_byte(node);
+                    size_t len = end - start;
+                    char *value_str = malloc(len + 1);
+                    CHECK(value_str);
+                    strncpy(value_str, source + start, len);
+                    value_str[len] = '\0';
+
+                    char *token = strtok(value_str, " ");
+                    while (token) {
+                        *class_names = realloc(*class_names, (*count + 1) * sizeof(char *));
+                        CHECK(*class_names);
+                        (*class_names)[*count] = strdup(token);
+                        CHECK((*class_names)[*count]);
+                        (*count)++;
+                        token = strtok(NULL, " ");
+                    }
+                    free(value_str);
+                    break; 
+                }
             }
         }
     }
@@ -384,20 +392,6 @@ int main(int argc, char *argv[]) {
     uv_signal_init(loop, &signal_handle);
     uv_signal_start(&signal_handle, on_signal, SIGINT);
 
-    uv_run(loop, UV_RUN_DEFAULT);
-
-    ts_parser_delete(parser);
-    uv_fs_event_stop(&fs_event);
-    if (tty_inited) {
-        uv_tty_reset_mode();
-        uv_close((uv_handle_t*)&tty_stdin, NULL);
-    }
-    uv_signal_stop(&signal_handle);
-    
-    printf("%sShutdown complete.%s\n", KBLU, KNRM);
-    uv_loop_close(loop);
-    return 0;
-}
     uv_run(loop, UV_RUN_DEFAULT);
 
     ts_parser_delete(parser);
