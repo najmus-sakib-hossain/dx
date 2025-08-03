@@ -32,7 +32,7 @@ add_custom_command(
     COMMENT "Generating FlatBuffers headers"
 )
 
-# Build generate_styles
+# Build generate_styles (output will be in the build directory by default)
 add_executable(generate_styles styles.c ${FBS_OUTPUT})
 target_include_directories(generate_styles PRIVATE ${TOML_INCLUDE_DIR} ${FLATCC_INCLUDE_DIR} ${CMAKE_BINARY_DIR})
 target_link_libraries(generate_styles PRIVATE ${TOML_LIBRARY} ${FLATCC_LIBRARY})
@@ -49,3 +49,7 @@ target_link_libraries(dx-styles PRIVATE
     ${UV_LIBRARY} 
     ${TREE_SITTER_LIBRARY}
     ${TREE_SITTER_TYPESCRIPT_LIBRARY})
+
+# Set the output directory for the dx-styles executable to the project root
+set_target_properties(dx-styles PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+set_target_properties(generate_styles PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})

@@ -1,15 +1,17 @@
-all: generate
+.PHONY: all build watch clean
 
-generate:
+all: build
+
+build:
+	@echo "🚀 Starting build process..."
 	@mkdir -p build
 	@cd build && cmake .. && make
-	@./build/generate_styles
+	@./generate_styles
+	@./dx-styles
+	@echo "✅ Build successful. Executables are in the root directory."
 
 clean:
-	@rm -rf build styles.bin
-
-watch:
-	@while true; do \
-		inotifywait -e modify styles.toml; \
-		make generate; \
-	done
+	@echo "🧹 Cleaning up build artifacts..."
+	@rm -rf build
+	@rm -f dx-styles generate_styles styles.bin styles.css
+	@echo "✨ Clean up complete."

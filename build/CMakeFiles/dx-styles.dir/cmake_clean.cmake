@@ -1,8 +1,8 @@
 file(REMOVE_RECURSE
+  "/workspaces/dx/dx-styles"
+  "/workspaces/dx/dx-styles.pdb"
   "CMakeFiles/dx-styles.dir/dx-styles.c.o"
   "CMakeFiles/dx-styles.dir/dx-styles.c.o.d"
-  "dx-styles"
-  "dx-styles.pdb"
   "styles_generated.h"
 )
 

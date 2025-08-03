@@ -1,1 +1,1 @@
-/usr/bin/cc CMakeFiles/generate_styles.dir/styles.c.o -o generate_styles  /usr/local/lib/libtoml.a /usr/local/lib/libflatccrt.a 
+/usr/bin/cc CMakeFiles/generate_styles.dir/styles.c.o -o /workspaces/dx/generate_styles  /usr/local/lib/libtoml.a /usr/local/lib/libflatccrt.a 
