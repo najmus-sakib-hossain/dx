@@ -7,6 +7,7 @@
 #include <flatcc/flatcc_builder.h>
 #include "styles_reader.h"
 #include "styles_verifier.h"
+#include <ctype.h>
 
 TSLanguage *tree_sitter_typescript(void);
 
@@ -16,6 +17,43 @@ uv_loop_t *loop;
 uv_fs_event_t fs_event;
 TSParser *parser;
 FILE *css_file;
+uv_tty_t tty_stdin;
+int tty_inited = 0;
+uv_signal_t signal_handle;
+
+void alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf) {
+    buf->base = (char*) malloc(suggested_size);
+    if (!buf->base) {
+        buf->len = 0;
+        return;
+    }
+    buf->len = suggested_size;
+}
+
+void on_tty_read(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
+    if (nread < 0) {
+        if (nread != UV_EOF) {
+            fprintf(stderr, "Read error %s\n", uv_strerror(nread));
+        }
+        uv_close((uv_handle_t*) &tty_stdin, NULL);
+        free(buf->base);
+        return;
+    }
+
+    if (nread > 0) {
+        // Check for single char exit conditions
+        if (nread == 1 && (buf->base[0] == 'q' || buf->base[0] == 'Q' || buf->base[0] == 0x11 /* ctrl-q */ || buf->base[0] == 0x03 /* ctrl-c */)) {
+            printf("Exit key pressed. Exiting.\n");
+            uv_stop(loop);
+        }
+    }
+    free(buf->base);
+}
+
+void on_signal(uv_signal_t *handle, int signum) {
+    printf("Signal received. Exiting.\n");
+    uv_stop(loop);
+}
 
 void *load_styles_bin(const char *filename) {
     FILE *fp = fopen(filename, "rb");
@@ -280,12 +318,29 @@ int main(int argc, char *argv[]) {
     uv_fs_event_init(loop, &fs_event);
     uv_fs_event_start(&fs_event, on_file_change, "./src", UV_FS_EVENT_RECURSIVE);
     printf("Watching ./src for .tsx file changes...\n");
+    printf("Press Ctrl+Q or Ctrl+C to exit.\n");
+
+    if (uv_tty_init(loop, &tty_stdin, 0, 1) == 0) {
+        tty_inited = 1;
+        uv_tty_set_mode(&tty_stdin, UV_TTY_MODE_RAW);
+        uv_read_start((uv_stream_t*)&tty_stdin, alloc_buffer, on_tty_read);
+    } else {
+        fprintf(stderr, "Could not initialize TTY. Keystroke detection will not work.\n");
+    }
+
+    uv_signal_init(loop, &signal_handle);
+    uv_signal_start(&signal_handle, on_signal, SIGINT);
 
     uv_run(loop, UV_RUN_DEFAULT);
 
     free(buffer);
     ts_parser_delete(parser);
     uv_fs_event_stop(&fs_event);
+    if (tty_inited) {
+        uv_tty_reset_mode();
+        uv_close((uv_handle_t*)&tty_stdin, NULL);
+    }
+    uv_signal_stop(&signal_handle);
     uv_loop_close(loop);
     return 0;
 }

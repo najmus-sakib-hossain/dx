@@ -202,7 +202,7 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o
  /usr/local/include/flatcc/portable/pstatic_assert.h
  /usr/local/include/flatcc/portable/pstdalign.h
  /usr/local/include/flatcc/portable/pwarnings.h
- /workspaces/dx/flatbuffers_common_reader.h
- /workspaces/dx/styles_reader.h
- /workspaces/dx/styles_verifier.h
+ /workspaces/dx/build/flatbuffers_common_reader.h
+ /workspaces/dx/build/styles_reader.h
+ /workspaces/dx/build/styles_verifier.h
 

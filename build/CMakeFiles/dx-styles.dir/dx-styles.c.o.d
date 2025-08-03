@@ -172,4 +172,4 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
  /usr/local/include/flatcc/flatcc_epilogue.h \
  /usr/local/include/flatcc/portable/pdiagnostic_pop.h \
  /workspaces/dx/build/styles_verifier.h \
- /usr/local/include/flatcc/flatcc_verifier.h
+ /usr/local/include/flatcc/flatcc_verifier.h /usr/include/ctype.h
