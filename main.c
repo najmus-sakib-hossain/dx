@@ -3,15 +3,38 @@
 #include <string.h>
 #include <time.h>
 
-// Platform detection for POSIX (Linux, macOS) vs. others
-#if defined(__unix__) || defined(__APPLE__)
+#if defined(__linux__)
+    #define DX_PLATFORM_LINUX_IO_URING
+#elif defined(_WIN32)
+    #define DX_PLATFORM_WINDOWS_IORING
+#elif defined(__APPLE__)
+    #define DX_PLATFORM_MACOS_KQUEUE
+#elif defined(__unix__)
     #define DX_PLATFORM_POSIX
 #else
     #define DX_PLATFORM_STANDARD
 #endif
 
-// Include platform-specific headers
-#if defined(DX_PLATFORM_STANDARD)
+#if defined(DX_PLATFORM_LINUX_IO_URING)
+    #include <fcntl.h>
+    #include <unistd.h>
+    #include <sys/stat.h>
+    #include <liburing.h>
+#elif defined(DX_PLATFORM_WINDOWS_IORING)
+    #include <windows.h>
+    #include <ioringapi.h>
+#elif defined(DX_PLATFORM_MACOS_KQUEUE)
+    #include <fcntl.h>
+    #include <unistd.h>
+    #include <sys/stat.h>
+    #include <sys/event.h>
+#elif defined(DX_PLATFORM_POSIX)
+    #include <pthread.h>
+    #include <fcntl.h>
+    #include <unistd.h>
+    #include <sys/stat.h>
+    #include <sys/mman.h>
+#elif defined(DX_PLATFORM_STANDARD)
     #if defined(_WIN32)
         #include <direct.h>
         #define MKDIR(path) _mkdir(path)
@@ -19,66 +42,14 @@
         #include <sys/stat.h>
         #define MKDIR(path) mkdir(path, 0755)
     #endif
-    #include <threads.h> // C11 threads
-#elif defined(DX_PLATFORM_POSIX)
-    #include <pthread.h> // POSIX threads
-    #include <fcntl.h>
-    #include <unistd.h>
-    #include <sys/stat.h>
-    #include <sys/mman.h>
-    #define MKDIR(path) mkdir(path, 0755)
+    #include <threads.h>
 #endif
 
 #define FOLDER "modules"
 #define FILE_PREFIX "file"
 #define FILE_SUFFIX ".txt"
+#define CONTENT "Hello, High-Performance I/O!"
 
-#if defined(DX_PLATFORM_STANDARD)
-#define CONTENT "Hello, Standard C I/O!"
-typedef struct {
-    const int *indices;
-    int start;
-    int end;
-} ThreadData_Standard;
-
-// Worker thread function for standard C I/O
-int create_files_worker_standard(void* arg) {
-    ThreadData_Standard *data = (ThreadData_Standard *)arg;
-    char filepath[256];
-    for (int i = data->start; i < data->end; ++i) {
-        snprintf(filepath, sizeof(filepath), "%s/%s%d%s", FOLDER, FILE_PREFIX, data->indices[i], FILE_SUFFIX);
-        FILE *fp = fopen(filepath, "w");
-        if (fp == NULL) {
-            fprintf(stderr, "Error: Could not open file %s\n", filepath);
-            continue;
-        }
-        fputs(CONTENT, fp);
-        fclose(fp);
-    }
-    return 0;
-}
-
-// High-resolution timer for non-POSIX systems
-double get_monotonic_time() {
-    struct timespec ts;
-    timespec_get(&ts, TIME_UTC);
-    return (double)ts.tv_sec + (double)ts.tv_nsec / 1.0e9;
-}
-
-#elif defined(DX_PLATFORM_POSIX)
-#define CREATE_CONTENT "Files Created!\n"
-#define OVERWRITE_CONTENT "Files Overwritten!\n"
-
-typedef struct {
-    const int *indices;
-    int start;
-    int end;
-    int dir_fd;
-    const char *content;
-    size_t content_len;
-} ThreadArgs_POSIX;
-
-// A fast integer-to-string conversion function
 static inline char* fast_itoa(int value, char* buffer_end) {
     *buffer_end = '\0';
     char* p = buffer_end;
@@ -90,47 +61,21 @@ static inline char* fast_itoa(int value, char* buffer_end) {
     return p;
 }
 
-// Worker thread to create files using modern POSIX APIs (openat, write)
-void *create_files_worker_posix(void *arg) {
-    ThreadArgs_POSIX *args = (ThreadArgs_POSIX *)arg;
+#if defined(DX_PLATFORM_POSIX) || defined(DX_PLATFORM_STANDARD)
+typedef struct {
+    const int *indices;
+    int start;
+    int end;
+    int dir_fd;
+} ThreadArgs;
+
+#if defined(DX_PLATFORM_POSIX)
+void *worker_posix(void *arg) {
+    ThreadArgs *args = (ThreadArgs *)arg;
     char filename[256];
     const size_t prefix_len = strlen(FILE_PREFIX);
     const size_t suffix_len = strlen(FILE_SUFFIX);
-    memcpy(filename, FILE_PREFIX, prefix_len);
-    char *num_start_ptr = filename + prefix_len;
-
-    for (int i = args->start; i < args->end; i++) {
-        char num_buf[12];
-        char* num_str = fast_itoa(args->indices[i], num_buf + sizeof(num_buf) - 1);
-        size_t num_len = (num_buf + sizeof(num_buf) - 1) - num_str;
-
-        memcpy(num_start_ptr, num_str, num_len);
-        memcpy(num_start_ptr + num_len, FILE_SUFFIX, suffix_len + 1); // +1 for null terminator
-
-        int fd = openat(args->dir_fd, filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (fd == -1) continue;
-        
-        // Fix the warning by checking the return value of write
-        ssize_t bytes_written = write(fd, args->content, args->content_len);
-        if (bytes_written == -1) {
-            // Handle write error
-            perror("Write error");
-        } else if ((size_t)bytes_written < args->content_len) {
-            // Handle partial write (optional)
-            fprintf(stderr, "Partial write: %zd of %zu bytes\n", bytes_written, args->content_len);
-        }
-        
-        close(fd);
-    }
-    return NULL;
-}
-
-// Worker thread to overwrite files using high-performance memory-mapping (mmap)
-void *overwrite_files_mmap_worker_posix(void *arg) {
-    ThreadArgs_POSIX *args = (ThreadArgs_POSIX *)arg;
-    char filename[256];
-    const size_t prefix_len = strlen(FILE_PREFIX);
-    const size_t suffix_len = strlen(FILE_SUFFIX);
+    const size_t content_len = strlen(CONTENT);
     memcpy(filename, FILE_PREFIX, prefix_len);
     char *num_start_ptr = filename + prefix_len;
 
@@ -142,25 +87,43 @@ void *overwrite_files_mmap_worker_posix(void *arg) {
         memcpy(num_start_ptr, num_str, num_len);
         memcpy(num_start_ptr + num_len, FILE_SUFFIX, suffix_len + 1);
 
-        int fd = openat(args->dir_fd, filename, O_RDWR);
+        int fd = openat(args->dir_fd, filename, O_RDWR | O_CREAT | O_TRUNC, 0644);
         if (fd == -1) continue;
 
-        void *map = mmap(NULL, args->content_len, PROT_WRITE, MAP_SHARED, fd, 0);
+        ftruncate(fd, content_len);
+        void *map = mmap(NULL, content_len, PROT_WRITE, MAP_SHARED, fd, 0);
         if (map == MAP_FAILED) {
             close(fd);
             continue;
         }
-        memcpy(map, args->content, args->content_len);
-        munmap(map, args->content_len);
+        memcpy(map, CONTENT, content_len);
+        munmap(map, content_len);
         close(fd);
     }
     return NULL;
 }
+#elif defined(DX_PLATFORM_STANDARD)
+int worker_standard(void *arg) {
+    ThreadArgs *data = (ThreadArgs *)arg;
+    char filepath[256];
+    for (int i = data->start; i < data->end; ++i) {
+        snprintf(filepath, sizeof(filepath), "%s/%s%d%s", FOLDER, FILE_PREFIX, data->indices[i], FILE_SUFFIX);
+        FILE *fp = fopen(filepath, "w");
+        if (fp == NULL) continue;
+        fputs(CONTENT, fp);
+        fclose(fp);
+    }
+    return 0;
+}
+double get_monotonic_time() {
+    struct timespec ts;
+    timespec_get(&ts, TIME_UTC);
+    return (double)ts.tv_sec + (double)ts.tv_nsec / 1.0e9;
+}
+#endif
 #endif
 
-// The main entry point of the program
 int main(void) {
-    // --- Test Data Setup ---
     const int num_files = 10000;
     int* indices = malloc(num_files * sizeof(int));
     if (!indices) {
@@ -170,35 +133,199 @@ int main(void) {
     for (int i = 0; i < num_files; ++i) {
         indices[i] = i;
     }
-    // --- End Test Data Setup ---
 
-    #define NUM_THREADS 8
+#if defined(_WIN32)
+    CreateDirectoryA(FOLDER, NULL);
+#else
+    mkdir(FOLDER, 0755);
+#endif
 
-    if (MKDIR(FOLDER) != 0) {
-        printf("Directory '%s' may already exist. Continuing...\n", FOLDER);
-    } else {
-        printf("Directory '%s' created successfully.\n", FOLDER);
+#if defined(DX_PLATFORM_LINUX_IO_URING)
+    printf("Running on Linux: Using ultra-performance io_uring.\n");
+    struct timespec start_time, end_time;
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+
+    struct io_uring ring;
+    io_uring_queue_init(256, &ring, 0);
+
+    int dir_fd = open(FOLDER, O_RDONLY | O_DIRECTORY);
+    const size_t content_len = strlen(CONTENT);
+
+    for (int i = 0; i < num_files; i++) {
+        char filename[256];
+        snprintf(filename, sizeof(filename), "%s%d%s", FILE_PREFIX, indices[i], FILE_SUFFIX);
+        struct io_uring_sqe *sqe = io_uring_get_sqe(&ring);
+        io_uring_prep_openat(sqe, dir_fd, filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        sqe->user_data = i;
+    }
+    io_uring_submit(&ring);
+
+    int fds[num_files];
+    for (int i = 0; i < num_files; i++) {
+        struct io_uring_cqe *cqe;
+        io_uring_wait_cqe(&ring, &cqe);
+        fds[cqe->user_data] = cqe->res < 0 ? -1 : cqe->res;
+        io_uring_cqe_seen(&ring, cqe);
     }
 
-#if defined(DX_PLATFORM_STANDARD)
-    #if defined(_WIN32)
-        printf("Running on Windows: Using standard C11 I/O method.\n");
-    #else
-        printf("Running on an unrecognized OS: Using generic standard C11 I/O fallback.\n");
-    #endif
+    for (int i = 0; i < num_files; i++) {
+        if (fds[i] != -1) {
+            struct io_uring_sqe *sqe = io_uring_get_sqe(&ring);
+            io_uring_prep_write(sqe, fds[i], CONTENT, content_len, 0);
+            sqe->user_data = (uint64_t)fds[i];
+        }
+    }
+    io_uring_submit_and_wait(&ring, num_files);
 
+    struct io_uring_cqe *cqe;
+    unsigned head;
+    unsigned i = 0;
+    io_uring_for_each_cqe(&ring, head, cqe) { i++; }
+    io_uring_cq_advance(&ring, i);
+
+    for (int i = 0; i < num_files; i++) {
+        if(fds[i] != -1) close(fds[i]);
+    }
+
+    close(dir_fd);
+    io_uring_queue_exit(&ring);
+
+    clock_gettime(CLOCK_MONOTONIC, &end_time);
+    double time_ms = (end_time.tv_sec - start_time.tv_sec) * 1000.0 + (end_time.tv_nsec - start_time.tv_nsec) / 1000000.0;
+    printf("\nFinished creating %d files.\n", num_files);
+    printf("Total time taken: %.2f ms\n", time_ms);
+
+#elif defined(DX_PLATFORM_WINDOWS_IORING)
+    printf("Running on Windows: Using high-performance IORing.\n");
+    LARGE_INTEGER frequency, start_time, end_time;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&start_time);
+
+    HIORING ring;
+    CreateIoRing(IORING_VERSION_3, 256, 256, &ring);
+
+    char current_dir[MAX_PATH];
+    GetCurrentDirectoryA(MAX_PATH, current_dir);
+    char folder_path[MAX_PATH];
+    snprintf(folder_path, sizeof(folder_path), "%s\\%s", current_dir, FOLDER);
+
+    const size_t content_len = strlen(CONTENT);
+    HANDLE file_handles[num_files];
+
+    for (int i = 0; i < num_files; i++) {
+        char filepath[MAX_PATH];
+        snprintf(filepath, sizeof(filepath), "%s\\%s%d%s", folder_path, FILE_PREFIX, indices[i], FILE_SUFFIX);
+        file_handles[i] = CreateFileA(filepath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_OVERLAPPED, NULL);
+        if (file_handles[i] == INVALID_HANDLE_VALUE) continue;
+
+        IORING_BUFFER_INFO buffer_info = { .Address = (void*)CONTENT, .Length = (UINT32)content_len };
+        IORING_HANDLE_INFO handle_info = { .Handle = file_handles[i], .Registering = FALSE };
+        BuildIoRingWriteFile(ring, handle_info, buffer_info, 0, 0, (UINT_PTR)i, IOSQE_FLAGS_NONE);
+    }
+
+    SubmitIoRing(ring, 0, 0, NULL);
+
+    for (int i = 0; i < num_files; i++) {
+        IORING_CQE cqe;
+        PopIoRingCompletion(ring, &cqe);
+    }
+
+    for (int i = 0; i < num_files; i++) {
+        if (file_handles[i] != INVALID_HANDLE_VALUE) CloseHandle(file_handles[i]);
+    }
+    CloseIoRing(ring);
+
+    QueryPerformanceCounter(&end_time);
+    double time_ms = ((double)(end_time.QuadPart - start_time.QuadPart) * 1000.0) / frequency.QuadPart;
+    printf("\nFinished creating %d files.\n", num_files);
+    printf("Total time taken: %.2f ms\n", time_ms);
+
+#elif defined(DX_PLATFORM_MACOS_KQUEUE)
+    printf("Running on macOS: Using high-performance kqueue.\n");
+    struct timespec start_time, end_time;
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+
+    int kq = kqueue();
+    int dir_fd = open(FOLDER, O_RDONLY | O_DIRECTORY);
+    int fds[num_files];
+    struct kevent changelist[num_files];
+    const size_t content_len = strlen(CONTENT);
+
+    for (int i = 0; i < num_files; i++) {
+        char filename[256];
+        snprintf(filename, sizeof(filename), "%s%d%s", FILE_PREFIX, indices[i], FILE_SUFFIX);
+        fds[i] = openat(dir_fd, filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (fds[i] == -1) continue;
+        EV_SET(&changelist[i], fds[i], EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, (void*)(intptr_t)i);
+    }
+
+    kevent(kq, changelist, num_files, NULL, 0, NULL);
+
+    struct kevent eventlist[num_files];
+    int events_handled = 0;
+    while(events_handled < num_files) {
+        int nev = kevent(kq, NULL, 0, eventlist, num_files, NULL);
+        for (int i = 0; i < nev; i++) {
+            int fd = eventlist[i].ident;
+            write(fd, CONTENT, content_len);
+            close(fd);
+            events_handled++;
+        }
+    }
+
+    close(dir_fd);
+    close(kq);
+
+    clock_gettime(CLOCK_MONOTONIC, &end_time);
+    double time_ms = (end_time.tv_sec - start_time.tv_sec) * 1000.0 + (end_time.tv_nsec - start_time.tv_nsec) / 1000000.0;
+    printf("\nFinished creating %d files.\n", num_files);
+    printf("Total time taken: %.2f ms\n", time_ms);
+
+#elif defined(DX_PLATFORM_POSIX)
+    printf("Running on POSIX (BSD/etc): Using high-performance mmap/pthreads.\n");
+    struct timespec start_time, end_time;
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+    
+    int dir_fd = open(FOLDER, O_RDONLY | O_DIRECTORY);
+    #define NUM_THREADS 8
+    pthread_t threads[NUM_THREADS];
+    ThreadArgs args[NUM_THREADS];
+    int files_per_thread = num_files / NUM_THREADS;
+
+    for (int i = 0; i < NUM_THREADS; i++) {
+        args[i].indices = indices;
+        args[i].start = i * files_per_thread;
+        args[i].end = (i == NUM_THREADS - 1) ? num_files : (i + 1) * files_per_thread;
+        args[i].dir_fd = dir_fd;
+        pthread_create(&threads[i], NULL, worker_posix, &args[i]);
+    }
+
+    for (int i = 0; i < NUM_THREADS; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    close(dir_fd);
+    clock_gettime(CLOCK_MONOTONIC, &end_time);
+    double time_ms = (end_time.tv_sec - start_time.tv_sec) * 1000.0 + (end_time.tv_nsec - start_time.tv_nsec) / 1000000.0;
+    printf("\nFinished creating %d files.\n", num_files);
+    printf("Total time taken: %.2f ms\n", time_ms);
+
+#elif defined(DX_PLATFORM_STANDARD)
+    printf("Running on other OS: Using standard C11 threads and I/O.\n");
     double start_time = get_monotonic_time();
+    
+    MKDIR(FOLDER);
+    
+    #define NUM_THREADS 8
     thrd_t threads[NUM_THREADS];
-    ThreadData_Standard thread_data_array[NUM_THREADS];
+    ThreadArgs thread_data_array[NUM_THREADS];
     int files_per_thread = num_files / NUM_THREADS;
 
     for (int i = 0; i < NUM_THREADS; ++i) {
         thread_data_array[i].indices = indices;
         thread_data_array[i].start = i * files_per_thread;
         thread_data_array[i].end = (i == NUM_THREADS - 1) ? num_files : (i + 1) * files_per_thread;
-        if (thrd_create(&threads[i], create_files_worker_standard, &thread_data_array[i]) != thrd_success) {
-            fprintf(stderr, "Error: Failed to create thread %d.\n", i);
-        }
+        thrd_create(&threads[i], worker_standard, &thread_data_array[i]);
     }
 
     for (int i = 0; i < NUM_THREADS; ++i) {
@@ -209,74 +336,8 @@ int main(void) {
     double time_ms = (end_time - start_time) * 1000.0;
     printf("\nFinished creating %d files.\n", num_files);
     printf("Total time taken: %.2f ms\n", time_ms);
-
-#elif defined(DX_PLATFORM_POSIX)
-    printf("Running on POSIX: Using high-performance mmap/openat methods.\n");
-    struct timespec start_time, end_time;
-    clock_gettime(CLOCK_MONOTONIC, &start_time);
-
-    int dir_fd = open(FOLDER, O_RDONLY | O_DIRECTORY);
-    if (dir_fd == -1) {
-        perror("Fatal: Could not open directory " FOLDER);
-        free(indices);
-        return 1;
-    }
-
-    void *(*worker_func)(void *);
-    const char *content_to_write;
-    const char *action_description;
-
-    // Pad content to be the same size for creation and overwriting
-    const size_t create_len = strlen(CREATE_CONTENT);
-    const size_t overwrite_len = strlen(OVERWRITE_CONTENT);
-    const size_t max_len = (create_len > overwrite_len) ? create_len : overwrite_len;
-    char padded_create_content[max_len + 1];
-    char padded_overwrite_content[max_len + 1];
-    memcpy(padded_create_content, CREATE_CONTENT, create_len);
-    memset(padded_create_content + create_len, ' ', max_len - create_len);
-    padded_create_content[max_len] = '\0';
-    memcpy(padded_overwrite_content, OVERWRITE_CONTENT, overwrite_len);
-    memset(padded_overwrite_content + overwrite_len, ' ', max_len - overwrite_len);
-    padded_overwrite_content[max_len] = '\0';
-
-    // Check if the first file exists to decide whether to create or overwrite
-    char first_filename[64];
-    snprintf(first_filename, sizeof(first_filename), "%s%d%s", FILE_PREFIX, indices[0], FILE_SUFFIX);
-    if (faccessat(dir_fd, first_filename, F_OK, 0) == 0) {
-        worker_func = overwrite_files_mmap_worker_posix;
-        content_to_write = padded_overwrite_content;
-        action_description = "overwriting";
-    } else {
-        worker_func = create_files_worker_posix;
-        content_to_write = padded_create_content;
-        action_description = "creating";
-    }
-
-    pthread_t threads[NUM_THREADS];
-    ThreadArgs_POSIX args[NUM_THREADS];
-    int files_per_thread = num_files / NUM_THREADS;
-
-    for (int i = 0; i < NUM_THREADS; i++) {
-        args[i].indices = indices;
-        args[i].start = i * files_per_thread;
-        args[i].end = (i == NUM_THREADS - 1) ? num_files : (i + 1) * files_per_thread;
-        args[i].dir_fd = dir_fd;
-        args[i].content = content_to_write;
-        args[i].content_len = max_len;
-        pthread_create(&threads[i], NULL, worker_func, &args[i]);
-    }
-
-    for (int i = 0; i < NUM_THREADS; i++) {
-        pthread_join(threads[i], NULL);
-    }
-
-    close(dir_fd);
-    clock_gettime(CLOCK_MONOTONIC, &end_time);
-    double time_ms = (end_time.tv_sec - start_time.tv_sec) * 1000.0 + (end_time.tv_nsec - start_time.tv_nsec) / 1000000.0;
-    printf("\nFinished %s %d files.\n", action_description, num_files);
-    printf("Total time taken: %.2f ms\n", time_ms);
 #endif
 
-    free(indices); // Free the allocated memory
+    free(indices);
     return 0;
 }
