@@ -215,12 +215,8 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
   /usr/local/include/flatcc/portable/pstatic_assert.h \
   /usr/local/include/flatcc/portable/pstdalign.h \
   /usr/local/include/flatcc/portable/pwarnings.h \
-  /workspaces/dx/flatbuffers_common_reader.h \
-  /workspaces/dx/styles_reader.h \
-  /workspaces/dx/styles_verifier.h
+  /workspaces/dx/styles_generated.h
 
-
-/workspaces/dx/styles_reader.h:
 
 /usr/local/include/flatcc/portable/pstatic_assert.h:
 
@@ -233,6 +229,8 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 /usr/local/include/flatcc/portable/pattributes.h:
 
 /usr/local/include/flatcc/portable/paligned_alloc.h:
+
+/workspaces/dx/styles_generated.h:
 
 /usr/local/include/flatcc/flatcc_verifier.h:
 
@@ -259,8 +257,6 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 /usr/include/x86_64-linux-gnu/sys/types.h:
 
 /usr/include/x86_64-linux-gnu/sys/ttydefaults.h:
-
-/workspaces/dx/styles_verifier.h:
 
 /usr/include/x86_64-linux-gnu/sys/param.h:
 
@@ -449,8 +445,6 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 /usr/local/include/flatcc/flatcc_alloc.h:
 
 /usr/include/linux/stddef.h:
-
-/workspaces/dx/flatbuffers_common_reader.h:
 
 /usr/include/stdlib.h:
 
