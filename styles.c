@@ -12,9 +12,15 @@ int main(int argc, char *argv[]) {
     // Initialize TOML parser
     FILE *fp = fopen("styles.toml", "r");
     CHECK(fp);
-    toml_table_t *conf = toml_parse_file(fp, NULL, 0);
+    
+    char errbuf[200];
+    toml_table_t *conf = toml_parse_file(fp, errbuf, sizeof(errbuf));
     fclose(fp);
-    CHECK(conf);
+    
+    if (!conf) {
+        fprintf(stderr, "Error parsing TOML: %s\n", errbuf);
+        return 1;
+    }
 
     // Initialize FlatBuffers builder
     flatcc_builder_t builder;
