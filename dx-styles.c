@@ -15,6 +15,7 @@
 #include <unistd.h>
 
 TSLanguage *tree_sitter_typescript(void);
+TSLanguage *tree_sitter_tsx(void);
 
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "Fatal Error at %s:%d\n", __FILE__, __LINE__); exit(1); } } while (0)
 
@@ -125,10 +126,10 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     
     TSNode root = ts_tree_root_node(tree);
 
-    const char *query_str = "(jsx_attribute (property_identifier) @name (string (string_fragment) @value))";
+    const char *query_str = "((jsx_attribute name: (property_identifier) @name value: (string (string_fragment) @value)))";
     uint32_t error_offset;
     TSQueryError error_type;
-    TSQuery *query = ts_query_new(tree_sitter_typescript(), query_str, strlen(query_str), &error_offset, &error_type);
+    TSQuery *query = ts_query_new(tree_sitter_tsx(), query_str, strlen(query_str), &error_offset, &error_type);
     if (!query) {
         fprintf(stderr, "%sError: Failed to create tree-sitter query (error type %d at offset %d)%s\n", KRED, error_type, error_offset, KNRM);
         ts_tree_delete(tree);
@@ -360,7 +361,7 @@ int main(int argc, char *argv[]) {
 
     parser = ts_parser_new();
     CHECK(parser);
-    CHECK(ts_parser_set_language(parser, tree_sitter_typescript()));
+    CHECK(ts_parser_set_language(parser, tree_sitter_tsx()));
 
     printf("%sStarting dx-style generator...%s\n", KBLU, KNRM);
 

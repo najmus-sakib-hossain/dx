@@ -2,6 +2,64 @@
 
 Dx cli
 
+git clone https://github.com/tree-sitter/tree-sitter-typescript.git
+cd tree-sitter-typescript
+make && sudo make install
+sudo ldconfig
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 CMakeLists.txt
 dx-styles.c
 src
@@ -132,6 +190,7 @@ styles_reader.h
 
 sudo apt update
 sudo apt install -y libuv1-dev
+sudo apt install -y tree_sitter_tsx
 
 cd /workspaces/dx
 make generate  # Assumes Makefile from previous responses
