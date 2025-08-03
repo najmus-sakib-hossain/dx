@@ -97,6 +97,7 @@ void *load_styles_bin(const char *filename, size_t *size) {
 }
 
 void extract_class_names(const char *filename, char ***class_names, size_t *count) {
+    printf("%sOpening file %s%s\n", KCYN, filename, KNRM);
     FILE *fp = fopen(filename, "r");
     if (!fp) {
         fprintf(stderr, "%sWarning: Could not open file %s%s\n", KYEL, filename, KNRM);
@@ -114,6 +115,7 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     source[size] = '\0';
     fclose(fp);
 
+    printf("%sParsing %s with Tree-sitter%s\n", KCYN, filename, KNRM);
     TSTree *tree = ts_parser_parse_string(parser, NULL, source, size);
     if (!tree) {
         fprintf(stderr, "%sError: Failed to parse source in %s%s\n", KRED, filename, KNRM);
@@ -206,6 +208,7 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     ts_query_delete(query);
     ts_tree_delete(tree);
     free(source);
+    printf("%sFinished processing %s, found %zu class names%s\n", KCYN, filename, *count, KNRM);
 }
 
 void write_css_from_classes(char **class_names, size_t class_count, void *buffer) {
@@ -231,14 +234,20 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
     for (size_t i = 0; i < class_count; i++) {
         for (size_t j = 0; j < static_rules_len; j++) {
             StaticRule_table_t rule = StaticRule_vec_at(static_rules, j);
+            if (!rule) continue;
             const char *rule_name = StaticRule_name(rule);
-            if (strcmp(class_names[i], rule_name) == 0) {
+            if (rule_name && strcmp(class_names[i], rule_name) == 0) {
                 fprintf(css_file, ".%s {\n", rule_name);
                 Property_vec_t props = StaticRule_properties(rule);
                 size_t props_len = Property_vec_len(props);
                 for (size_t k = 0; k < props_len; k++) {
                     Property_table_t prop = Property_vec_at(props, k);
-                    fprintf(css_file, "  %s: %s;\n", Property_key(prop), Property_value(prop));
+                    if (!prop) continue;
+                    const char *key = Property_key(prop);
+                    const char *value = Property_value(prop);
+                    if (key && value) {
+                        fprintf(css_file, "  %s: %s;\n", key, value);
+                    }
                 }
                 fprintf(css_file, "}\n\n");
             }
@@ -250,17 +259,24 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
     for (size_t i = 0; i < class_count; i++) {
         for (size_t j = 0; j < dynamic_rules_len; j++) {
             DynamicRule_table_t rule = DynamicRule_vec_at(dynamic_rules, j);
+            if (!rule) continue;
             const char *prefix = DynamicRule_prefix(rule);
-            if (strncmp(class_names[i], prefix, strlen(prefix)) == 0 && class_names[i][strlen(prefix)] == '-') {
+            if (prefix && strncmp(class_names[i], prefix, strlen(prefix)) == 0 && class_names[i][strlen(prefix)] == '-') {
                 fprintf(css_file, ".%s {\n", class_names[i]);
                 DynamicProperty_vec_t props = DynamicRule_properties(rule);
                 if (DynamicProperty_vec_len(props) > 0) {
                     DynamicProperty_table_t dyn_prop = DynamicProperty_vec_at(props, 0);
+                    if (!dyn_prop) continue;
                     Property_vec_t prop_pairs = DynamicProperty_properties(dyn_prop);
                     size_t prop_pairs_len = Property_vec_len(prop_pairs);
                     for (size_t m = 0; m < prop_pairs_len; m++) {
                         Property_table_t prop = Property_vec_at(prop_pairs, m);
-                        fprintf(css_file, "  %s: %s;\n", Property_key(prop), Property_value(prop));
+                        if (!prop) continue;
+                        const char *key = Property_key(prop);
+                        const char *value = Property_value(prop);
+                        if (key && value) {
+                            fprintf(css_file, "  %s: %s;\n", key, value);
+                        }
                     }
                 }
                 fprintf(css_file, "}\n\n");
@@ -288,14 +304,18 @@ void scan_all_and_generate_css(void* buffer) {
     }
 
     uv_dirent_t dirent;
+    printf("%sScanning ./src for .tsx files...%s\n", KGRN, KNRM);
     while (UV_EOF != uv_fs_scandir_next(&scan_req, &dirent)) {
         if (dirent.type == UV_DIRENT_FILE && strstr(dirent.name, ".tsx")) {
             char full_path[512];
             snprintf(full_path, sizeof(full_path), "./src/%s", dirent.name);
+            printf("%sProcessing file: %s%s\n", KCYN, full_path, KNRM);
 
             char **file_class_names = NULL;
             size_t file_class_count = 0;
             extract_class_names(full_path, &file_class_names, &file_class_count);
+
+            printf("%sFinished processing %s, found %zu class names%s\n", KCYN, full_path, file_class_count, KNRM);
 
             if (file_class_count > 0) {
                 all_class_names = realloc(all_class_names, (total_class_count + file_class_count) * sizeof(char*));
@@ -307,6 +327,8 @@ void scan_all_and_generate_css(void* buffer) {
         }
     }
     uv_fs_req_cleanup(&scan_req);
+
+    printf("%sTotal class names collected: %zu%s\n", KGRN, total_class_count, KNRM);
 
     if (total_class_count == 0) {
         FILE* css_file = fopen("styles.css", "w");
@@ -350,7 +372,7 @@ void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int
             munmap(buffer, styles_bin_size);
             printf("%sSuccessfully updated styles.css.%s\n", KGRN, KNRM);
         } else {
-             fprintf(stderr, "%sFailed to reload styles.bin. CSS not updated.%s\n", KRED, KNRM);
+            fprintf(stderr, "%sFailed to reload styles.bin. CSS not updated.%s\n", KRED, KNRM);
         }
     }
 }
@@ -371,6 +393,14 @@ int main(int argc, char *argv[]) {
         ts_parser_delete(parser);
         return 1;
     }
+
+    if (Styles_verify_as_root(buffer, styles_bin_size) != 0) {
+        fprintf(stderr, "%sError: styles.bin is corrupted or invalid. Exiting.%s\n", KRED, KNRM);
+        munmap(buffer, styles_bin_size);
+        ts_parser_delete(parser);
+        return 1;
+    }
+
     printf("%sInitial scan of ./src...%s\n", KGRN, KNRM);
     scan_all_and_generate_css(buffer);
     munmap(buffer, styles_bin_size);
