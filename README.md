@@ -2,6 +2,36 @@
 
 Dx cli
 
+
+sudo apt update
+sudo apt install -y git cmake make gcc
+
+
+# Clone tomlc99 repository
+git clone https://github.com/cktan/tomlc99.git
+cd tomlc99
+
+# Build and install
+make
+sudo make install
+sudo ldconfig  # Update dynamic linker cache
+cd ..
+
+# Clone flatcc repository
+git clone https://github.com/dvidelabs/flatcc.git
+cd flatcc
+
+# Create build directory and configure with CMake
+mkdir build && cd build
+cmake .. -DFLATCC_INSTALL=ON
+
+# Build and install
+make
+sudo make install
+sudo ldconfig  # Update dynamic linker cache
+cd ../..
+
+
 ## Prerequisites
 
 ```bash

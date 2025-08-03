@@ -1,0 +1,3 @@
+/workspaces/dx/build/CMakeFiles/generate_styles.dir
+/workspaces/dx/build/CMakeFiles/edit_cache.dir
+/workspaces/dx/build/CMakeFiles/rebuild_cache.dir

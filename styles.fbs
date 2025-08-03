@@ -1,0 +1,30 @@
+// styles.fbs - FlatBuffers schema for dx-styles
+// Defines the structure for the high-performance styles.bin file
+
+table Property {
+  key:string (key);
+  value:string;
+}
+
+table StaticRule {
+  name:string (key);
+  properties:[Property];
+}
+
+table DynamicProperty {
+  name:string (key);
+  properties:[Property];
+}
+
+table DynamicRule {
+  prefix:string (key);
+  values:[string];
+  properties:[DynamicProperty];
+}
+
+table Styles {
+  static_rules:[StaticRule];
+  dynamic_rules:[DynamicRule];
+}
+
+root_type Styles;

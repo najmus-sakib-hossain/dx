@@ -1,0 +1,1 @@
+/usr/bin/cc -rdynamic CMakeFiles/generate_styles.dir/styles.c.o -o generate_styles  -lTOML_LIBRARY-NOTFOUND /usr/local/lib/libflatccrt.a 
