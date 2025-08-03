@@ -13,10 +13,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+// Forward declaration for the tree-sitter language
 TSLanguage *tree_sitter_tsx(void);
 
-#define CHECK(x) do { if (!(x)) { fprintf(stderr, "Fatal Error at %s:%d\n", __FILE__, __LINE__); exit(1); } } while (0)
-
+// --- Global Variables ---
 #define KNRM  "\x1B[0m"
 #define KRED  "\x1B[31m"
 #define KGRN  "\x1B[32m"
@@ -24,51 +24,17 @@ TSLanguage *tree_sitter_tsx(void);
 #define KBLU  "\x1B[34m"
 #define KMAG  "\x1B[35m"
 #define KCYN  "\x1B[36m"
-#define KWHT  "\x1B[37m"
 
 uv_loop_t *loop;
-uv_fs_event_t fs_event;
 TSParser *parser;
-uv_tty_t tty_stdin;
-int tty_inited = 0;
-uv_signal_t signal_handle;
 
+// --- Function Prototypes ---
 void scan_all_and_generate_css(void* buffer);
-void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int status);
 
-void alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf) {
-    buf->base = (char*) malloc(suggested_size);
-    if (!buf->base) {
-        buf->len = 0;
-        return;
-    }
-    buf->len = suggested_size;
-}
+// --- Utility Functions ---
+#define CHECK(x) do { if (!(x)) { fprintf(stderr, "%sFatal Error at %s:%d%s\n", KRED, __FILE__, __LINE__, KNRM); exit(1); } } while (0)
 
-void on_tty_read(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
-    if (nread < 0) {
-        if (nread != UV_EOF) {
-            fprintf(stderr, "Read error %s\n", uv_strerror(nread));
-        }
-        uv_close((uv_handle_t*) &tty_stdin, NULL);
-        free(buf->base);
-        return;
-    }
-
-    if (nread > 0) {
-        if (nread == 1 && (buf->base[0] == 'q' || buf->base[0] == 'Q' || buf->base[0] == 0x11 || buf->base[0] == 0x03)) {
-            printf("\n%sExit key pressed. Exiting.%s\n", KYEL, KNRM);
-            uv_stop(loop);
-        }
-    }
-    free(buf->base);
-}
-
-void on_signal(uv_signal_t *handle, int signum) {
-    printf("\n%sSignal received. Exiting.%s\n", KYEL, KNRM);
-    uv_stop(loop);
-}
-
+// Loads the styles.bin file into memory using mmap for efficiency.
 void *load_styles_bin(const char *filename, size_t *size) {
     int fd = open(filename, O_RDONLY);
     if (fd == -1) {
@@ -95,8 +61,8 @@ void *load_styles_bin(const char *filename, size_t *size) {
     return buf;
 }
 
+// Extracts all className values from a given TSX file using Tree-sitter.
 void extract_class_names(const char *filename, char ***class_names, size_t *count) {
-    printf("%sOpening file %s%s\n", KCYN, filename, KNRM);
     FILE *fp = fopen(filename, "r");
     if (!fp) {
         fprintf(stderr, "%sWarning: Could not open file %s%s\n", KYEL, filename, KNRM);
@@ -114,7 +80,6 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     source[size] = '\0';
     fclose(fp);
 
-    printf("%sParsing %s with Tree-sitter%s\n", KCYN, filename, KNRM);
     TSTree *tree = ts_parser_parse_string(parser, NULL, source, size);
     if (!tree) {
         fprintf(stderr, "%sError: Failed to parse source in %s%s\n", KRED, filename, KNRM);
@@ -126,6 +91,7 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     
     TSNode root = ts_tree_root_node(tree);
 
+    // Tree-sitter query to find className="..." attributes.
     const char *query_str = "(jsx_attribute (property_identifier) @name (string (string_fragment) @value))";
     uint32_t error_offset;
     TSQueryError error_type;
@@ -141,7 +107,6 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
 
     TSQueryCursor *cursor = ts_query_cursor_new();
     CHECK(cursor);
-    
     ts_query_cursor_exec(cursor, query, root);
 
     *count = 0;
@@ -149,57 +114,48 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     TSQueryMatch match;
     while (ts_query_cursor_next_match(cursor, &match)) {
         bool is_classname = false;
+        uint32_t value_capture_index = -1;
 
+        // First, check if the attribute name is 'className'.
         for (uint32_t i = 0; i < match.capture_count; i++) {
             uint32_t capture_index = match.captures[i].index;
             uint32_t capture_name_len;
             const char* capture_name = ts_query_capture_name_for_id(query, capture_index, &capture_name_len);
 
-            if (capture_name && strcmp(capture_name, "name") == 0) {
+            if (strcmp(capture_name, "name") == 0) {
                 TSNode name_node = match.captures[i].node;
                 uint32_t start = ts_node_start_byte(name_node);
                 uint32_t end = ts_node_end_byte(name_node);
-                size_t len = end - start;
-                char *temp_name_str = malloc(len + 1);
-                CHECK(temp_name_str);
-                strncpy(temp_name_str, source + start, len);
-                temp_name_str[len] = '\0';
-                if (strcmp(temp_name_str, "className") == 0) {
+                if (strncmp(source + start, "className", end - start) == 0) {
                     is_classname = true;
                 }
-                free(temp_name_str);
+            } else if (strcmp(capture_name, "value") == 0) {
+                value_capture_index = i;
             }
         }
 
-        if (is_classname) {
-            for (uint32_t i = 0; i < match.capture_count; i++) {
-                uint32_t capture_index = match.captures[i].index;
-                uint32_t capture_name_len;
-                const char* capture_name = ts_query_capture_name_for_id(query, capture_index, &capture_name_len);
+        // If it is 'className', extract the value and split it into individual classes.
+        if (is_classname && value_capture_index != -1) {
+            TSNode node = match.captures[value_capture_index].node;
+            uint32_t start = ts_node_start_byte(node);
+            uint32_t end = ts_node_end_byte(node);
+            
+            char *value_str = malloc(end - start + 1);
+            CHECK(value_str);
+            strncpy(value_str, source + start, end - start);
+            value_str[end - start] = '\0';
 
-                if (capture_name && strcmp(capture_name, "value") == 0) {
-                    TSNode node = match.captures[i].node;
-                    uint32_t start = ts_node_start_byte(node);
-                    uint32_t end = ts_node_end_byte(node);
-                    size_t len = end - start;
-                    char *value_str = malloc(len + 1);
-                    CHECK(value_str);
-                    strncpy(value_str, source + start, len);
-                    value_str[len] = '\0';
-
-                    char *token = strtok(value_str, " ");
-                    while (token) {
-                        *class_names = realloc(*class_names, (*count + 1) * sizeof(char *));
-                        CHECK(*class_names);
-                        (*class_names)[*count] = strdup(token);
-                        CHECK((*class_names)[*count]);
-                        (*count)++;
-                        token = strtok(NULL, " ");
-                    }
-                    free(value_str);
-                    break; 
-                }
+            // Tokenize the string by spaces to handle multiple class names
+            char *token = strtok(value_str, " ");
+            while (token) {
+                *class_names = realloc(*class_names, (*count + 1) * sizeof(char *));
+                CHECK(*class_names);
+                (*class_names)[*count] = strdup(token);
+                CHECK((*class_names)[*count]);
+                (*count)++;
+                token = strtok(NULL, " ");
             }
+            free(value_str);
         }
     }
 
@@ -207,9 +163,9 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     ts_query_delete(query);
     ts_tree_delete(tree);
     free(source);
-    printf("%sFinished processing %s, found %zu class names%s\n", KCYN, filename, *count, KNRM);
 }
 
+// Writes the final CSS file by matching found class names against static and dynamic rules.
 void write_css_from_classes(char **class_names, size_t class_count, void *buffer) {
     if (!buffer) {
         fprintf(stderr, "%sError: Invalid buffer for styles%s\n", KRED, KNRM);
@@ -229,37 +185,77 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
     }
 
     StaticRule_vec_t static_rules = Styles_static_rules(styles);
+    DynamicRule_vec_t dynamic_rules = Styles_dynamic_rules(styles);
     size_t static_rules_len = StaticRule_vec_len(static_rules);
+    size_t dynamic_rules_len = DynamicRule_vec_len(dynamic_rules);
+
+    // Loop through every unique class name found in the source code.
     for (size_t i = 0; i < class_count; i++) {
+        const char *current_class = class_names[i];
+        bool matched = false;
+
+        // --- 1. Check for a STATIC rule match ---
         for (size_t j = 0; j < static_rules_len; j++) {
             StaticRule_table_t rule = StaticRule_vec_at(static_rules, j);
-            if (!rule) continue;
             const char *rule_name = StaticRule_name(rule);
-            if (rule_name && strcmp(class_names[i], rule_name) == 0) {
+            if (rule_name && strcmp(current_class, rule_name) == 0) {
                 fprintf(css_file, ".%s {\n", rule_name);
                 Property_vec_t props = StaticRule_properties(rule);
-                size_t props_len = Property_vec_len(props);
-                for (size_t k = 0; k < props_len; k++) {
+                for (size_t k = 0; k < Property_vec_len(props); k++) {
                     Property_table_t prop = Property_vec_at(props, k);
-                    if (!prop) continue;
-                    const char *key = Property_key(prop);
-                    const char *value = Property_value(prop);
-                    if (key && value) {
-                        fprintf(css_file, "  %s: %s;\n", key, value);
-                    }
+                    fprintf(css_file, "    %s: %s;\n", Property_key(prop), Property_value(prop));
                 }
                 fprintf(css_file, "}\n\n");
+                matched = true;
+                break; // Found a match, no need to check other static rules.
             }
+        }
+        if (matched) continue;
+
+        // --- 2. Check for a DYNAMIC rule match ---
+        for (size_t j = 0; j < dynamic_rules_len; j++) {
+            DynamicRule_table_t rule = DynamicRule_vec_at(dynamic_rules, j);
+            const char *prefix = DynamicRule_prefix(rule);
+            size_t prefix_len = strlen(prefix);
+
+            if (prefix && strncmp(current_class, prefix, prefix_len) == 0) {
+                const char *value_part = current_class + prefix_len;
+                // Ensure there's a separator like '-' or that the prefix is the whole class
+                if (*value_part == '-' || *value_part == '\0') {
+                     if(*value_part == '-') value_part++; // Skip the separator
+
+                    DynamicProperty_vec_t dyn_props = DynamicRule_properties(rule);
+                    for (size_t k = 0; k < DynamicProperty_vec_len(dyn_props); k++) {
+                        DynamicProperty_table_t dyn_prop = DynamicProperty_vec_at(dyn_props, k);
+                        const char* prop_name = DynamicProperty_name(dyn_prop);
+
+                        if (prop_name && strcmp(prop_name, value_part) == 0) {
+                            fprintf(css_file, ".%s {\n", current_class);
+                            Property_vec_t props = DynamicProperty_properties(dyn_prop);
+                            for (size_t l = 0; l < Property_vec_len(props); l++) {
+                                Property_table_t prop = Property_vec_at(props, l);
+                                fprintf(css_file, "    %s: %s;\n", Property_key(prop), Property_value(prop));
+                            }
+                            fprintf(css_file, "}\n\n");
+                            matched = true;
+                            break; // Found the matching property
+                        }
+                    }
+                }
+            }
+            if (matched) break; // Found the matching rule
         }
     }
 
     fclose(css_file);
 }
 
+// Helper for qsort to sort and find unique class names.
 int compare_strings(const void *a, const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
 }
 
+// Scans all .tsx files, collects all class names, and triggers the CSS generation.
 void scan_all_and_generate_css(void* buffer) {
     char **all_class_names = NULL;
     size_t total_class_count = 0;
@@ -284,8 +280,6 @@ void scan_all_and_generate_css(void* buffer) {
             size_t file_class_count = 0;
             extract_class_names(full_path, &file_class_names, &file_class_count);
 
-            printf("%sFinished processing %s, found %zu class names%s\n", KCYN, full_path, file_class_count, KNRM);
-
             if (file_class_count > 0) {
                 all_class_names = realloc(all_class_names, (total_class_count + file_class_count) * sizeof(char*));
                 CHECK(all_class_names);
@@ -306,24 +300,30 @@ void scan_all_and_generate_css(void* buffer) {
         return;
     }
 
+    // Sort and remove duplicates
     qsort(all_class_names, total_class_count, sizeof(char*), compare_strings);
-    size_t unique_count = 1;
-    for (size_t i = 1; i < total_class_count; i++) {
-        if (strcmp(all_class_names[i], all_class_names[unique_count - 1]) != 0) {
-            all_class_names[unique_count++] = all_class_names[i];
-        } else {
-            free(all_class_names[i]);
+    size_t unique_count = 0;
+    if (total_class_count > 0) {
+        unique_count = 1;
+        for (size_t i = 1; i < total_class_count; i++) {
+            if (strcmp(all_class_names[i], all_class_names[unique_count - 1]) != 0) {
+                all_class_names[unique_count++] = all_class_names[i];
+            } else {
+                free(all_class_names[i]); // Free the duplicate string
+            }
         }
     }
-
+    
     write_css_from_classes(all_class_names, unique_count, buffer);
 
+    // Cleanup the unique list of strings
     for (size_t i = 0; i < unique_count; i++) {
         free(all_class_names[i]);
     }
     free(all_class_names);
 }
 
+// Callback for when a file change is detected by libuv.
 void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int status) {
     if (status < 0) {
         fprintf(stderr, "%sError watching file: %s%s\n", KRED, uv_strerror(status), KNRM);
@@ -346,6 +346,7 @@ void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int
     }
 }
 
+// Main entry point for the application.
 int main(int argc, char *argv[]) {
     loop = uv_default_loop();
 
@@ -363,6 +364,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    // Verify the FlatBuffers data is valid before proceeding.
     if (Styles_verify_as_root(buffer, styles_bin_size) != 0) {
         fprintf(stderr, "%sError: styles.bin is corrupted or invalid. Exiting.%s\n", KRED, KNRM);
         munmap(buffer, styles_bin_size);
@@ -375,33 +377,17 @@ int main(int argc, char *argv[]) {
     munmap(buffer, styles_bin_size);
     printf("%sInitial styles.css generated.%s\n", KGRN, KNRM);
 
+    uv_fs_event_t fs_event;
     uv_fs_event_init(loop, &fs_event);
     uv_fs_event_start(&fs_event, on_file_change, "./src", UV_FS_EVENT_RECURSIVE);
     printf("%sWatching ./src for .tsx file changes...%s\n", KBLU, KNRM);
-    printf("%sPress 'q' or Ctrl+C to exit.%s\n", KYEL, KNRM);
-
-    if (uv_tty_init(loop, &tty_stdin, 0, 1) == 0) {
-        tty_inited = 1;
-        uv_tty_set_mode(&tty_stdin, UV_TTY_MODE_RAW);
-        uv_read_start((uv_stream_t*)&tty_stdin, alloc_buffer, on_tty_read);
-    } else {
-        fprintf(stderr, "%sWarning: Could not initialize TTY. Keystroke detection might not work.%s\n", KYEL, KNRM);
-    }
-
-    uv_signal_init(loop, &signal_handle);
-    uv_signal_start(&signal_handle, on_signal, SIGINT);
-
+    
     uv_run(loop, UV_RUN_DEFAULT);
 
+    // Cleanup resources
     ts_parser_delete(parser);
     uv_fs_event_stop(&fs_event);
-    if (tty_inited) {
-        uv_tty_reset_mode();
-        uv_close((uv_handle_t*)&tty_stdin, NULL);
-    }
-    uv_signal_stop(&signal_handle);
-    
-    printf("%sShutdown complete.%s\n", KBLU, KNRM);
     uv_loop_close(loop);
+    printf("%sShutdown complete.%s\n", KBLU, KNRM);
     return 0;
 }

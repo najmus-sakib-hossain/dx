@@ -1,0 +1,11 @@
+.button {
+    background-color: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.flex {
+    display: flex;
+}
+
