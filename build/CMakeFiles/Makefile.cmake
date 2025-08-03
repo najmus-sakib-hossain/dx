@@ -25,7 +25,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/workspaces/dx/CMakeLists.txt"
   "CMakeFiles/3.28.3/CMakeCCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeSystem.cmake"
-  "/workspaces/dx/styles.toml"
   )
 
 # The corresponding makefile is:
@@ -36,11 +35,11 @@ set(CMAKE_MAKEFILE_OUTPUTS
 
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
-  "styles.toml"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/generate_styles.dir/DependInfo.cmake"
+  "CMakeFiles/dx-styles.dir/DependInfo.cmake"
   )

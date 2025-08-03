@@ -64,6 +64,7 @@ CMAKE_BINARY_DIR = /workspaces/dx/build
 
 # The main recursive "all" target.
 all: CMakeFiles/generate_styles.dir/all
+all: CMakeFiles/dx-styles.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -72,6 +73,7 @@ preinstall:
 
 # The main recursive "clean" target.
 clean: CMakeFiles/generate_styles.dir/clean
+clean: CMakeFiles/dx-styles.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -81,7 +83,7 @@ clean: CMakeFiles/generate_styles.dir/clean
 CMakeFiles/generate_styles.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/generate_styles.dir/build.make CMakeFiles/generate_styles.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/generate_styles.dir/build.make CMakeFiles/generate_styles.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=1,2,3 "Built target generate_styles"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=4,5,6 "Built target generate_styles"
 .PHONY : CMakeFiles/generate_styles.dir/all
 
 # Build rule for subdir invocation for target.
@@ -99,6 +101,32 @@ generate_styles: CMakeFiles/generate_styles.dir/rule
 CMakeFiles/generate_styles.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/generate_styles.dir/build.make CMakeFiles/generate_styles.dir/clean
 .PHONY : CMakeFiles/generate_styles.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/dx-styles.dir
+
+# All Build rule for target.
+CMakeFiles/dx-styles.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=1,2,3 "Built target dx-styles"
+.PHONY : CMakeFiles/dx-styles.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/dx-styles.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/dx/build/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/dx-styles.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspaces/dx/build/CMakeFiles 0
+.PHONY : CMakeFiles/dx-styles.dir/rule
+
+# Convenience name for target.
+dx-styles: CMakeFiles/dx-styles.dir/rule
+.PHONY : dx-styles
+
+# clean rule for target.
+CMakeFiles/dx-styles.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/clean
+.PHONY : CMakeFiles/dx-styles.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

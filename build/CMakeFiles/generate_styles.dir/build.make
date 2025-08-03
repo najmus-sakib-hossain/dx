@@ -71,7 +71,7 @@ include CMakeFiles/generate_styles.dir/flags.make
 
 /workspaces/dx/styles_generated.h: /workspaces/dx/styles.fbs
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating FlatBuffers headers"
-	cd /workspaces/dx && flatcc --outfile /workspaces/dx/styles_generated.h -a /workspaces/dx/styles.fbs
+	cd /workspaces/dx && /usr/local/bin/flatcc -a /workspaces/dx/styles.fbs
 
 CMakeFiles/generate_styles.dir/styles.c.o: CMakeFiles/generate_styles.dir/flags.make
 CMakeFiles/generate_styles.dir/styles.c.o: /workspaces/dx/styles.c

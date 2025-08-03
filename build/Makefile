@@ -129,6 +129,43 @@ generate_styles/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/generate_styles.dir/build.make CMakeFiles/generate_styles.dir/build
 .PHONY : generate_styles/fast
 
+#=============================================================================
+# Target rules for targets named dx-styles
+
+# Build rule for target.
+dx-styles: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 dx-styles
+.PHONY : dx-styles
+
+# fast build rule for target.
+dx-styles/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/build
+.PHONY : dx-styles/fast
+
+dx-styles.o: dx-styles.c.o
+.PHONY : dx-styles.o
+
+# target to build an object file
+dx-styles.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/dx-styles.c.o
+.PHONY : dx-styles.c.o
+
+dx-styles.i: dx-styles.c.i
+.PHONY : dx-styles.i
+
+# target to preprocess a source file
+dx-styles.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/dx-styles.c.i
+.PHONY : dx-styles.c.i
+
+dx-styles.s: dx-styles.c.s
+.PHONY : dx-styles.s
+
+# target to generate assembly for a file
+dx-styles.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/dx-styles.c.s
+.PHONY : dx-styles.c.s
+
 styles.o: styles.c.o
 .PHONY : styles.o
 
@@ -161,7 +198,11 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... dx-styles"
 	@echo "... generate_styles"
+	@echo "... dx-styles.o"
+	@echo "... dx-styles.i"
+	@echo "... dx-styles.s"
 	@echo "... styles.o"
 	@echo "... styles.i"
 	@echo "... styles.s"
