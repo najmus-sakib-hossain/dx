@@ -99,7 +99,7 @@ dx__styles_EXTERNAL_OBJECTS =
 /workspaces/dx/dx-styles: /usr/local/lib/libflatccrt.a
 /workspaces/dx/dx-styles: /usr/lib/x86_64-linux-gnu/libuv.so
 /workspaces/dx/dx-styles: /usr/lib/x86_64-linux-gnu/libtree-sitter.so
-/workspaces/dx/dx-styles: /usr/local/lib/libtree-sitter-typescript.so
+/workspaces/dx/dx-styles: /usr/local/lib/libtree-sitter-tsx.so
 /workspaces/dx/dx-styles: CMakeFiles/dx-styles.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable /workspaces/dx/dx-styles"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/dx-styles.dir/link.txt --verbose=$(VERBOSE)

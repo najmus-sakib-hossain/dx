@@ -16,8 +16,8 @@ find_library(UV_LIBRARY NAMES uv PATHS /usr/lib)
 find_path(TREE_SITTER_INCLUDE_DIR tree_sitter/api.h)
 find_library(TREE_SITTER_LIBRARY NAMES tree-sitter ts)
 
-# Find tree-sitter-typescript library
-find_library(TREE_SITTER_TYPESCRIPT_LIBRARY NAMES tree-sitter-typescript)
+# Find tree-sitter-tsx library (FIXED: was tree-sitter-typescript)
+find_library(TREE_SITTER_TSX_LIBRARY NAMES tree-sitter-tsx)
 
 
 # Generate FlatBuffers headers
@@ -48,7 +48,7 @@ target_link_libraries(dx-styles PRIVATE
     ${FLATCC_LIBRARY} 
     ${UV_LIBRARY} 
     ${TREE_SITTER_LIBRARY}
-    ${TREE_SITTER_TYPESCRIPT_LIBRARY})
+    ${TREE_SITTER_TSX_LIBRARY}) # FIXED: Using the correct library variable
 
 # Set the output directory for the dx-styles executable to the project root
 set_target_properties(dx-styles PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})

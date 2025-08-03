@@ -208,6 +208,9 @@ TREE_SITTER_INCLUDE_DIR:PATH=/usr/include
 TREE_SITTER_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libtree-sitter.so
 
 //Path to a library.
+TREE_SITTER_TSX_LIBRARY:FILEPATH=/usr/local/lib/libtree-sitter-tsx.so
+
+//Path to a library.
 TREE_SITTER_TYPESCRIPT_LIBRARY:FILEPATH=/usr/local/lib/libtree-sitter-typescript.so
 
 //Path to a library.
