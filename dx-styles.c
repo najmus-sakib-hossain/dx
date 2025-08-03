@@ -8,62 +8,95 @@
 #include "styles_reader.h"
 #include "styles_verifier.h"
 
-// Tree-sitter language for TypeScript/TSX
-TSLanguage *tree_sitter_typescript(void); // Provided by tree-sitter-typescript
+TSLanguage *tree_sitter_typescript(void);
 
-// Error handling macro
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "Error at %s:%d\n", __FILE__, __LINE__); exit(1); } } while (0)
 
-// Global variables
 uv_loop_t *loop;
 uv_fs_event_t fs_event;
 TSParser *parser;
 FILE *css_file;
 
-// Function to read styles.bin
 void *load_styles_bin(const char *filename) {
     FILE *fp = fopen(filename, "rb");
-    CHECK(fp);
+    if (!fp) {
+        fprintf(stderr, "Warning: Could not open file %s\n", filename);
+        return NULL;
+    }
+    
     fseek(fp, 0, SEEK_END);
     size_t size = ftell(fp);
     fseek(fp, 0, SEEK_SET);
     void *buf = malloc(size);
-    CHECK(buf);
+    if (!buf) {
+        fprintf(stderr, "Error: Memory allocation failed\n");
+        fclose(fp);
+        return NULL;
+    }
     fread(buf, 1, size, fp);
     fclose(fp);
-    // Return the buffer directly instead of creating a flatcc_buffer_t
     return buf;
 }
 
-// Function to extract class names from TSX file using Tree-sitter
 void extract_class_names(const char *filename, char ***class_names, size_t *count) {
-    // Read TSX file content
     FILE *fp = fopen(filename, "r");
-    CHECK(fp);
+    if (!fp) {
+        fprintf(stderr, "Warning: Could not open file %s\n", filename);
+        *class_names = NULL;
+        *count = 0;
+        return;
+    }
+    
     fseek(fp, 0, SEEK_END);
     size_t size = ftell(fp);
     fseek(fp, 0, SEEK_SET);
     char *source = malloc(size + 1);
-    CHECK(source);
+    if (!source) {
+        fprintf(stderr, "Error: Memory allocation failed\n");
+        fclose(fp);
+        *class_names = NULL;
+        *count = 0;
+        return;
+    }
     fread(source, 1, size, fp);
     source[size] = '\0';
     fclose(fp);
 
-    // Parse TSX file
     TSTree *tree = ts_parser_parse_string(parser, NULL, source, size);
-    CHECK(tree);
+    if (!tree) {
+        fprintf(stderr, "Error: Failed to parse source\n");
+        free(source);
+        *class_names = NULL;
+        *count = 0;
+        return;
+    }
+    
     TSNode root = ts_tree_root_node(tree);
 
-    // Query to find className attributes
     const char *query_str = "(jsx_attribute (property_identifier) @name (#eq? @name \"className\") (string (string_fragment) @value))";
     TSQuery *query = ts_query_new(tree_sitter_typescript(), query_str, strlen(query_str), NULL, NULL);
-    CHECK(query);
+    if (!query) {
+        fprintf(stderr, "Error: Failed to create query\n");
+        ts_tree_delete(tree);
+        free(source);
+        *class_names = NULL;
+        *count = 0;
+        return;
+    }
 
     TSQueryCursor *cursor = ts_query_cursor_new();
-    CHECK(cursor);
+    if (!cursor) {
+        fprintf(stderr, "Error: Failed to create query cursor\n");
+        ts_query_delete(query);
+        ts_tree_delete(tree);
+        free(source);
+        *class_names = NULL;
+        *count = 0;
+        return;
+    }
+    
     ts_query_cursor_exec(cursor, query, root);
 
-    // Collect class names
     *count = 0;
     *class_names = NULL;
     TSQueryMatch match;
@@ -72,7 +105,6 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
             const char *capture_name;
             uint32_t capture_length;
             
-            // Fix: correct API usage
             capture_name = ts_query_capture_name_for_id(query, match.captures[i].index, &capture_length);
             if (capture_name && strcmp(capture_name, "value") == 0) {
                 TSNode node = match.captures[i].node;
@@ -89,29 +121,46 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
         }
     }
 
-    // Cleanup
     ts_query_cursor_delete(cursor);
     ts_query_delete(query);
     ts_tree_delete(tree);
     free(source);
 }
 
-// Function to match class names and generate CSS
 void generate_css(const char *filename, void *buffer) {
-    // Parse class names from TSX file
+    if (!buffer) {
+        fprintf(stderr, "Error: Invalid buffer for styles\n");
+        return;
+    }
+    
     char **class_names;
     size_t class_count;
     extract_class_names(filename, &class_names, &class_count);
+    
+    if (class_count == 0 || !class_names) {
+        return;
+    }
 
-    // Load styles.bin - Fixed: removed extra "Styles_" prefix
     Styles_table_t styles = Styles_as_root(buffer);
-    CHECK(styles);
+    if (!styles) {
+        fprintf(stderr, "Error: Invalid styles data\n");
+        for (size_t i = 0; i < class_count; i++) {
+            free(class_names[i]);
+        }
+        free(class_names);
+        return;
+    }
 
-    // Open styles.css for writing
     css_file = fopen("styles.css", "w");
-    CHECK(css_file);
+    if (!css_file) {
+        fprintf(stderr, "Error: Could not open styles.css for writing\n");
+        for (size_t i = 0; i < class_count; i++) {
+            free(class_names[i]);
+        }
+        free(class_names);
+        return;
+    }
 
-    // Process static rules - Fixed: correct function names
     StaticRule_vec_t static_rules = Styles_static_rules(styles);
     size_t static_rules_len = StaticRule_vec_len(static_rules);
     
@@ -133,7 +182,6 @@ void generate_css(const char *filename, void *buffer) {
         }
     }
 
-    // Process dynamic rules - Fixed: correct function names and types
     DynamicRule_vec_t dynamic_rules = Styles_dynamic_rules(styles);
     size_t dynamic_rules_len = DynamicRule_vec_len(dynamic_rules);
     
@@ -169,7 +217,6 @@ void generate_css(const char *filename, void *buffer) {
         }
     }
 
-    // Cleanup
     for (size_t i = 0; i < class_count; i++) {
         free(class_names[i]);
     }
@@ -177,7 +224,6 @@ void generate_css(const char *filename, void *buffer) {
     fclose(css_file);
 }
 
-// libuv file system event callback
 void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int status) {
     if (status < 0) {
         fprintf(stderr, "Error watching file: %s\n", uv_strerror(status));
@@ -188,24 +234,35 @@ void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int
         char full_path[512];
         snprintf(full_path, sizeof(full_path), "./src/%s", filename);
         void *buffer = load_styles_bin("styles.bin");
-        generate_css(full_path, buffer);
-        free(buffer); // Use free instead of flatcc_destroy_buffer
+        if (buffer) {
+            generate_css(full_path, buffer);
+            free(buffer);
+        }
     }
 }
 
 int main(int argc, char *argv[]) {
-    // Initialize libuv loop
     loop = uv_default_loop();
 
-    // Initialize Tree-sitter parser
     parser = ts_parser_new();
-    CHECK(parser);
-    ts_parser_set_language(parser, tree_sitter_typescript());
+    if (!parser) {
+        fprintf(stderr, "Error: Failed to create parser\n");
+        return 1;
+    }
+    
+    if (!ts_parser_set_language(parser, tree_sitter_typescript())) {
+        fprintf(stderr, "Error: Failed to set parser language\n");
+        ts_parser_delete(parser);
+        return 1;
+    }
 
-    // Load styles.bin
     void *buffer = load_styles_bin("styles.bin");
+    if (!buffer) {
+        fprintf(stderr, "Error: Failed to load styles.bin\n");
+        ts_parser_delete(parser);
+        return 1;
+    }
 
-    // Generate initial CSS for all TSX files
     uv_fs_t scan_req;
     int scan_result = uv_fs_scandir(loop, &scan_req, "./src", 0, NULL);
     if (scan_result >= 0) {
@@ -220,16 +277,13 @@ int main(int argc, char *argv[]) {
     }
     uv_fs_req_cleanup(&scan_req);
 
-    // Start watching ./src directory
     uv_fs_event_init(loop, &fs_event);
     uv_fs_event_start(&fs_event, on_file_change, "./src", UV_FS_EVENT_RECURSIVE);
     printf("Watching ./src for .tsx file changes...\n");
 
-    // Run libuv loop
     uv_run(loop, UV_RUN_DEFAULT);
 
-    // Cleanup
-    free(buffer); // Use free instead of flatcc_destroy_buffer
+    free(buffer);
     ts_parser_delete(parser);
     uv_fs_event_stop(&fs_event);
     uv_loop_close(loop);
