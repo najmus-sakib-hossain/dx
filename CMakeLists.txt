@@ -16,13 +16,21 @@ find_library(UV_LIBRARY NAMES uv PATHS /usr/lib)
 find_path(TREE_SITTER_INCLUDE_DIR tree_sitter/api.h)
 find_library(TREE_SITTER_LIBRARY NAMES tree-sitter ts)
 
-# Find tree-sitter-typescript
-find_library(TREE_SITTER_TYPESCRIPT_LIBRARY NAMES tree-sitter-typescript)
+# Find tree-sitter-typescript library
+find_library(TREE_SITTER_TYPESCRIPT_LIBRARY tree-sitter-typescript)
+
 if(NOT TREE_SITTER_TYPESCRIPT_LIBRARY)
-    message(STATUS "tree-sitter-typescript library not found, using source files directly")
-    set(TREE_SITTER_TYPESCRIPT_SOURCES
-        ${CMAKE_SOURCE_DIR}/tree-sitter-typescript/typescript/src/parser.c
-        ${CMAKE_SOURCE_DIR}/tree-sitter-typescript/typescript/src/scanner.c)
+  message(STATUS "tree-sitter-typescript library not found, using source files directly")
+  # Add the source files directly to the target instead of linking the library
+  set(TREE_SITTER_TYPESCRIPT_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/tree-sitter-typescript/typescript/src/parser.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/tree-sitter-typescript/typescript/src/scanner.c
+  )
+  # Don't try to link the library that wasn't found
+  set(TREE_SITTER_TYPESCRIPT_LIBRARY "")
+else()
+  message(STATUS "Found tree-sitter-typescript library: ${TREE_SITTER_TYPESCRIPT_LIBRARY}")
+  set(TREE_SITTER_TYPESCRIPT_SOURCES "")
 endif()
 
 # Generate FlatBuffers headers
