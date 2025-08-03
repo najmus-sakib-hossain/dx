@@ -1,30 +1,38 @@
-// styles.fbs - FlatBuffers schema for dx-styles
-// Defines the structure for the high-performance styles.bin file
+// styles.fbs
+// Defines the schema for styling rules.
 
+namespace MyGame.Sample;
+
+// A simple key-value pair for properties.
 table Property {
-  key:string (key);
+  key:string;
   value:string;
 }
 
+// A rule for static styles.
 table StaticRule {
-  name:string (key);
+  name:string;
   properties:[Property];
 }
 
+// A property for dynamic rules, which itself contains properties.
 table DynamicProperty {
-  name:string (key);
-  properties:[Property];
+    name: string;
+    properties: [Property];
 }
 
+// A rule for dynamic styles that are generated based on a prefix and a set of values.
 table DynamicRule {
-  prefix:string (key);
+  prefix:string;
   values:[string];
   properties:[DynamicProperty];
 }
 
+// The root table that contains all styling rules.
 table Styles {
   static_rules:[StaticRule];
   dynamic_rules:[DynamicRule];
 }
 
+// The root type for the buffer.
 root_type Styles;

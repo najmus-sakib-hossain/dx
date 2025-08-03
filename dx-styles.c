@@ -5,8 +5,7 @@
 #include <tree_sitter/api.h>
 #include <flatcc/flatcc.h>
 #include <flatcc/flatcc_builder.h>
-#include "styles_reader.h"
-#include "styles_verifier.h"
+#include "styles_generated.h"
 #include <ctype.h>
 
 #include <sys/mman.h>
@@ -247,36 +246,6 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
                     const char *value = Property_value(prop);
                     if (key && value) {
                         fprintf(css_file, "  %s: %s;\n", key, value);
-                    }
-                }
-                fprintf(css_file, "}\n\n");
-            }
-        }
-    }
-
-    DynamicRule_vec_t dynamic_rules = Styles_dynamic_rules(styles);
-    size_t dynamic_rules_len = DynamicRule_vec_len(dynamic_rules);
-    for (size_t i = 0; i < class_count; i++) {
-        for (size_t j = 0; j < dynamic_rules_len; j++) {
-            DynamicRule_table_t rule = DynamicRule_vec_at(dynamic_rules, j);
-            if (!rule) continue;
-            const char *prefix = DynamicRule_prefix(rule);
-            if (prefix && strncmp(class_names[i], prefix, strlen(prefix)) == 0 && class_names[i][strlen(prefix)] == '-') {
-                fprintf(css_file, ".%s {\n", class_names[i]);
-                DynamicProperty_vec_t props = DynamicRule_properties(rule);
-                if (DynamicProperty_vec_len(props) > 0) {
-                    DynamicProperty_table_t dyn_prop = DynamicProperty_vec_at(props, 0);
-                    if (!dyn_prop) continue;
-                    Property_vec_t prop_pairs = DynamicProperty_properties(dyn_prop);
-                    size_t prop_pairs_len = Property_vec_len(prop_pairs);
-                    for (size_t m = 0; m < prop_pairs_len; m++) {
-                        Property_table_t prop = Property_vec_at(prop_pairs, m);
-                        if (!prop) continue;
-                        const char *key = Property_key(prop);
-                        const char *value = Property_value(prop);
-                        if (key && value) {
-                            fprintf(css_file, "  %s: %s;\n", key, value);
-                        }
                     }
                 }
                 fprintf(css_file, "}\n\n");

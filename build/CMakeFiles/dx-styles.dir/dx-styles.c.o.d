@@ -163,15 +163,13 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
  /usr/local/include/flatcc/flatcc_emitter.h \
  /usr/local/include/flatcc/flatcc_iov.h \
  /usr/local/include/flatcc/flatcc_refmap.h \
- /workspaces/dx/build/styles_reader.h \
- /workspaces/dx/build/flatbuffers_common_reader.h \
+ /workspaces/dx/styles_generated.h \
  /usr/local/include/flatcc/flatcc_prologue.h \
  /usr/local/include/flatcc/portable/pdiagnostic_push.h \
  /usr/local/include/flatcc/portable/pdiagnostic.h \
  /usr/local/include/flatcc/flatcc_flatbuffers.h \
  /usr/local/include/flatcc/flatcc_epilogue.h \
  /usr/local/include/flatcc/portable/pdiagnostic_pop.h \
- /workspaces/dx/build/styles_verifier.h \
  /usr/local/include/flatcc/flatcc_verifier.h /usr/include/ctype.h \
  /usr/include/x86_64-linux-gnu/sys/mman.h \
  /usr/include/x86_64-linux-gnu/bits/mman.h \

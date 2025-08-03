@@ -215,12 +215,12 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
   /usr/local/include/flatcc/portable/pstatic_assert.h \
   /usr/local/include/flatcc/portable/pstdalign.h \
   /usr/local/include/flatcc/portable/pwarnings.h \
-  flatbuffers_common_reader.h \
-  styles_reader.h \
-  styles_verifier.h
+  /workspaces/dx/flatbuffers_common_reader.h \
+  /workspaces/dx/styles_reader.h \
+  /workspaces/dx/styles_verifier.h
 
 
-styles_verifier.h:
+/workspaces/dx/styles_reader.h:
 
 /usr/local/include/flatcc/portable/pstatic_assert.h:
 
@@ -260,6 +260,8 @@ styles_verifier.h:
 
 /usr/include/x86_64-linux-gnu/sys/ttydefaults.h:
 
+/workspaces/dx/styles_verifier.h:
+
 /usr/include/x86_64-linux-gnu/sys/param.h:
 
 /usr/include/x86_64-linux-gnu/sys/mman.h:
@@ -275,8 +277,6 @@ styles_verifier.h:
 /usr/include/x86_64-linux-gnu/bits/waitstatus.h:
 
 /usr/include/x86_64-linux-gnu/bits/waitflags.h:
-
-styles_reader.h:
 
 /usr/include/x86_64-linux-gnu/bits/unistd_ext.h:
 
@@ -384,8 +384,6 @@ styles_reader.h:
 
 /usr/include/x86_64-linux-gnu/bits/mman-map-flags-generic.h:
 
-flatbuffers_common_reader.h:
-
 /usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
@@ -451,6 +449,8 @@ flatbuffers_common_reader.h:
 /usr/local/include/flatcc/flatcc_alloc.h:
 
 /usr/include/linux/stddef.h:
+
+/workspaces/dx/flatbuffers_common_reader.h:
 
 /usr/include/stdlib.h:
 
