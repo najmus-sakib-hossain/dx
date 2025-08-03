@@ -126,7 +126,12 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     
     TSNode root = ts_tree_root_node(tree);
 
-    const char *query_str = "((jsx_attribute name: (property_identifier) @name value: (string (string_fragment) @value)))";
+    const char *query_str =
+        "["
+        "  (jsx_attribute name: (property_identifier) @name value: (string (string_fragment) @value))"
+        "  (jsx_attribute name: (property_identifier) @name value: (jsx_expression (string (string_fragment) @value)))"
+        "  (jsx_attribute name: (property_identifier) @name value: (jsx_expression (template_string (string_fragment) @value)))"
+        "]";
     uint32_t error_offset;
     TSQueryError error_type;
     TSQuery *query = ts_query_new(tree_sitter_tsx(), query_str, strlen(query_str), &error_offset, &error_type);
