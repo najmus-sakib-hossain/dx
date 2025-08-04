@@ -13,7 +13,7 @@ all: build
 build:
 	@echo "🚀 Starting build process..."
 	@mkdir -p build
-	@cd build && cmake .. && make
+	cmake .. && make
 	@echo "⚙️  Running the styles generator..."
 	@./styles
 	@echo "✅ Build successful. Executables are in the root directory."
