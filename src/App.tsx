@@ -3,7 +3,7 @@ import React from 'react';
 function App() {
   return (
     <div className="flex body" id="f1">
-      <button className="" id="b1">Click me</button>
+      <button className="button" id="b1">Click me</button>
     </div>
   );
 }
