@@ -10,3 +10,7 @@
     border-radius: 5px;
 }
 
+.flex {
+    display: flex;
+}
+
