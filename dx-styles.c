@@ -15,8 +15,6 @@
 
 #if defined(DX_PLATFORM_WINDOWS)
     #include <windows.h>
-    // Note: For Windows, you might need a POSIX regex library like PCRE,
-    // or ensure your MinGW environment provides a compatible regex.h.
     #include <regex.h> 
 #elif defined(DX_PLATFORM_POSIX)
     #include <fcntl.h>
@@ -161,7 +159,6 @@ void extract_class_names_from_file_regex(const char *filename, char ***class_nam
     unmap_file_read(source, size);
 }
 
-
 void write_css_from_classes(char **class_names, size_t class_count, void *buffer, double *search_time_ms, double *write_time_ms) {
     if (!buffer) return;
     Styles_table_t styles = Styles_as_root(buffer);
@@ -291,6 +288,27 @@ char** extract_and_unify_all_classes(size_t *final_count) {
     return all_class_names;
 }
 
+void count_class_changes(char **old_list, size_t old_count, char **new_list, size_t new_count, int *added, int *removed) {
+    *added = 0;
+    *removed = 0;
+    size_t i = 0, j = 0;
+    while (i < old_count && j < new_count) {
+        int cmp = strcmp(old_list[i], new_list[j]);
+        if (cmp < 0) {
+            (*removed)++;
+            i++;
+        } else if (cmp > 0) {
+            (*added)++;
+            j++;
+        } else {
+            i++;
+            j++;
+        }
+    }
+    *added += (new_count - j);
+    *removed += (old_count - i);
+}
+
 bool are_class_sets_equal(char **new_classes, size_t new_count) {
     if (new_count != g_previous_class_count) return false;
     for (size_t i = 0; i < new_count; i++) {
@@ -321,6 +339,9 @@ void run_generation_cycle(const char* trigger_file) {
         return;
     }
 
+    int added = 0, removed = 0;
+    count_class_changes(g_previous_class_names, g_previous_class_count, new_class_names, new_class_count, &added, &removed);
+
     double search_ms = 0, write_ms = 0;
     size_t styles_bin_size;
     void *buffer = map_file_read("styles.bin", &styles_bin_size);
@@ -338,8 +359,8 @@ void run_generation_cycle(const char* trigger_file) {
     
     if (trigger_file) {
         double scan_ms = (scan_end_time - scan_start_time) / 1e6;
-        printf("%s%s%s changed -> %sstyles.css%s updated in %.2fms (scan: %.2fms, search: %.2fms, write: %.2fms)\n",
-               KCYN, trigger_file, KNRM, KGRN, KNRM, scan_ms + search_ms + write_ms, scan_ms, search_ms, write_ms);
+        printf("%s%s%s changed -> %sstyles.css%s updated (+%d, -%d) in %.2fms (scan: %.2fms, search: %.2fms, write: %.2fms)\n",
+               KCYN, trigger_file, KNRM, KGRN, KNRM, added, removed, scan_ms + search_ms + write_ms, scan_ms, search_ms, write_ms);
     }
     
     update_global_class_state(new_class_names, new_class_count);
@@ -357,14 +378,13 @@ void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int
     if (status < 0) { fprintf(stderr, "Error watching file: %s\n", uv_strerror(status)); return; }
     if (filename && (events & UV_CHANGE) && strstr(filename, ".tsx")) {
         uv_timer_stop(&debounce_timer);
-
         if (last_changed_file) free(last_changed_file);
         
         char full_path[512];
         snprintf(full_path, sizeof(full_path), "./src/%s", filename);
         last_changed_file = strdup(full_path);
         
-        uv_timer_start(&debounce_timer, on_debounce_timeout, 100, 0);
+        uv_timer_start(&debounce_timer, on_debounce_timeout, 50, 0);
     }
 }
 
