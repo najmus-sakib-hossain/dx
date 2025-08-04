@@ -28,7 +28,8 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
  /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
  /usr/include/ctype.h /usr/include/x86_64-linux-gnu/bits/endian.h \
- /usr/include/x86_64-linux-gnu/bits/endianness.h /usr/include/fcntl.h \
+ /usr/include/x86_64-linux-gnu/bits/endianness.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/stdbool.h /usr/include/fcntl.h \
  /usr/include/x86_64-linux-gnu/bits/fcntl.h \
  /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
@@ -129,9 +130,7 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
  /usr/include/uv/threadpool.h /usr/include/uv/linux.h \
- /usr/include/tree_sitter/api.h \
- /usr/lib/gcc/x86_64-linux-gnu/13/include/stdbool.h \
- /usr/local/include/flatcc/flatcc.h \
+ /usr/include/tree_sitter/api.h /usr/local/include/flatcc/flatcc.h \
  /usr/local/include/flatcc/flatcc_builder.h \
  /usr/local/include/flatcc/flatcc_flatbuffers.h \
  /usr/local/include/flatcc/portable/pstatic_assert.h \
