@@ -1,0 +1,5 @@
+/workspaces/dx/build/CMakeFiles/GenerateFBSHeader.dir
+/workspaces/dx/build/CMakeFiles/styles_generator.dir
+/workspaces/dx/build/CMakeFiles/dx-styles.dir
+/workspaces/dx/build/CMakeFiles/edit_cache.dir
+/workspaces/dx/build/CMakeFiles/rebuild_cache.dir

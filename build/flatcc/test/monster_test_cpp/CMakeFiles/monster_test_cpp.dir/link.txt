@@ -1,0 +1,1 @@
+/usr/bin/g++ -g CMakeFiles/monster_test_cpp.dir/monster_test.cpp.o -o monster_test_cpp_d  /workspaces/dx/flatcc/lib/libflatccrt_d.a 

@@ -15,7 +15,7 @@ build:
 	@mkdir -p build
 	@cd build && cmake .. && make
 	@echo "⚙️  Running the styles generator..."
-	@./styles
+	@./styles_generator
 	@echo "✅ Build successful. Executables are in the root directory."
 
 # 'forge' builds the code and then runs the 'dx-styles' file watcher.

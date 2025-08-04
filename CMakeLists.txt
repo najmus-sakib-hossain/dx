@@ -1,99 +1,40 @@
 # --- Project Setup ---
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.10)
 project(dx-tools C)
 
-# Include FetchContent for downloading missing dependencies
-include(FetchContent)
+# --- Find Pre-installed System Libraries ---
+# This section looks for libraries in standard system locations.
 
-# --- Dependency Management ---
-# This section checks for local directories first before downloading.
+# 1. Find flatcc compiler and runtime library
+find_program(FLATCC_EXECUTABLE NAMES flatcc HINTS /usr/local/bin)
+find_path(FLATCC_INCLUDE_DIR flatcc_flatbuffers.h PATH_SUFFIXES flatcc)
+find_library(FLATCC_LIBRARY NAMES flatccrt)
 
-# 1. flatcc (for FlatBuffers)
-if(EXISTS "${CMAKE_SOURCE_DIR}/flatcc/CMakeLists.txt")
-    message(STATUS "Found local flatcc, using add_subdirectory.")
-    add_subdirectory(${CMAKE_SOURCE_DIR}/flatcc)
-else()
-    message(STATUS "Local flatcc not found, using FetchContent.")
-    FetchContent_Declare(
-        flatcc
-        GIT_REPOSITORY https://github.com/dvidelabs/flatcc.git
-        GIT_TAG        v0.6.1
-    )
-    FetchContent_MakeAvailable(flatcc)
-endif()
+# 2. Find tomlc99
+find_path(TOML_INCLUDE_DIR toml.h PATH_SUFFIXES tomlc99)
+find_library(TOML_LIBRARY NAMES tomlc99)
 
-# 2. tomlc99 (for TOML parsing)
-if(EXISTS "${CMAKE_SOURCE_DIR}/tomlc99/toml.c")
-    message(STATUS "Found local tomlc99, creating library.")
-    add_library(tomlc99 STATIC ${CMAKE_SOURCE_DIR}/tomlc99/toml.c)
-    set(TOMLC99_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/tomlc99)
-else()
-    message(STATUS "Local tomlc99 not found, using FetchContent.")
-    FetchContent_Declare(
-        tomlc99
-        GIT_REPOSITORY https://github.com/cktan/tomlc99.git
-        GIT_TAG        master
-    )
-    FetchContent_Populate(tomlc99)
-    add_library(tomlc99 STATIC ${tomlc99_SOURCE_DIR}/toml.c)
-    set(TOMLC99_INCLUDE_DIR ${tomlc99_SOURCE_DIR})
-endif()
+# 3. Find libuv
+find_library(UV_LIBRARY NAMES uv)
 
-# 3. libuv (for async I/O)
-if(EXISTS "${CMAKE_SOURCE_DIR}/libuv/CMakeLists.txt")
-    message(STATUS "Found local libuv, using add_subdirectory.")
-    add_subdirectory(${CMAKE_SOURCE_DIR}/libuv)
-else()
-    message(STATUS "Local libuv not found, using FetchContent.")
-    FetchContent_Declare(
-        libuv
-        GIT_REPOSITORY https://github.com/libuv/libuv.git
-        GIT_TAG        v1.48.0
-    )
-    FetchContent_MakeAvailable(libuv)
-endif()
+# 4. Find tree-sitter
+find_path(TREE_SITTER_INCLUDE_DIR tree_sitter/api.h)
+find_library(TREE_SITTER_LIBRARY NAMES tree-sitter)
 
-# 4. tree-sitter (core parsing library)
-if(EXISTS "${CMAKE_SOURCE_DIR}/tree-sitter/CMakeLists.txt")
-    message(STATUS "Found local tree-sitter, using add_subdirectory.")
-    add_subdirectory(${CMAKE_SOURCE_DIR}/tree-sitter)
-else()
-    message(STATUS "Local tree-sitter not found, using FetchContent.")
-    FetchContent_Declare(
-        tree-sitter
-        GIT_REPOSITORY https://github.com/tree-sitter/tree-sitter.git
-        GIT_TAG        v0.22.6
-    )
-    FetchContent_MakeAvailable(tree-sitter)
-endif()
+# 5. Find tree-sitter-typescript
+# Note: This assumes the compiled .a or .so file is in a standard library path.
+find_library(TREE_SITTER_TSX_LIBRARY NAMES tree-sitter-tsx)
 
-# 5. tree-sitter-typescript (TSX grammar)
-if(EXISTS "${CMAKE_SOURCE_DIR}/tree-sitter-typescript/tsx/src/parser.c")
-    message(STATUS "Found local tree-sitter-typescript, creating library.")
-    set(TS_TSX_SRC_DIR ${CMAKE_SOURCE_DIR}/tree-sitter-typescript/tsx/src)
-else()
-    message(STATUS "Local tree-sitter-typescript not found, using FetchContent.")
-    FetchContent_Declare(
-        tree-sitter-typescript
-        GIT_REPOSITORY https://github.com/tree-sitter/tree-sitter-typescript.git
-        GIT_TAG        master
-    )
-    FetchContent_Populate(tree-sitter-typescript)
-    set(TS_TSX_SRC_DIR ${tree-sitter-typescript_SOURCE_DIR}/tsx/src)
-endif()
-add_library(tree-sitter-tsx STATIC ${TS_TSX_SRC_DIR}/parser.c ${TS_TSX_SRC_DIR}/scanner.c)
-target_include_directories(tree-sitter-tsx PUBLIC ${tree-sitter_SOURCE_DIR}/lib/include)
-
-
-# --- Code Generation (FlatBuffers, used by both) ---
+# --- Code Generation (FlatBuffers) ---
 set(FBS_SCHEMA "${CMAKE_CURRENT_SOURCE_DIR}/styles.fbs")
 set(GENERATED_HEADER_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 set(GENERATED_HEADER "${GENERATED_HEADER_DIR}/styles_generated.h")
 
+# Custom command to generate header using the found flatcc executable
 add_custom_command(
     OUTPUT ${GENERATED_HEADER}
-    COMMAND $<TARGET_FILE:flatcc> -a -o ${GENERATED_HEADER_DIR} ${FBS_SCHEMA}
-    DEPENDS ${FBS_SCHEMA} flatcc
+    COMMAND ${FLATCC_EXECUTABLE} -a -o ${GENERATED_HEADER_DIR} ${FBS_SCHEMA}
+    DEPENDS ${FBS_SCHEMA}
     COMMENT "Generating FlatBuffers header: styles_generated.h"
 )
 add_custom_target(GenerateFBSHeader DEPENDS ${GENERATED_HEADER})
@@ -101,26 +42,34 @@ add_custom_target(GenerateFBSHeader DEPENDS ${GENERATED_HEADER})
 
 # --- Build Executables ---
 
-# Target 1: 'styles' (TOML to FlatBuffers converter)
-add_executable(styles main.c)
-add_dependencies(styles GenerateFBSHeader)
-target_include_directories(styles PRIVATE
-    ${TOMLC99_INCLUDE_DIR}
-    ${flatcc_SOURCE_DIR}/include
+# Target 1: 'styles_generator' (TOML to FlatBuffers converter)
+add_executable(styles_generator main.c)
+add_dependencies(styles_generator GenerateFBSHeader)
+target_include_directories(styles_generator PRIVATE
+    ${TOML_INCLUDE_DIR}
+    ${FLATCC_INCLUDE_DIR}
     ${GENERATED_HEADER_DIR}
 )
-target_link_libraries(styles PRIVATE styles tomlc99 flatccrt m)
+target_link_libraries(styles_generator PRIVATE
+    ${TOML_LIBRARY}
+    ${FLATCC_LIBRARY}
+    m
+)
 
 # Target 2: 'dx-styles' (File watcher)
 add_executable(dx-styles dx-styles.c)
 add_dependencies(dx-styles GenerateFBSHeader)
 target_include_directories(dx-styles PRIVATE
-    ${flatcc_SOURCE_DIR}/include
-    ${tree-sitter_SOURCE_DIR}/lib/include
+    ${FLATCC_INCLUDE_DIR}
+    ${TREE_SITTER_INCLUDE_DIR}
     ${GENERATED_HEADER_DIR}
 )
-target_link_libraries(dx-styles PRIVATE flatccrt uv_a tree-sitter tree-sitter-tsx)
+target_link_libraries(dx-styles PRIVATE
+    ${FLATCC_LIBRARY}
+    ${UV_LIBRARY}
+    ${TREE_SITTER_LIBRARY}
+    ${TREE_SITTER_TSX_LIBRARY}
+)
 
 # --- Set Final Executable Output Location ---
-# This explicitly places the final programs in your project's root directory.
-set_target_properties(styles dx-styles PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+set_target_properties(styles_generator dx-styles PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})

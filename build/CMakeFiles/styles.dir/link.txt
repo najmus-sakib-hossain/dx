@@ -1,0 +1,1 @@
+/usr/bin/gcc -g CMakeFiles/styles.dir/main.c.o -o /workspaces/dx/styles  libtomlc99.a /workspaces/dx/flatcc/lib/libflatccrt_d.a -lm 

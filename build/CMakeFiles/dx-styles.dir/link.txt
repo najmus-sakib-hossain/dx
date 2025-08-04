@@ -1,0 +1,1 @@
+/usr/bin/gcc -g "CMakeFiles/dx-styles.dir/dx-styles.c.o" -o /workspaces/dx/dx-styles  -Wl,-rpath,/usr/local/lib /usr/local/lib/libflatccrt.a /usr/lib/x86_64-linux-gnu/libuv.so /usr/lib/x86_64-linux-gnu/libtree-sitter.so /usr/local/lib/libtree-sitter-tsx.so 

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtree-sitter-tsx.a "CMakeFiles/tree-sitter-tsx.dir/tree-sitter-typescript/tsx/src/parser.c.o" "CMakeFiles/tree-sitter-tsx.dir/tree-sitter-typescript/tsx/src/scanner.c.o"
+/usr/bin/ranlib libtree-sitter-tsx.a

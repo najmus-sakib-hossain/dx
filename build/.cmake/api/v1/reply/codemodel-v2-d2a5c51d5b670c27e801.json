@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "dx-tools",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "GenerateFBSHeader::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GenerateFBSHeader-Debug-d286f4ef85dbf5465f3b.json",
+					"name" : "GenerateFBSHeader",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "dx-styles::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-dx-styles-Debug-7f12a1ea37cfb2b2514d.json",
+					"name" : "dx-styles",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "styles_generator::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-styles_generator-Debug-a0030c396793d9d8bb32.json",
+					"name" : "styles_generator",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/workspaces/dx/build",
+		"source" : "/workspaces/dx"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}
