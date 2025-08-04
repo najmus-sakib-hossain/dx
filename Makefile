@@ -24,7 +24,7 @@ forge:
 	@mkdir -p build
 	@cd build && cmake .. && make
 	@echo "⚙️  Running the initial styles generator..."
-	@./styles
+	@./styles_generator
 	@echo "👀 Watching for file changes with dx-styles..."
 	@./dx-styles
 	@echo "Thanks for using Forge! Your styles have been generated and dx-styles is running."
