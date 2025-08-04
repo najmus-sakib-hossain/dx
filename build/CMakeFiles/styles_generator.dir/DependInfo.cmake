@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/workspaces/dx/main.c" "CMakeFiles/styles_generator.dir/main.c.o" "gcc" "CMakeFiles/styles_generator.dir/main.c.o.d"
+  "/workspaces/dx/styles_generator.c" "CMakeFiles/styles_generator.dir/styles_generator.c.o" "gcc" "CMakeFiles/styles_generator.dir/styles_generator.c.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

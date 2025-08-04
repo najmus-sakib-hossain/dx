@@ -43,7 +43,7 @@ add_custom_target(GenerateFBSHeader DEPENDS ${GENERATED_HEADER})
 # --- Build Executables ---
 
 # Target 1: 'styles_generator' (TOML to FlatBuffers converter)
-add_executable(styles_generator main.c)
+add_executable(styles_generator styles_generator.c)
 add_dependencies(styles_generator GenerateFBSHeader)
 target_include_directories(styles_generator PRIVATE
     ${TOML_INCLUDE_DIR}

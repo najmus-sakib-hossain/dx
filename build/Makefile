@@ -179,29 +179,29 @@ dx-styles.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/dx-styles.dir/build.make CMakeFiles/dx-styles.dir/dx-styles.c.s
 .PHONY : dx-styles.c.s
 
-main.o: main.c.o
-.PHONY : main.o
+styles_generator.o: styles_generator.c.o
+.PHONY : styles_generator.o
 
 # target to build an object file
-main.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/styles_generator.dir/build.make CMakeFiles/styles_generator.dir/main.c.o
-.PHONY : main.c.o
+styles_generator.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/styles_generator.dir/build.make CMakeFiles/styles_generator.dir/styles_generator.c.o
+.PHONY : styles_generator.c.o
 
-main.i: main.c.i
-.PHONY : main.i
+styles_generator.i: styles_generator.c.i
+.PHONY : styles_generator.i
 
 # target to preprocess a source file
-main.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/styles_generator.dir/build.make CMakeFiles/styles_generator.dir/main.c.i
-.PHONY : main.c.i
+styles_generator.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/styles_generator.dir/build.make CMakeFiles/styles_generator.dir/styles_generator.c.i
+.PHONY : styles_generator.c.i
 
-main.s: main.c.s
-.PHONY : main.s
+styles_generator.s: styles_generator.c.s
+.PHONY : styles_generator.s
 
 # target to generate assembly for a file
-main.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/styles_generator.dir/build.make CMakeFiles/styles_generator.dir/main.c.s
-.PHONY : main.c.s
+styles_generator.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/styles_generator.dir/build.make CMakeFiles/styles_generator.dir/styles_generator.c.s
+.PHONY : styles_generator.c.s
 
 # Help Target
 help:
@@ -217,9 +217,9 @@ help:
 	@echo "... dx-styles.o"
 	@echo "... dx-styles.i"
 	@echo "... dx-styles.s"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... styles_generator.o"
+	@echo "... styles_generator.i"
+	@echo "... styles_generator.s"
 .PHONY : help
 
 

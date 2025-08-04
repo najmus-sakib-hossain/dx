@@ -69,28 +69,28 @@ include CMakeFiles/styles_generator.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/styles_generator.dir/flags.make
 
-CMakeFiles/styles_generator.dir/main.c.o: CMakeFiles/styles_generator.dir/flags.make
-CMakeFiles/styles_generator.dir/main.c.o: /workspaces/dx/main.c
-CMakeFiles/styles_generator.dir/main.c.o: CMakeFiles/styles_generator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/styles_generator.dir/main.c.o"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/styles_generator.dir/main.c.o -MF CMakeFiles/styles_generator.dir/main.c.o.d -o CMakeFiles/styles_generator.dir/main.c.o -c /workspaces/dx/main.c
+CMakeFiles/styles_generator.dir/styles_generator.c.o: CMakeFiles/styles_generator.dir/flags.make
+CMakeFiles/styles_generator.dir/styles_generator.c.o: /workspaces/dx/styles_generator.c
+CMakeFiles/styles_generator.dir/styles_generator.c.o: CMakeFiles/styles_generator.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspaces/dx/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/styles_generator.dir/styles_generator.c.o"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/styles_generator.dir/styles_generator.c.o -MF CMakeFiles/styles_generator.dir/styles_generator.c.o.d -o CMakeFiles/styles_generator.dir/styles_generator.c.o -c /workspaces/dx/styles_generator.c
 
-CMakeFiles/styles_generator.dir/main.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/styles_generator.dir/main.c.i"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspaces/dx/main.c > CMakeFiles/styles_generator.dir/main.c.i
+CMakeFiles/styles_generator.dir/styles_generator.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/styles_generator.dir/styles_generator.c.i"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspaces/dx/styles_generator.c > CMakeFiles/styles_generator.dir/styles_generator.c.i
 
-CMakeFiles/styles_generator.dir/main.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/styles_generator.dir/main.c.s"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspaces/dx/main.c -o CMakeFiles/styles_generator.dir/main.c.s
+CMakeFiles/styles_generator.dir/styles_generator.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/styles_generator.dir/styles_generator.c.s"
+	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspaces/dx/styles_generator.c -o CMakeFiles/styles_generator.dir/styles_generator.c.s
 
 # Object files for target styles_generator
 styles_generator_OBJECTS = \
-"CMakeFiles/styles_generator.dir/main.c.o"
+"CMakeFiles/styles_generator.dir/styles_generator.c.o"
 
 # External object files for target styles_generator
 styles_generator_EXTERNAL_OBJECTS =
 
-/workspaces/dx/styles_generator: CMakeFiles/styles_generator.dir/main.c.o
+/workspaces/dx/styles_generator: CMakeFiles/styles_generator.dir/styles_generator.c.o
 /workspaces/dx/styles_generator: CMakeFiles/styles_generator.dir/build.make
 /workspaces/dx/styles_generator: /usr/local/lib/libtoml.a
 /workspaces/dx/styles_generator: /usr/local/lib/libflatccrt.a

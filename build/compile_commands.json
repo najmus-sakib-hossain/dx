@@ -1,9 +1,9 @@
 [
 {
   "directory": "/workspaces/dx/build",
-  "command": "/usr/bin/gcc  -I/usr/local/include/tomlc99 -I/usr/local/include/flatcc -I/workspaces/dx/build -g -o CMakeFiles/styles_generator.dir/main.c.o -c /workspaces/dx/main.c",
-  "file": "/workspaces/dx/main.c",
-  "output": "CMakeFiles/styles_generator.dir/main.c.o"
+  "command": "/usr/bin/gcc  -I/usr/local/include/tomlc99 -I/usr/local/include/flatcc -I/workspaces/dx/build -g -o CMakeFiles/styles_generator.dir/styles_generator.c.o -c /workspaces/dx/styles_generator.c",
+  "file": "/workspaces/dx/styles_generator.c",
+  "output": "CMakeFiles/styles_generator.dir/styles_generator.c.o"
 },
 {
   "directory": "/workspaces/dx/build",
