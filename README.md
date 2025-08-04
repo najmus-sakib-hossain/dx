@@ -835,6 +835,86 @@ int main(void) {
 
 
 
+# Makefile for the TOML to FlatBuffers converter
+
+# --- Compiler and Flags ---
+CC = gcc
+# CFLAGS: C compiler flags
+# -I adds directories to the header search path
+# -O2 is a standard optimization level
+# -Wall enables all warnings
+CFLAGS = -I./flatcc/include -I./tomlc99 -O2 -Wall
+# LDFLAGS: Linker flags
+# -L adds directories to the library search path
+LDFLAGS = -L./flatcc/lib
+# LDLIBS: Libraries to link against
+LDLIBS = -lflatccrt -lm
+
+# --- Source and Target Files ---
+TARGET_EXEC = toml_converter
+# We now explicitly list all C source files to be compiled.
+SRC_C = main.c tomlc99/toml.c
+SRC_FBS = styles.fbs
+GENERATED_H = styles_generated.h
+
+# --- Dependency Paths ---
+FLATCC_DIR = flatcc
+FLATCC_COMPILER = $(FLATCC_DIR)/bin/flatcc
+TOMLC99_DIR = tomlc99
+
+# --- Main Build Rule ---
+# The 'all' rule is the default rule. It depends on the final executable.
+all: $(TARGET_EXEC)
+
+# Rule to build the final executable.
+# It now depends on the C source files and the generated header.
+$(TARGET_EXEC): $(SRC_C) $(GENERATED_H)
+	@echo "LD   $@"
+	# We now pass all our C source files directly to the compiler.
+	$(CC) $(CFLAGS) $(SRC_C) -o $@ $(LDFLAGS) $(LDLIBS)
+
+# Rule to generate the C header from the FlatBuffers schema.
+# It depends on the schema file and the flatcc compiler.
+$(GENERATED_H): $(SRC_FBS) $(FLATCC_COMPILER)
+	@echo "FLATCC $< -> $@"
+	$(FLATCC_COMPILER) -a $<
+
+# --- Dependency Management ---
+
+# Rule to build the flatcc compiler.
+# It depends on the flatcc directory existing.
+$(FLATCC_COMPILER): $(FLATCC_DIR)
+	@echo "Building flatcc..."
+	@cd $(FLATCC_DIR) && mkdir -p build && cd build && cmake .. && make
+
+# Rule to clone the flatcc repository from GitHub if the directory doesn't exist.
+$(FLATCC_DIR):
+	@echo "Cloning flatcc repository..."
+	git clone https://github.com/dvidelabs/flatcc.git $(FLATCC_DIR)
+
+# Rule to clone the tomlc99 repository if the directory doesn't exist.
+# This ensures toml.c is available for compilation.
+$(TOMLC99_DIR):
+	@echo "Cloning tomlc99 repository..."
+	git clone https://github.com/cktan/tomlc99.git $(TOMLC99_DIR)
+
+# The C source files depend on the tomlc99 directory being present.
+$(SRC_C): $(TOMLC99_DIR)
+
+# --- Utility Rules ---
+
+# The 'run' rule executes the program.
+run: all
+	./$(TARGET_EXEC)
+
+# The 'clean' rule removes all generated files.
+clean:
+	@echo "Cleaning up..."
+	rm -f $(TARGET_EXEC) $(GENERATED_H)
+	rm -rf $(FLATCC_DIR) $(TOMLC99_DIR)
+
+# Phony targets are rules that don't represent actual files.
+.PHONY: all clean run
 
 
 
