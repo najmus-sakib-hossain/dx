@@ -5,7 +5,6 @@
 #include <ctype.h>
 #include <stdbool.h>
 
-
 #if defined(_WIN32)
     #define DX_PLATFORM_WINDOWS
 #elif defined(__unix__) || defined(__APPLE__)
@@ -16,20 +15,19 @@
 
 #if defined(DX_PLATFORM_WINDOWS)
     #include <windows.h>
+    // Note: For Windows, you might need a POSIX regex library like PCRE,
+    // or ensure your MinGW environment provides a compatible regex.h.
+    #include <regex.h> 
 #elif defined(DX_PLATFORM_POSIX)
     #include <fcntl.h>
     #include <unistd.h>
     #include <sys/stat.h>
     #include <sys/mman.h>
+    #include <regex.h>
 #endif
 
 #include <uv.h>
-#include <tree_sitter/api.h>
-#include <flatcc/flatcc.h>
-#include <flatcc/flatcc_builder.h>
 #include "styles_generated.h"
-
-TSLanguage *tree_sitter_tsx(void);
 
 #define KNRM  "\x1B[0m"
 #define KRED  "\x1B[31m"
@@ -41,9 +39,10 @@ TSLanguage *tree_sitter_tsx(void);
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "%sFatal Error at %s:%d%s\n", KRED, __FILE__, __LINE__, KNRM); exit(1); } } while (0)
 
 uv_loop_t *loop;
-TSParser *parser;
 char **g_previous_class_names = NULL;
 size_t g_previous_class_count = 0;
+uv_timer_t debounce_timer;
+char* last_changed_file = NULL;
 
 typedef struct {
     char *buffer;
@@ -96,97 +95,54 @@ void *map_file_read(const char *filename, size_t *size) {
 
 void unmap_file_read(void *buffer, size_t size) {
     if (!buffer) return;
-    #if defined(DX_PLATFORM_WINDOWS)
-        if (size > 0) UnmapViewOfFile(buffer); else free(buffer);
-    #elif defined(DX_PLATFORM_POSIX)
+    #if defined(DX_PLATFORM_WINDOWS) || defined(DX_PLATFORM_POSIX)
         if (size > 0) munmap(buffer, size); else free(buffer);
     #else
         free(buffer);
     #endif
 }
 
-int write_file_mmap(const char *filename, const char *content, size_t content_len) {
-    #if defined(DX_PLATFORM_WINDOWS)
-        HANDLE hFile = CreateFileA(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-        if (hFile == INVALID_HANDLE_VALUE) return -1;
-        if (content_len == 0) { CloseHandle(hFile); return 0; }
-        HANDLE hMapFile = CreateFileMappingA(hFile, NULL, PAGE_READWRITE, 0, (DWORD)content_len, NULL);
-        if (hMapFile == NULL) { CloseHandle(hFile); return -1; }
-        LPVOID pMapView = MapViewOfFile(hMapFile, FILE_MAP_WRITE, 0, 0, content_len);
-        if (pMapView == NULL) { CloseHandle(hMapFile); CloseHandle(hFile); return -1; }
-        memcpy(pMapView, content, content_len);
-        FlushViewOfFile(pMapView, content_len);
-        UnmapViewOfFile(pMapView);
-        CloseHandle(hMapFile);
-        CloseHandle(hFile);
-        return 0;
-    #elif defined(DX_PLATFORM_POSIX)
-        int fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, 0644);
-        if (fd == -1) return -1;
-        if (content_len == 0) { close(fd); return 0; }
-        if (ftruncate(fd, content_len) == -1) { close(fd); return -1; }
-        void *map = mmap(NULL, content_len, PROT_WRITE, MAP_SHARED, fd, 0);
-        if (map == MAP_FAILED) { close(fd); return -1; }
-        memcpy(map, content, content_len);
-        msync(map, content_len, MS_SYNC);
-        munmap(map, content_len);
-        close(fd);
-        return 0;
-    #else
-        FILE *fp = fopen(filename, "wb");
-        if (!fp) return -1;
-        if (content_len > 0 && fwrite(content, 1, content_len, fp) != content_len) { fclose(fp); return -1; }
-        fclose(fp);
-        return 0;
-    #endif
+int write_file_fast(const char *filename, const char *content, size_t content_len) {
+    FILE *fp = fopen(filename, "wb");
+    if (!fp) return -1;
+    if (content_len > 0) {
+        if (fwrite(content, 1, content_len, fp) != content_len) {
+            fclose(fp);
+            return -1;
+        }
+    }
+    fclose(fp);
+    return 0;
 }
 
-void extract_class_names_from_file(const char *filename, char ***class_names, size_t *count) {
+void extract_class_names_from_file_regex(const char *filename, char ***class_names, size_t *count) {
     size_t size;
     char *source = map_file_read(filename, &size);
     if (!source) { *class_names = NULL; *count = 0; return; }
-    
-    TSTree *tree = ts_parser_parse_string(parser, NULL, source, size);
-    if (!tree) { unmap_file_read(source, size); *class_names = NULL; *count = 0; return; }
-    
-    TSNode root = ts_tree_root_node(tree);
-    const char *query_str = "(jsx_attribute (property_identifier) @name (string (string_fragment) @value))";
-    uint32_t error_offset;
-    TSQueryError error_type;
-    TSQuery *query = ts_query_new(tree_sitter_tsx(), query_str, strlen(query_str), &error_offset, &error_type);
-    if (!query) { ts_tree_delete(tree); unmap_file_read(source, size); *class_names = NULL; *count = 0; return; }
-
-    TSQueryCursor *cursor = ts_query_cursor_new();
-    CHECK(cursor);
-    ts_query_cursor_exec(cursor, query, root);
 
     *count = 0;
     *class_names = NULL;
-    TSQueryMatch match;
-    while (ts_query_cursor_next_match(cursor, &match)) {
-        bool is_classname = false;
-        uint32_t value_capture_index = (uint32_t)-1;
-        for (uint32_t i = 0; i < match.capture_count; i++) {
-            uint32_t capture_index = match.captures[i].index;
-            uint32_t capture_name_len;
-            const char* capture_name = ts_query_capture_name_for_id(query, capture_index, &capture_name_len);
-            if (strcmp(capture_name, "name") == 0) {
-                TSNode name_node = match.captures[i].node;
-                if (strncmp(source + ts_node_start_byte(name_node), "className", ts_node_end_byte(name_node) - ts_node_start_byte(name_node)) == 0) {
-                    is_classname = true;
-                }
-            } else if (strcmp(capture_name, "value") == 0) {
-                value_capture_index = i;
-            }
-        }
-        if (is_classname && value_capture_index != (uint32_t)-1) {
-            TSNode node = match.captures[value_capture_index].node;
-            uint32_t start = ts_node_start_byte(node);
-            uint32_t end = ts_node_end_byte(node);
-            char *value_str = malloc(end - start + 1);
+
+    regex_t regex;
+    int reti = regcomp(&regex, "className=\"([^\"]*)\"", REG_EXTENDED);
+    if (reti) {
+        fprintf(stderr, "Could not compile regex\n");
+        unmap_file_read(source, size);
+        return;
+    }
+
+    const char *cursor = source;
+    regmatch_t pmatch[2];
+    while (regexec(&regex, cursor, 2, pmatch, 0) == 0) {
+        int start = pmatch[1].rm_so;
+        int end = pmatch[1].rm_eo;
+        if (start != -1 && end != -1) {
+            size_t len = end - start;
+            char *value_str = malloc(len + 1);
             CHECK(value_str);
-            strncpy(value_str, source + start, end - start);
-            value_str[end - start] = '\0';
+            strncpy(value_str, cursor + start, len);
+            value_str[len] = '\0';
+
             char *token = strtok(value_str, " ");
             while (token) {
                 *class_names = realloc(*class_names, (*count + 1) * sizeof(char *));
@@ -198,12 +154,13 @@ void extract_class_names_from_file(const char *filename, char ***class_names, si
             }
             free(value_str);
         }
+        cursor += pmatch[0].rm_eo;
     }
-    ts_query_cursor_delete(cursor);
-    ts_query_delete(query);
-    ts_tree_delete(tree);
+
+    regfree(&regex);
     unmap_file_read(source, size);
 }
+
 
 void write_css_from_classes(char **class_names, size_t class_count, void *buffer, double *search_time_ms, double *write_time_ms) {
     if (!buffer) return;
@@ -280,7 +237,7 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
     if (sb.len > 1) { sb.len -= 2; }
     
     uint64_t write_start_time = uv_hrtime();
-    if (write_file_mmap("styles.css", sb.buffer, sb.len) != 0) {
+    if (write_file_fast("styles.css", sb.buffer, sb.len) != 0) {
         fprintf(stderr, "%sError: Could not write to styles.css%s\n", KRED, KNRM);
     }
     uint64_t write_end_time = uv_hrtime();
@@ -309,7 +266,7 @@ char** extract_and_unify_all_classes(size_t *final_count) {
             snprintf(full_path, sizeof(full_path), "./src/%s", dirent.name);
             char **file_class_names = NULL;
             size_t file_class_count = 0;
-            extract_class_names_from_file(full_path, &file_class_names, &file_class_count);
+            extract_class_names_from_file_regex(full_path, &file_class_names, &file_class_count);
             if (file_class_count > 0) {
                 all_class_names = realloc(all_class_names, (total_class_count + file_class_count) * sizeof(char*));
                 CHECK(all_class_names);
@@ -372,7 +329,7 @@ void run_generation_cycle(const char* trigger_file) {
             write_css_from_classes(new_class_names, new_class_count, buffer, &search_ms, &write_ms);
         } else {
             uint64_t write_start_time = uv_hrtime();
-            write_file_mmap("styles.css", "", 0);
+            write_file_fast("styles.css", "", 0);
             uint64_t write_end_time = uv_hrtime();
             write_ms = (write_end_time - write_start_time) / 1e6;
         }
@@ -388,28 +345,42 @@ void run_generation_cycle(const char* trigger_file) {
     update_global_class_state(new_class_names, new_class_count);
 }
 
+void on_debounce_timeout(uv_timer_t *handle) {
+    if (last_changed_file) {
+        run_generation_cycle(last_changed_file);
+        free(last_changed_file);
+        last_changed_file = NULL;
+    }
+}
+
 void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int status) {
     if (status < 0) { fprintf(stderr, "Error watching file: %s\n", uv_strerror(status)); return; }
     if (filename && (events & UV_CHANGE) && strstr(filename, ".tsx")) {
+        uv_timer_stop(&debounce_timer);
+
+        if (last_changed_file) free(last_changed_file);
+        
         char full_path[512];
         snprintf(full_path, sizeof(full_path), "./src/%s", filename);
-        run_generation_cycle(full_path);
+        last_changed_file = strdup(full_path);
+        
+        uv_timer_start(&debounce_timer, on_debounce_timeout, 100, 0);
     }
 }
 
 void cleanup() {
     for (size_t i = 0; i < g_previous_class_count; i++) free(g_previous_class_names[i]);
     free(g_previous_class_names);
-    ts_parser_delete(parser);
+    if (last_changed_file) free(last_changed_file);
+    uv_close((uv_handle_t*)&debounce_timer, NULL);
+    uv_run(loop, UV_RUN_ONCE);
     uv_loop_close(loop);
 }
 
 int main(int argc, char *argv[]) {
     loop = uv_default_loop();
-    parser = ts_parser_new();
-    CHECK(parser);
-    CHECK(ts_parser_set_language(parser, tree_sitter_tsx()));
     atexit(cleanup);
+    uv_timer_init(loop, &debounce_timer);
 
     size_t styles_bin_size;
     void *buffer = map_file_read("styles.bin", &styles_bin_size);

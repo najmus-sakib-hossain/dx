@@ -24,6 +24,7 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o
  /usr/include/netinet/tcp.h
  /usr/include/pthread.h
  /usr/include/pwd.h
+ /usr/include/regex.h
  /usr/include/sched.h
  /usr/include/semaphore.h
  /usr/include/signal.h
@@ -34,7 +35,6 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o
  /usr/include/string.h
  /usr/include/termios.h
  /usr/include/time.h
- /usr/include/tree_sitter/api.h
  /usr/include/unistd.h
  /usr/include/uv.h
  /usr/include/uv/errno.h
@@ -165,7 +165,6 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h
  /usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h
- /usr/local/include/flatcc/flatcc.h
  /usr/local/include/flatcc/flatcc_accessors.h
  /usr/local/include/flatcc/flatcc_alloc.h
  /usr/local/include/flatcc/flatcc_assert.h

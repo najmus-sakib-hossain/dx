@@ -48,7 +48,18 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
  /usr/include/x86_64-linux-gnu/bits/mman-map-flags-generic.h \
  /usr/include/x86_64-linux-gnu/bits/mman-linux.h \
  /usr/include/x86_64-linux-gnu/bits/mman-shared.h \
- /usr/include/x86_64-linux-gnu/bits/mman_ext.h /usr/include/uv.h \
+ /usr/include/x86_64-linux-gnu/bits/mman_ext.h /usr/include/regex.h \
+ /usr/include/x86_64-linux-gnu/sys/types.h \
+ /usr/include/x86_64-linux-gnu/bits/types/clock_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/clockid_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/timer_t.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
+ /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
+ /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
+ /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
+ /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
+ /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
+ /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h /usr/include/uv.h \
  /usr/include/uv/errno.h /usr/include/errno.h \
  /usr/include/x86_64-linux-gnu/bits/errno.h /usr/include/linux/errno.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
@@ -56,20 +67,9 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
  /usr/include/uv/version.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h /usr/include/stdint.h \
  /usr/include/x86_64-linux-gnu/bits/wchar.h \
- /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-least.h /usr/include/uv/unix.h \
- /usr/include/x86_64-linux-gnu/sys/types.h \
- /usr/include/x86_64-linux-gnu/bits/types/clock_t.h \
- /usr/include/x86_64-linux-gnu/bits/types/clockid_t.h \
- /usr/include/x86_64-linux-gnu/bits/types/timer_t.h \
- /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
- /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
- /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
- /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
- /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
- /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h /usr/include/dirent.h \
- /usr/include/x86_64-linux-gnu/bits/dirent.h \
+ /usr/include/dirent.h /usr/include/x86_64-linux-gnu/bits/dirent.h \
  /usr/include/x86_64-linux-gnu/bits/dirent_ext.h \
  /usr/include/x86_64-linux-gnu/sys/socket.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
@@ -130,8 +130,10 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
  /usr/include/uv/threadpool.h /usr/include/uv/linux.h \
- /usr/include/tree_sitter/api.h /usr/local/include/flatcc/flatcc.h \
- /usr/local/include/flatcc/flatcc_builder.h \
+ /workspaces/dx/styles_generated.h \
+ /usr/local/include/flatcc/flatcc_prologue.h \
+ /usr/local/include/flatcc/portable/pdiagnostic_push.h \
+ /usr/local/include/flatcc/portable/pdiagnostic.h \
  /usr/local/include/flatcc/flatcc_flatbuffers.h \
  /usr/local/include/flatcc/portable/pstatic_assert.h \
  /usr/include/assert.h /usr/local/include/flatcc/portable/pwarnings.h \
@@ -149,14 +151,11 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
  /usr/local/include/flatcc/flatcc_endian.h \
  /usr/local/include/flatcc/flatcc_accessors.h \
  /usr/local/include/flatcc/flatcc_identifier.h \
+ /usr/local/include/flatcc/flatcc_epilogue.h \
+ /usr/local/include/flatcc/portable/pdiagnostic_pop.h \
+ /usr/local/include/flatcc/flatcc_builder.h \
+ /usr/local/include/flatcc/flatcc_flatbuffers.h \
  /usr/local/include/flatcc/flatcc_emitter.h \
  /usr/local/include/flatcc/flatcc_iov.h \
  /usr/local/include/flatcc/flatcc_refmap.h \
- /workspaces/dx/styles_generated.h \
- /usr/local/include/flatcc/flatcc_prologue.h \
- /usr/local/include/flatcc/portable/pdiagnostic_push.h \
- /usr/local/include/flatcc/portable/pdiagnostic.h \
- /usr/local/include/flatcc/flatcc_flatbuffers.h \
- /usr/local/include/flatcc/flatcc_epilogue.h \
- /usr/local/include/flatcc/portable/pdiagnostic_pop.h \
  /usr/local/include/flatcc/flatcc_verifier.h

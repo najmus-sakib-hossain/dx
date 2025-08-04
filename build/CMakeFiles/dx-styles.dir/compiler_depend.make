@@ -23,6 +23,7 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
   /usr/include/netinet/tcp.h \
   /usr/include/pthread.h \
   /usr/include/pwd.h \
+  /usr/include/regex.h \
   /usr/include/sched.h \
   /usr/include/semaphore.h \
   /usr/include/signal.h \
@@ -33,7 +34,6 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
   /usr/include/string.h \
   /usr/include/termios.h \
   /usr/include/time.h \
-  /usr/include/tree_sitter/api.h \
   /usr/include/unistd.h \
   /usr/include/uv.h \
   /usr/include/uv/errno.h \
@@ -164,7 +164,6 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h \
-  /usr/local/include/flatcc/flatcc.h \
   /usr/local/include/flatcc/flatcc_accessors.h \
   /usr/local/include/flatcc/flatcc_alloc.h \
   /usr/local/include/flatcc/flatcc_assert.h \
@@ -238,8 +237,6 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 /usr/include/x86_64-linux-gnu/sys/mman.h:
 
 /usr/include/x86_64-linux-gnu/sys/cdefs.h:
-
-/usr/local/include/flatcc/flatcc.h:
 
 /usr/include/x86_64-linux-gnu/sys/stat.h:
 
@@ -341,6 +338,8 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 
 /usr/include/features.h:
 
+/usr/include/stdlib.h:
+
 /usr/include/time.h:
 
 /usr/include/x86_64-linux-gnu/bits/signum-arch.h:
@@ -387,6 +386,8 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 
 /usr/include/linux/limits.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
+
 /usr/include/uv/unix.h:
 
 /usr/include/x86_64-linux-gnu/bits/stat.h:
@@ -398,6 +399,8 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h:
 
 /usr/include/x86_64-linux-gnu/bits/floatn-common.h:
+
+/usr/include/regex.h:
 
 /usr/local/include/flatcc/flatcc_epilogue.h:
 
@@ -412,8 +415,6 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
 
 /usr/include/netinet/tcp.h:
-
-/usr/include/stdlib.h:
 
 /usr/include/ctype.h:
 
@@ -438,10 +439,6 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 /usr/include/stdio.h:
 
 /usr/include/uv.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
-
-/usr/include/tree_sitter/api.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/include/stdbool.h:
 
