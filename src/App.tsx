@@ -2,7 +2,7 @@ import React from 'react';
 
 function App() {
   return (
-    <div className="flex body">
+    <div className="flex">
       <button className="button">Click me</button>
     </div>
   );

@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 
+
 #if defined(_WIN32)
     #define DX_PLATFORM_WINDOWS
 #elif defined(__unix__) || defined(__APPLE__)
@@ -204,10 +205,12 @@ void extract_class_names_from_file(const char *filename, char ***class_names, si
     unmap_file_read(source, size);
 }
 
-void write_css_from_classes(char **class_names, size_t class_count, void *buffer) {
+void write_css_from_classes(char **class_names, size_t class_count, void *buffer, double *search_time_ms, double *write_time_ms) {
     if (!buffer) return;
     Styles_table_t styles = Styles_as_root(buffer);
     if (!styles) return;
+
+    uint64_t search_start_time = uv_hrtime();
 
     StringBuilder sb;
     sb_init(&sb, 8192);
@@ -233,7 +236,7 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
                     snprintf(temp_buffer, sizeof(temp_buffer), "    %s: %s;\n", Property_key(prop), Property_value(prop));
                     sb_append_str(&sb, temp_buffer);
                 }
-                sb_append_str(&sb, "}\n");
+                sb_append_str(&sb, "}\n\n");
                 matched = true;
                 break;
             }
@@ -260,7 +263,7 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
                                 snprintf(temp_buffer, sizeof(temp_buffer), "    %s: %s;\n", Property_key(prop), Property_value(prop));
                                 sb_append_str(&sb, temp_buffer);
                             }
-                            sb_append_str(&sb, "}\n");
+                            sb_append_str(&sb, "}\n\n");
                             matched = true;
                             break;
                         }
@@ -270,10 +273,19 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
             if (matched) break;
         }
     }
-    if (sb.len > 0) { sb.len--; }
+    
+    uint64_t search_end_time = uv_hrtime();
+    *search_time_ms = (search_end_time - search_start_time) / 1e6;
+
+    if (sb.len > 1) { sb.len -= 2; }
+    
+    uint64_t write_start_time = uv_hrtime();
     if (write_file_mmap("styles.css", sb.buffer, sb.len) != 0) {
         fprintf(stderr, "%sError: Could not write to styles.css%s\n", KRED, KNRM);
     }
+    uint64_t write_end_time = uv_hrtime();
+    *write_time_ms = (write_end_time - write_start_time) / 1e6;
+
     sb_free(&sb);
 }
 
@@ -352,24 +364,25 @@ void run_generation_cycle(const char* trigger_file) {
         return;
     }
 
-    uint64_t gen_start_time = uv_hrtime();
+    double search_ms = 0, write_ms = 0;
     size_t styles_bin_size;
     void *buffer = map_file_read("styles.bin", &styles_bin_size);
     if (buffer) {
         if (new_class_count > 0) {
-            write_css_from_classes(new_class_names, new_class_count, buffer);
+            write_css_from_classes(new_class_names, new_class_count, buffer, &search_ms, &write_ms);
         } else {
+            uint64_t write_start_time = uv_hrtime();
             write_file_mmap("styles.css", "", 0);
+            uint64_t write_end_time = uv_hrtime();
+            write_ms = (write_end_time - write_start_time) / 1e6;
         }
         unmap_file_read(buffer, styles_bin_size);
     }
-    uint64_t gen_end_time = uv_hrtime();
-
+    
     if (trigger_file) {
         double scan_ms = (scan_end_time - scan_start_time) / 1e6;
-        double gen_ms = (gen_end_time - gen_start_time) / 1e6;
-        printf("%s%s%s changed -> %sstyles.css%s updated in %.2fms (scan: %.2fms, gen: %.2fms)\n",
-               KCYN, trigger_file, KNRM, KGRN, KNRM, scan_ms + gen_ms, scan_ms, gen_ms);
+        printf("%s%s%s changed -> %sstyles.css%s updated in %.2fms (scan: %.2fms, search: %.2fms, write: %.2fms)\n",
+               KCYN, trigger_file, KNRM, KGRN, KNRM, scan_ms + search_ms + write_ms, scan_ms, search_ms, write_ms);
     }
     
     update_global_class_state(new_class_names, new_class_count);
