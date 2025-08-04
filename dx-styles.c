@@ -37,8 +37,8 @@
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "%sFatal Error at %s:%d%s\n", KRED, __FILE__, __LINE__, KNRM); exit(1); } } while (0)
 
 uv_loop_t *loop;
-char **g_previous_class_names = NULL;
-size_t g_previous_class_count = 0;
+char **g_previous_valid_classes = NULL;
+size_t g_previous_valid_count = 0;
 uv_timer_t debounce_timer;
 char* last_changed_file = NULL;
 
@@ -113,10 +113,42 @@ int write_file_fast(const char *filename, const char *content, size_t content_le
     return 0;
 }
 
+char* create_comment_free_copy(const char* source, size_t size) {
+    char* clean_source = (char*)malloc(size + 1);
+    CHECK(clean_source);
+    
+    size_t j = 0;
+    for (size_t i = 0; i < size; ++i) {
+        if (source[i] == '/' && i + 1 < size) {
+            if (source[i+1] == '/') {
+                i++;
+                while (i < size && source[i] != '\n') {
+                    i++;
+                }
+            } else if (source[i+1] == '*') {
+                i += 2;
+                while (i + 1 < size && (source[i] != '*' || source[i+1] != '/')) {
+                    i++;
+                }
+                i++;
+            } else {
+                clean_source[j++] = source[i];
+            }
+        } else {
+            clean_source[j++] = source[i];
+        }
+    }
+    clean_source[j] = '\0';
+    return clean_source;
+}
+
 void extract_class_names_from_file_regex(const char *filename, char ***class_names, size_t *count) {
-    size_t size;
-    char *source = map_file_read(filename, &size);
-    if (!source) { *class_names = NULL; *count = 0; return; }
+    size_t original_size;
+    char *original_source = map_file_read(filename, &original_size);
+    if (!original_source) { *class_names = NULL; *count = 0; return; }
+
+    char* source = create_comment_free_copy(original_source, original_size);
+    unmap_file_read(original_source, original_size);
 
     *count = 0;
     *class_names = NULL;
@@ -125,7 +157,7 @@ void extract_class_names_from_file_regex(const char *filename, char ***class_nam
     int reti = regcomp(&regex, "className=\"([^\"]*)\"", REG_EXTENDED);
     if (reti) {
         fprintf(stderr, "Could not compile regex\n");
-        unmap_file_read(source, size);
+        free(source);
         return;
     }
 
@@ -156,15 +188,13 @@ void extract_class_names_from_file_regex(const char *filename, char ***class_nam
     }
 
     regfree(&regex);
-    unmap_file_read(source, size);
+    free(source);
 }
 
-void write_css_from_classes(char **class_names, size_t class_count, void *buffer, double *search_time_ms, double *write_time_ms) {
+void write_css_from_classes(char **class_names, size_t class_count, void *buffer) {
     if (!buffer) return;
     Styles_table_t styles = Styles_as_root(buffer);
     if (!styles) return;
-
-    uint64_t search_start_time = uv_hrtime();
 
     StringBuilder sb;
     sb_init(&sb, 8192);
@@ -228,17 +258,11 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
         }
     }
     
-    uint64_t search_end_time = uv_hrtime();
-    *search_time_ms = (search_end_time - search_start_time) / 1e6;
-
     if (sb.len > 1) { sb.len -= 2; }
     
-    uint64_t write_start_time = uv_hrtime();
     if (write_file_fast("styles.css", sb.buffer, sb.len) != 0) {
         fprintf(stderr, "%sError: Could not write to styles.css%s\n", KRED, KNRM);
     }
-    uint64_t write_end_time = uv_hrtime();
-    *write_time_ms = (write_end_time - write_start_time) / 1e6;
 
     sb_free(&sb);
 }
@@ -288,6 +312,59 @@ char** extract_and_unify_all_classes(size_t *final_count) {
     return all_class_names;
 }
 
+char** filter_valid_classes(char **all_classes, size_t all_count, void *buffer, size_t *final_count) {
+    if (!buffer || all_count == 0) {
+        *final_count = 0;
+        return NULL;
+    }
+    Styles_table_t styles = Styles_as_root(buffer);
+    if (!styles) {
+        *final_count = 0;
+        return NULL;
+    }
+
+    char **valid_classes = NULL;
+    size_t valid_count = 0;
+
+    StaticRule_vec_t static_rules = Styles_static_rules(styles);
+    DynamicRule_vec_t dynamic_rules = Styles_dynamic_rules(styles);
+    size_t static_rules_len = StaticRule_vec_len(static_rules);
+    size_t dynamic_rules_len = DynamicRule_vec_len(dynamic_rules);
+
+    for (size_t i = 0; i < all_count; i++) {
+        const char *current_class = all_classes[i];
+        bool matched = false;
+        for (size_t j = 0; j < static_rules_len; j++) {
+            if (strcmp(current_class, StaticRule_name(StaticRule_vec_at(static_rules, j))) == 0) {
+                matched = true;
+                break;
+            }
+        }
+        if (matched) {
+            valid_classes = realloc(valid_classes, (valid_count + 1) * sizeof(char*));
+            CHECK(valid_classes);
+            valid_classes[valid_count++] = strdup(current_class);
+            continue;
+        }
+        for (size_t j = 0; j < dynamic_rules_len; j++) {
+            DynamicRule_table_t rule = DynamicRule_vec_at(dynamic_rules, j);
+            const char *prefix = DynamicRule_prefix(rule);
+            if (strncmp(current_class, prefix, strlen(prefix)) == 0) {
+                matched = true;
+                break;
+            }
+        }
+        if (matched) {
+            valid_classes = realloc(valid_classes, (valid_count + 1) * sizeof(char*));
+            CHECK(valid_classes);
+            valid_classes[valid_count++] = strdup(current_class);
+        }
+    }
+
+    *final_count = valid_count;
+    return valid_classes;
+}
+
 void count_class_changes(char **old_list, size_t old_count, char **new_list, size_t new_count, int *added, int *removed) {
     *added = 0;
     *removed = 0;
@@ -310,51 +387,60 @@ void count_class_changes(char **old_list, size_t old_count, char **new_list, siz
 }
 
 bool are_class_sets_equal(char **new_classes, size_t new_count) {
-    if (new_count != g_previous_class_count) return false;
+    if (new_count != g_previous_valid_count) return false;
     for (size_t i = 0; i < new_count; i++) {
-        if (strcmp(new_classes[i], g_previous_class_names[i]) != 0) return false;
+        if (strcmp(new_classes[i], g_previous_valid_classes[i]) != 0) return false;
     }
     return true;
 }
 
 void update_global_class_state(char **new_classes, size_t new_count) {
-    for (size_t i = 0; i < g_previous_class_count; i++) free(g_previous_class_names[i]);
-    free(g_previous_class_names);
-    g_previous_class_names = new_classes;
-    g_previous_class_count = new_count;
+    for (size_t i = 0; i < g_previous_valid_count; i++) free(g_previous_valid_classes[i]);
+    free(g_previous_valid_classes);
+    g_previous_valid_classes = new_classes;
+    g_previous_valid_count = new_count;
 }
 
 void run_generation_cycle(const char* trigger_file) {
     uint64_t cycle_start_time = uv_hrtime();
-    size_t new_class_count;
-    char **new_class_names = extract_and_unify_all_classes(&new_class_count);
+    size_t all_class_count;
+    char **all_class_names = extract_and_unify_all_classes(&all_class_count);
 
-    if (are_class_sets_equal(new_class_names, new_class_count)) {
+    size_t styles_bin_size;
+    void *buffer = map_file_read("styles.bin", &styles_bin_size);
+    if (!buffer) {
+        fprintf(stderr, "%sError: Failed to reload styles.bin%s\n", KRED, KNRM);
+        for(size_t i = 0; i < all_class_count; i++) free(all_class_names[i]);
+        free(all_class_names);
+        return;
+    }
+
+    size_t current_valid_count;
+    char **current_valid_classes = filter_valid_classes(all_class_names, all_class_count, buffer, &current_valid_count);
+
+    for(size_t i = 0; i < all_class_count; i++) free(all_class_names[i]);
+    free(all_class_names);
+
+    if (are_class_sets_equal(current_valid_classes, current_valid_count)) {
         if (trigger_file) {
-            printf("%s%s%s changed -> No className changes detected.\n", KCYN, trigger_file, KNRM);
+            printf("✨ %sNo style changes detected. Everything is up to date!%s\n", KGRN, KNRM);
         }
-        for (size_t i = 0; i < new_class_count; i++) free(new_class_names[i]);
-        free(new_class_names);
+        for (size_t i = 0; i < current_valid_count; i++) free(current_valid_classes[i]);
+        free(current_valid_classes);
+        unmap_file_read(buffer, styles_bin_size);
         return;
     }
 
     int added = 0, removed = 0;
-    count_class_changes(g_previous_class_names, g_previous_class_count, new_class_names, new_class_count, &added, &removed);
-
-    double search_ms = 0, write_ms = 0;
-    size_t styles_bin_size;
-    void *buffer = map_file_read("styles.bin", &styles_bin_size);
-    if (buffer) {
-        if (new_class_count > 0) {
-            write_css_from_classes(new_class_names, new_class_count, buffer, &search_ms, &write_ms);
-        } else {
-            uint64_t write_start_time = uv_hrtime();
-            write_file_fast("styles.css", "", 0);
-            uint64_t write_end_time = uv_hrtime();
-            write_ms = (write_end_time - write_start_time) / 1e6;
-        }
-        unmap_file_read(buffer, styles_bin_size);
+    count_class_changes(g_previous_valid_classes, g_previous_valid_count, current_valid_classes, current_valid_count, &added, &removed);
+    
+    if (current_valid_count > 0) {
+        write_css_from_classes(current_valid_classes, current_valid_count, buffer);
+    } else {
+        write_file_fast("styles.css", "", 0);
     }
+    
+    unmap_file_read(buffer, styles_bin_size);
     
     if (trigger_file) {
         double total_ms = (uv_hrtime() - cycle_start_time) / 1e6;
@@ -362,7 +448,7 @@ void run_generation_cycle(const char* trigger_file) {
                KCYN, trigger_file, KNRM, KGRN, KNRM, added, removed, total_ms);
     }
     
-    update_global_class_state(new_class_names, new_class_count);
+    update_global_class_state(current_valid_classes, current_valid_count);
 }
 
 void on_debounce_timeout(uv_timer_t *handle) {
@@ -388,8 +474,8 @@ void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int
 }
 
 void cleanup() {
-    for (size_t i = 0; i < g_previous_class_count; i++) free(g_previous_class_names[i]);
-    free(g_previous_class_names);
+    for (size_t i = 0; i < g_previous_valid_count; i++) free(g_previous_valid_classes[i]);
+    free(g_previous_valid_classes);
     if (last_changed_file) free(last_changed_file);
     uv_close((uv_handle_t*)&debounce_timer, NULL);
     uv_run(loop, UV_RUN_ONCE);
