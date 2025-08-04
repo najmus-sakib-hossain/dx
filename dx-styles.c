@@ -4,9 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 
-//==============================================================================
-// PLATFORM DETECTION & INCLUDES
-//==============================================================================
 #if defined(_WIN32)
     #define DX_PLATFORM_WINDOWS
 #elif defined(__unix__) || defined(__APPLE__)
@@ -32,15 +29,11 @@
 
 TSLanguage *tree_sitter_tsx(void);
 
-//==============================================================================
-// UTILITIES & GLOBALS
-//==============================================================================
 #define KNRM  "\x1B[0m"
 #define KRED  "\x1B[31m"
 #define KGRN  "\x1B[32m"
 #define KYEL  "\x1B[33m"
 #define KBLU  "\x1B[34m"
-#define KMAG  "\x1B[35m"
 #define KCYN  "\x1B[36m"
 
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "%sFatal Error at %s:%d%s\n", KRED, __FILE__, __LINE__, KNRM); exit(1); } } while (0)
@@ -48,33 +41,17 @@ TSLanguage *tree_sitter_tsx(void);
 uv_loop_t *loop;
 TSParser *parser;
 
-// A simple dynamic string builder.
 typedef struct {
     char *buffer;
     size_t len;
     size_t capacity;
 } StringBuilder;
 
-//==============================================================================
-// FORWARD DECLARATIONS
-//==============================================================================
 void scan_all_and_generate_css(void* buffer);
 void sb_init(StringBuilder *sb, size_t initial_capacity);
 void sb_append_str(StringBuilder *sb, const char *str);
 void sb_free(StringBuilder *sb);
 
-//==============================================================================
-// CROSS-PLATFORM FILE I/O (MMAP)
-//==============================================================================
-
-/**
- * @brief Maps a file into memory for reading.
- *
- * @param filename The path to the file.
- * @param size Pointer to a size_t to store the file size.
- * @return A pointer to the memory-mapped file content, or NULL on failure.
- * The caller must call unmap_file_read() on the returned pointer.
- */
 void *map_file_read(const char *filename, size_t *size) {
     #if defined(DX_PLATFORM_WINDOWS)
         HANDLE hFile = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -88,15 +65,15 @@ void *map_file_read(const char *filename, size_t *size) {
         *size = (size_t)liSize.QuadPart;
         if (*size == 0) {
             CloseHandle(hFile);
-            return calloc(1, 1); // Return valid pointer for zero-sized file
+            return calloc(1, 1);
         }
 
         HANDLE hMapFile = CreateFileMappingA(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
-        CloseHandle(hFile); // Can close file handle after creating mapping
+        CloseHandle(hFile);
         if (hMapFile == NULL) return NULL;
 
         LPVOID pMapView = MapViewOfFile(hMapFile, FILE_MAP_READ, 0, 0, *size);
-        CloseHandle(hMapFile); // Can close mapping handle after creating view
+        CloseHandle(hMapFile);
         return pMapView;
     #elif defined(DX_PLATFORM_POSIX)
         int fd = open(filename, O_RDONLY);
@@ -116,7 +93,7 @@ void *map_file_read(const char *filename, size_t *size) {
         void *buf = mmap(NULL, *size, PROT_READ, MAP_PRIVATE, fd, 0);
         close(fd);
         return (buf == MAP_FAILED) ? NULL : buf;
-    #else // DX_PLATFORM_STANDARD (Fallback)
+    #else
         FILE *fp = fopen(filename, "rb");
         if (!fp) return NULL;
         fseek(fp, 0, SEEK_END);
@@ -141,9 +118,6 @@ void *map_file_read(const char *filename, size_t *size) {
     #endif
 }
 
-/**
- * @brief Unmaps or frees a memory buffer created by map_file_read.
- */
 void unmap_file_read(void *buffer, size_t size) {
     if (!buffer) return;
     #if defined(DX_PLATFORM_WINDOWS)
@@ -157,14 +131,6 @@ void unmap_file_read(void *buffer, size_t size) {
     #endif
 }
 
-/**
- * @brief Writes content to a file, overwriting it using mmap where possible.
- *
- * This function creates a new file or truncates an existing one, then writes
- * the content using an efficient memory-mapped operation.
- *
- * @return 0 on success, -1 on failure.
- */
 int write_file_mmap(const char *filename, const char *content, size_t content_len) {
     #if defined(DX_PLATFORM_WINDOWS)
         HANDLE hFile = CreateFileA(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -220,7 +186,7 @@ int write_file_mmap(const char *filename, const char *content, size_t content_le
         munmap(map, content_len);
         close(fd);
         return 0;
-    #else // DX_PLATFORM_STANDARD (Fallback)
+    #else
         FILE *fp = fopen(filename, "wb");
         if (!fp) return -1;
         if (content_len > 0) {
@@ -234,13 +200,6 @@ int write_file_mmap(const char *filename, const char *content, size_t content_le
     #endif
 }
 
-//==============================================================================
-// CORE LOGIC
-//==============================================================================
-
-/**
- * @brief Loads the styles.bin FlatBuffers file using mmap.
- */
 void *load_styles_bin(const char *filename, size_t *size) {
     void* buffer = map_file_read(filename, size);
     if (!buffer) {
@@ -250,16 +209,10 @@ void *load_styles_bin(const char *filename, size_t *size) {
     return buffer;
 }
 
-/**
- * @brief Extracts all 'className' values from a given TSX file.
- *
- * Uses tree-sitter for parsing and mmap for fast file reading.
- */
 void extract_class_names(const char *filename, char ***class_names, size_t *count) {
     size_t size;
     char *source = map_file_read(filename, &size);
     if (!source) {
-        fprintf(stderr, "%sWarning: Could not open file %s%s\n", KYEL, filename, KNRM);
         *class_names = NULL;
         *count = 0;
         return;
@@ -267,7 +220,6 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     
     TSTree *tree = ts_parser_parse_string(parser, NULL, source, size);
     if (!tree) {
-        fprintf(stderr, "%sError: Failed to parse source in %s%s\n", KRED, filename, KNRM);
         unmap_file_read(source, size);
         *class_names = NULL;
         *count = 0;
@@ -281,7 +233,6 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     TSQueryError error_type;
     TSQuery *query = ts_query_new(tree_sitter_tsx(), query_str, strlen(query_str), &error_offset, &error_type);
     if (!query) {
-        fprintf(stderr, "%sError: Failed to create tree-sitter query (error type %d at offset %d)%s\n", KRED, error_type, error_offset, KNRM);
         ts_tree_delete(tree);
         unmap_file_read(source, size);
         *class_names = NULL;
@@ -346,26 +297,14 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     unmap_file_read(source, size);
 }
 
-/**
- * @brief Generates a CSS string from a list of class names and a styles definition buffer.
- *
- * Builds the entire CSS file in an in-memory string builder and then writes it to
- * "styles.css" using the efficient mmap-based writer.
- */
 void write_css_from_classes(char **class_names, size_t class_count, void *buffer) {
-    if (!buffer) {
-        fprintf(stderr, "%sError: Invalid buffer for styles%s\n", KRED, KNRM);
-        return;
-    }
+    if (!buffer) return;
 
     Styles_table_t styles = Styles_as_root(buffer);
-    if (!styles) {
-        fprintf(stderr, "%sError: Invalid styles data in styles.bin%s\n", KRED, KNRM);
-        return;
-    }
+    if (!styles) return;
 
     StringBuilder sb;
-    sb_init(&sb, 8192); // Start with 8KB capacity
+    sb_init(&sb, 8192);
     char temp_buffer[1024];
 
     StaticRule_vec_t static_rules = Styles_static_rules(styles);
@@ -377,7 +316,6 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
         const char *current_class = class_names[i];
         bool matched = false;
 
-        // Match static rules
         for (size_t j = 0; j < static_rules_len; j++) {
             StaticRule_table_t rule = StaticRule_vec_at(static_rules, j);
             const char *rule_name = StaticRule_name(rule);
@@ -390,14 +328,13 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
                     snprintf(temp_buffer, sizeof(temp_buffer), "    %s: %s;\n", Property_key(prop), Property_value(prop));
                     sb_append_str(&sb, temp_buffer);
                 }
-                sb_append_str(&sb, "}\n\n");
+                sb_append_str(&sb, "}\n");
                 matched = true;
                 break;
             }
         }
         if (matched) continue;
 
-        // Match dynamic rules
         for (size_t j = 0; j < dynamic_rules_len; j++) {
             DynamicRule_table_t rule = DynamicRule_vec_at(dynamic_rules, j);
             const char *prefix = DynamicRule_prefix(rule);
@@ -422,7 +359,7 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
                                 snprintf(temp_buffer, sizeof(temp_buffer), "    %s: %s;\n", Property_key(prop), Property_value(prop));
                                 sb_append_str(&sb, temp_buffer);
                             }
-                            sb_append_str(&sb, "}\n\n");
+                            sb_append_str(&sb, "}\n");
                             matched = true;
                             break;
                         }
@@ -443,9 +380,6 @@ int compare_strings(const void *a, const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
 }
 
-/**
- * @brief Scans all .tsx files in ./src, extracts class names, and generates styles.css.
- */
 void scan_all_and_generate_css(void* buffer) {
     char **all_class_names = NULL;
     size_t total_class_count = 0;
@@ -459,12 +393,10 @@ void scan_all_and_generate_css(void* buffer) {
     }
 
     uv_dirent_t dirent;
-    printf("%sScanning ./src for .tsx files...%s\n", KGRN, KNRM);
     while (UV_EOF != uv_fs_scandir_next(&scan_req, &dirent)) {
         if (dirent.type == UV_DIRENT_FILE && strstr(dirent.name, ".tsx")) {
             char full_path[512];
             snprintf(full_path, sizeof(full_path), "./src/%s", dirent.name);
-            printf("%sProcessing file: %s%s\n", KCYN, full_path, KNRM);
 
             char **file_class_names = NULL;
             size_t file_class_count = 0;
@@ -481,11 +413,8 @@ void scan_all_and_generate_css(void* buffer) {
     }
     uv_fs_req_cleanup(&scan_req);
 
-    printf("%sTotal class names collected: %zu%s\n", KGRN, total_class_count, KNRM);
-
     if (total_class_count == 0) {
-        write_file_mmap("styles.css", "", 0); // Write an empty file
-        printf("%sNo classNames found. Emptied styles.css.%s\n", KYEL, KNRM);
+        write_file_mmap("styles.css", "", 0);
         return;
     }
 
@@ -510,10 +439,6 @@ void scan_all_and_generate_css(void* buffer) {
     free(all_class_names);
 }
 
-//==============================================================================
-// FILE WATCHER & MAIN LOOP
-//==============================================================================
-
 void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int status) {
     if (status < 0) {
         fprintf(stderr, "%sError watching file: %s%s\n", KRED, uv_strerror(status), KNRM);
@@ -521,15 +446,22 @@ void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int
     }
     
     if (filename && (events & UV_CHANGE) && strstr(filename, ".tsx")) {
-        printf("\n%sChange detected in %s./src/%s%s\n", KYEL, KCYN, filename, KNRM);
-        printf("%sRe-generating styles.css...%s\n", KGRN, KNRM);
+        uint64_t start_time = uv_hrtime();
         
         size_t styles_bin_size;
         void *buffer = load_styles_bin("styles.bin", &styles_bin_size);
         if (buffer) {
+            char full_path[512];
+            snprintf(full_path, sizeof(full_path), "./src/%s", filename);
+
             scan_all_and_generate_css(buffer);
             unmap_file_read(buffer, styles_bin_size);
-            printf("%sSuccessfully updated styles.css.%s\n", KGRN, KNRM);
+            
+            uint64_t end_time = uv_hrtime();
+            double time_ms = (end_time - start_time) / 1e6;
+            
+            printf("%s%s%s changed -> %sstyles.css%s updated in %.2fms\n", KCYN, full_path, KNRM, KGRN, KNRM, time_ms);
+
         } else {
             fprintf(stderr, "%sFailed to reload styles.bin. CSS not updated.%s\n", KRED, KNRM);
         }
@@ -542,8 +474,6 @@ int main(int argc, char *argv[]) {
     parser = ts_parser_new();
     CHECK(parser);
     CHECK(ts_parser_set_language(parser, tree_sitter_tsx()));
-
-    printf("%sStarting dx-style generator...%s\n", KBLU, KNRM);
 
     size_t styles_bin_size;
     void *buffer = load_styles_bin("styles.bin", &styles_bin_size);
@@ -560,28 +490,22 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    printf("%sInitial scan of ./src...%s\n", KGRN, KNRM);
     scan_all_and_generate_css(buffer);
     unmap_file_read(buffer, styles_bin_size);
-    printf("%sInitial styles.css generated.%s\n", KGRN, KNRM);
 
     uv_fs_event_t fs_event;
     uv_fs_event_init(loop, &fs_event);
     uv_fs_event_start(&fs_event, on_file_change, "./src", UV_FS_EVENT_RECURSIVE);
-    printf("%sWatching ./src for .tsx file changes...%s\n", KBLU, KNRM);
+    
+    printf("🎨 %sdx-styles%s watching for changes...\n", KBLU, KNRM);
     
     uv_run(loop, UV_RUN_DEFAULT);
 
     ts_parser_delete(parser);
     uv_fs_event_stop(&fs_event);
     uv_loop_close(loop);
-    printf("%sShutdown complete.%s\n", KBLU, KNRM);
     return 0;
 }
-
-//==============================================================================
-// STRING BUILDER IMPLEMENTATION
-//==============================================================================
 
 void sb_init(StringBuilder *sb, size_t initial_capacity) {
     sb->capacity = initial_capacity > 0 ? initial_capacity : 1024;
