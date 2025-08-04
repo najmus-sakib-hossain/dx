@@ -23,12 +23,11 @@
 #include "styles_generated.h"
 
 #define KNRM  "\x1B[0m"
-#define KRED  "\x1B[1;31m" // Bright Red
-#define KGRN  "\x1B[32m"   // Green
+#define KRED  "\x1B[1;31m"
+#define KGRN  "\x1B[32m"
 #define KBLU  "\x1B[34m"
-#define KMAG  "\x1B[1;35m" // Bright Magenta (for input file)
-#define KBCYN "\x1B[1;36m" // Bright Cyan (for output file)
-
+#define KMAG  "\x1B[1;35m"
+#define KBCYN "\x1B[1;36m"
 
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "%sFatal Error at %s:%d%s\n", KRED, __FILE__, __LINE__, KNRM); exit(1); } } while (0)
 
@@ -42,11 +41,10 @@ typedef struct {
     size_t capacity;
 } StringBuilder;
 
-typedef struct AcronymCounter {
-    char* acronym;
-    int count;
-    struct AcronymCounter* next;
-} AcronymCounter;
+typedef struct UsedIdNode {
+    char* id;
+    struct UsedIdNode* next;
+} UsedIdNode;
 
 typedef struct {
     char** class_names;
@@ -57,6 +55,12 @@ typedef struct {
     size_t id_capacity;
 } DataLists;
 
+typedef struct {
+    char** paths;
+    size_t count;
+    size_t capacity;
+} FileList;
+
 DataLists previous_data = {0};
 
 void sb_init(StringBuilder *sb, size_t initial_capacity);
@@ -64,52 +68,66 @@ void sb_append_str(StringBuilder *sb, const char *str);
 void sb_append_n(StringBuilder *sb, const char *str, size_t n);
 void sb_free(StringBuilder *sb);
 
-void generate_id_string(char* buffer, size_t buffer_size, const char* class_name_base, AcronymCounter** head) {
-    char acronym[256] = {0};
-    size_t acronym_len = 0;
+void generate_id_prefix(char* buffer, size_t buffer_size, const char* class_name_base) {
+    buffer[0] = '\0';
+    size_t prefix_len = 0;
     bool new_word = true;
+    char temp_prefix[8] = {0};
 
-    for (const char* p = class_name_base; *p && acronym_len < sizeof(acronym) - 1; ++p) {
+    for (const char* p = class_name_base; *p && prefix_len < 7; ++p) {
         if (isspace((unsigned char)*p)) {
             new_word = true;
         } else if (new_word) {
-            acronym[acronym_len++] = tolower((unsigned char)*p);
+            temp_prefix[prefix_len++] = tolower((unsigned char)*p);
             new_word = false;
         }
     }
-
-    AcronymCounter* current = *head;
-    AcronymCounter* parent = NULL;
-    while (current != NULL) {
-        if (strcmp(current->acronym, acronym) == 0) {
-            current->count++;
-            snprintf(buffer, buffer_size, "%s%d", acronym, current->count);
-            return;
-        }
-        parent = current;
-        current = current->next;
-    }
-
-    AcronymCounter* new_node = (AcronymCounter*)malloc(sizeof(AcronymCounter));
-    CHECK(new_node);
-    new_node->acronym = strdup(acronym);
-    CHECK(new_node->acronym);
-    new_node->count = 1;
-    new_node->next = NULL;
-
-    if (parent == NULL) {
-        *head = new_node;
-    } else {
-        parent->next = new_node;
-    }
-    snprintf(buffer, buffer_size, "%s1", acronym);
+    strncpy(buffer, temp_prefix, buffer_size);
 }
 
-void free_acronym_list(AcronymCounter** head) {
-    AcronymCounter* current = *head;
+bool is_id_used(UsedIdNode* head, const char* id) {
+    UsedIdNode* current = head;
     while (current != NULL) {
-        AcronymCounter* next = current->next;
-        free(current->acronym);
+        if (strcmp(current->id, id) == 0) {
+            return true;
+        }
+        current = current->next;
+    }
+    return false;
+}
+
+void add_used_id(UsedIdNode** head, const char* id) {
+    UsedIdNode* new_node = (UsedIdNode*)malloc(sizeof(UsedIdNode));
+    CHECK(new_node);
+    new_node->id = strdup(id);
+    CHECK(new_node->id);
+    new_node->next = *head;
+    *head = new_node;
+}
+
+void get_unique_id(char* buffer, size_t buffer_size, const char* prefix, UsedIdNode** head) {
+    if (!is_id_used(*head, prefix)) {
+        strncpy(buffer, prefix, buffer_size);
+        add_used_id(head, buffer);
+        return;
+    }
+
+    int count = 1;
+    while (true) {
+        snprintf(buffer, buffer_size, "%s%d", prefix, count);
+        if (!is_id_used(*head, buffer)) {
+            add_used_id(head, buffer);
+            return;
+        }
+        count++;
+    }
+}
+
+void free_used_id_list(UsedIdNode** head) {
+    UsedIdNode* current = *head;
+    while (current != NULL) {
+        UsedIdNode* next = current->next;
+        free(current->id);
         free(current);
         current = next;
     }
@@ -144,7 +162,7 @@ int write_file_fast(const char *filename, const char *content, size_t content_le
     return 0;
 }
 
-int process_file(const char* filename, AcronymCounter** acronym_head) {
+int process_file(const char* filename, UsedIdNode** used_ids_head) {
     size_t size;
     char *source = map_file_read(filename, &size);
     if (!source) return 0;
@@ -152,7 +170,6 @@ int process_file(const char* filename, AcronymCounter** acronym_head) {
     StringBuilder sb;
     sb_init(&sb, size + 4096);
     const char *cursor = source;
-    int ids_added = 0;
 
     while (*cursor) {
         const char *class_name_ptr = strstr(cursor, "className=");
@@ -174,72 +191,88 @@ int process_file(const char* filename, AcronymCounter** acronym_head) {
             continue;
         }
 
-        const char* tag_end = strchr(tag_start, '>');
+        const char *tag_end = strchr(tag_start, '>');
         if (!tag_end) {
-            sb_append_n(&sb, cursor, class_name_ptr - cursor + 1);
-            cursor = class_name_ptr + 1;
-            continue;
-        }
-
-        size_t tag_len = tag_end - tag_start;
-        char* tag_content = malloc(tag_len + 1);
-        CHECK(tag_content);
-        strncpy(tag_content, tag_start, tag_len);
-        tag_content[tag_len] = '\0';
-        bool id_exists = strstr(tag_content, "id=") != NULL;
-        free(tag_content);
-
-        const char *class_name_start = strchr(class_name_ptr, '"');
-        if (!class_name_start) {
-            sb_append_n(&sb, cursor, class_name_ptr - cursor + 10);
-            cursor = class_name_ptr + 10;
-            continue;
-        }
-        class_name_start++;
-
-        const char *class_name_end = strchr(class_name_start, '"');
-        if (!class_name_end) {
             sb_append_str(&sb, cursor);
             break;
         }
 
-        sb_append_n(&sb, cursor, class_name_end - cursor + 1);
-        cursor = class_name_end + 1;
+        sb_append_n(&sb, cursor, tag_start - cursor);
 
-        if (!id_exists) {
-            size_t class_name_len = class_name_end - class_name_start;
-            char class_name_val[512];
-            if (class_name_len > 0 && class_name_len < sizeof(class_name_val)) {
-                strncpy(class_name_val, class_name_start, class_name_len);
-                class_name_val[class_name_len] = '\0';
+        const char *class_val_start = strchr(class_name_ptr, '"') + 1;
+        const char *class_val_end = strchr(class_val_start, '"');
+        if (!class_val_start || !class_val_end || class_val_end > tag_end) {
+            sb_append_n(&sb, tag_start, tag_end - tag_start + 1);
+            cursor = tag_end + 1;
+            continue;
+        }
+        size_t class_name_len = class_val_end - class_val_start;
+        char class_name_val[512];
+        if (class_name_len < sizeof(class_name_val)) {
+            strncpy(class_name_val, class_val_start, class_name_len);
+            class_name_val[class_name_len] = '\0';
+        } else {
+            sb_append_n(&sb, tag_start, tag_end - tag_start + 1);
+            cursor = tag_end + 1;
+            continue;
+        }
 
-                char generated_id[512];
-                generate_id_string(generated_id, sizeof(generated_id), class_name_val, acronym_head);
-                
-                char id_attr[576];
-                snprintf(id_attr, sizeof(id_attr), " id=\"%s\"", generated_id);
-                sb_append_str(&sb, id_attr);
-                ids_added++;
+        char id_prefix[8];
+        generate_id_prefix(id_prefix, sizeof(id_prefix), class_name_val);
+
+        char final_id[512];
+        get_unique_id(final_id, sizeof(final_id), id_prefix, used_ids_head);
+
+        const char *id_ptr = NULL;
+        for (const char* p = tag_start; p < tag_end; ++p) {
+            if ((*p == ' ' || *p == '<') && p[1] == 'i' && p[2] == 'd' && p[3] == '=') {
+                id_ptr = p + 1;
+                break;
             }
         }
+        
+        if (id_ptr) {
+            const char* id_val_start = strchr(id_ptr, '"') + 1;
+            const char* id_val_end = strchr(id_val_start, '"');
+
+            if (!id_val_start || !id_val_end || id_val_end > tag_end) {
+                sb_append_n(&sb, tag_start, tag_end - tag_start + 1);
+            } else {
+                sb_append_n(&sb, tag_start, id_val_start - tag_start);
+                sb_append_str(&sb, final_id);
+                sb_append_n(&sb, id_val_end, tag_end - id_val_end + 1);
+            }
+        } else {
+            const char* injection_point = class_val_end + 1;
+            sb_append_n(&sb, tag_start, injection_point - tag_start);
+            char id_attr[576];
+            snprintf(id_attr, sizeof(id_attr), " id=\"%s\"", final_id);
+            sb_append_str(&sb, id_attr);
+            sb_append_n(&sb, injection_point, tag_end - injection_point + 1);
+        }
+
+        cursor = tag_end + 1;
     }
     
-    if (ids_added > 0) {
+    int changes_made = 0;
+    if (sb.len != size || strcmp(source, sb.buffer) != 0) {
         write_file_fast(filename, sb.buffer, sb.len);
+        changes_made = 1;
     }
     
     sb_free(&sb);
     free(source);
-    return ids_added;
+    return changes_made;
 }
+
 
 bool is_dx_id(const char* id) {
     size_t len = strlen(id);
-    if (len < 2) return false;
+    if (len < 1) return false;
     
     size_t i = 0;
     while(i < len && isalpha(id[i])) i++;
-    if (i == 0 || i == len) return false;
+    if (i == 0) return false;
     while(i < len && isdigit(id[i])) i++;
     
     return i == len;
@@ -390,10 +423,20 @@ void free_data_contents(DataLists* data) {
     memset(data, 0, sizeof(DataLists));
 }
 
+int compare_strings(const void* a, const void* b) {
+    return strcmp(*(const char**)a, *(const char**)b);
+}
+
+void free_file_list(FileList* list) {
+    for (size_t i = 0; i < list->count; i++) {
+        free(list->paths[i]);
+    }
+    free(list->paths);
+}
+
 void run_modification_cycle(const char* trigger_file) {
     uint64_t cycle_start_time = uv_hrtime();
-    int ids_injected_this_run = 0;
-    AcronymCounter* acronym_head = NULL;
+    UsedIdNode* used_ids_head = NULL;
 
     size_t styles_bin_size;
     void* styles_buffer = map_file_read("styles.bin", &styles_bin_size);
@@ -402,17 +445,35 @@ void run_modification_cycle(const char* trigger_file) {
         return;
     }
 
+    FileList file_list = {0};
+    file_list.capacity = 16;
+    file_list.paths = malloc(file_list.capacity * sizeof(char*));
+    CHECK(file_list.paths);
+
     uv_fs_t scan_req;
     uv_fs_scandir(NULL, &scan_req, "./src", 0, NULL);
     uv_dirent_t dirent;
     while (UV_EOF != uv_fs_scandir_next(&scan_req, &dirent)) {
         if (dirent.type == UV_DIRENT_FILE && strstr(dirent.name, ".tsx")) {
+            if (file_list.count >= file_list.capacity) {
+                file_list.capacity *= 2;
+                file_list.paths = realloc(file_list.paths, file_list.capacity * sizeof(char*));
+                CHECK(file_list.paths);
+            }
             char full_path[512];
             snprintf(full_path, sizeof(full_path), "./src/%s", dirent.name);
-            ids_injected_this_run += process_file(full_path, &acronym_head);
+            file_list.paths[file_list.count++] = strdup(full_path);
         }
     }
     uv_fs_req_cleanup(&scan_req);
+
+    qsort(file_list.paths, file_list.count, sizeof(char*), compare_strings);
+
+    for (size_t i = 0; i < file_list.count; i++) {
+        process_file(file_list.paths[i], &used_ids_head);
+    }
+    
+    free_file_list(&file_list);
 
     DataLists current_data;
     collect_data(&current_data);
@@ -466,18 +527,20 @@ void run_modification_cycle(const char* trigger_file) {
         }
 
         double total_ms = (uv_hrtime() - cycle_start_time) / 1e6;
-        printf("%s%s%s (%s+%d%s,%s-%d%s) -> %sstyles.css%s (%s+%d%s,%s-%d%s) • %.2fms\n",
-            KMAG, trigger_file, KNRM,
-            KGRN, ids_added, KNRM, KRED, ids_removed, KNRM,
-            KBCYN, KNRM,
-            KGRN, classes_added, KNRM, KRED, classes_removed, KNRM,
-            total_ms);
+        if (ids_added > 0 || ids_removed > 0 || classes_added > 0 || classes_removed > 0) {
+            printf("%s%s%s (%s+%d%s,%s-%d%s) -> %sstyles.css%s (%s+%d%s,%s-%d%s) • %.2fms\n",
+                   KMAG, trigger_file, KNRM,
+                   KGRN, ids_added, KNRM, KRED, ids_removed, KNRM,
+                   KBCYN, KNRM,
+                   KGRN, classes_added, KNRM, KRED, classes_removed, KNRM,
+                   total_ms);
+        }
     }
     
     free_data_contents(&previous_data);
     previous_data = current_data;
 
-    free_acronym_list(&acronym_head);
+    free_used_id_list(&used_ids_head);
     free(styles_buffer);
 }
 
