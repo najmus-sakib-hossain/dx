@@ -1,6 +1,5 @@
-.body {
-    background-color: #0f172a;
-    color: #f8fafc;
+.flex {
+    display: flex;
 }
 
 .button {
@@ -10,6 +9,6 @@
     border-radius: 5px;
 }
 
-.flex {
-    display: flex;
-}
+#f1 {}
+
+#bb1 {}

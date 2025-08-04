@@ -23,7 +23,6 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
   /usr/include/netinet/tcp.h \
   /usr/include/pthread.h \
   /usr/include/pwd.h \
-  /usr/include/regex.h \
   /usr/include/sched.h \
   /usr/include/semaphore.h \
   /usr/include/signal.h \
@@ -270,7 +269,11 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 
 /usr/include/x86_64-linux-gnu/bits/types/siginfo_t.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h:
+/usr/local/include/flatcc/flatcc_prologue.h:
+
+/usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
+
+/usr/include/x86_64-linux-gnu/bits/termios-misc.h:
 
 /usr/include/x86_64-linux-gnu/bits/getopt_posix.h:
 
@@ -326,6 +329,8 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 
 /usr/include/x86_64-linux-gnu/bits/fcntl.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h:
+
 /usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
 
 /usr/include/x86_64-linux-gnu/bits/dirent_ext.h:
@@ -337,8 +342,6 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 /usr/include/x86_64-linux-gnu/bits/time.h:
 
 /usr/include/features.h:
-
-/usr/include/stdlib.h:
 
 /usr/include/time.h:
 
@@ -400,8 +403,6 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 
 /usr/include/x86_64-linux-gnu/bits/floatn-common.h:
 
-/usr/include/regex.h:
-
 /usr/local/include/flatcc/flatcc_epilogue.h:
 
 /usr/include/x86_64-linux-gnu/bits/termios-struct.h:
@@ -415,6 +416,8 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
 
 /usr/include/netinet/tcp.h:
+
+/usr/include/stdlib.h:
 
 /usr/include/ctype.h:
 
@@ -457,12 +460,6 @@ CMakeFiles/dx-styles.dir/dx-styles.c.o: /workspaces/dx/dx-styles.c \
 /usr/include/x86_64-linux-gnu/bits/uintn-identity.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
-
-/usr/local/include/flatcc/flatcc_prologue.h:
-
-/usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
-
-/usr/include/x86_64-linux-gnu/bits/termios-misc.h:
 
 /usr/include/x86_64-linux-gnu/bits/wchar.h:
 
