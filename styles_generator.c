@@ -2,14 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Use angle-bracket include as we will provide the path via compiler flags.
 #include <toml.h> 
 
-// Flatcc and generated header includes
 #include <flatcc/flatcc_builder.h>
 #include "styles_generated.h"
 
-// Helper macro to check for errors and exit if something goes wrong.
 #define CHECK(x) do { \
     if (!(x)) { \
         fprintf(stderr, "Fatal Error at %s:%d\n", __FILE__, __LINE__); \
@@ -18,7 +15,6 @@
 } while (0)
 
 int main(int argc, char *argv[]) {
-    // --- 1. Argument and File Handling ---
     const char *toml_path = (argc > 1) ? argv[1] : "styles.toml";
     
     FILE *fp = fopen(toml_path, "r");
@@ -28,7 +24,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-    // --- 2. TOML Parsing ---
     char errbuf[200];
     toml_table_t *conf = toml_parse_file(fp, errbuf, sizeof(errbuf));
     fclose(fp);
@@ -38,11 +33,9 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // --- 3. FlatBuffers Builder Initialization ---
     flatcc_builder_t builder;
     flatcc_builder_init(&builder);
 
-    // --- 4. Process Static Rules ---
     StaticRule_vec_start(&builder);
     toml_table_t *static_rules = toml_table_in(conf, "static_rules");
     if (static_rules) {
@@ -83,18 +76,14 @@ int main(int argc, char *argv[]) {
     }
     StaticRule_vec_ref_t static_rules_vec = StaticRule_vec_end(&builder);
 
-    // --- 5. Process Dynamic Rules (Temporarily Disabled) ---
     DynamicRule_vec_start(&builder);
     DynamicRule_vec_ref_t dynamic_rules_vec = DynamicRule_vec_end(&builder);
 
-    // --- 6. Finalize FlatBuffers ---
     Styles_create_as_root(&builder, static_rules_vec, dynamic_rules_vec);
 
-    // Get the finalized buffer and its size
     size_t size;
     void *buf = flatcc_builder_get_direct_buffer(&builder, &size);
     
-    // --- 7. Write to Output File ---
     FILE *out = fopen("styles.bin", "wb");
     if (!out) {
         fprintf(stderr, "Error: Failed to open output file 'styles.bin' for writing.\n");
@@ -105,7 +94,6 @@ int main(int argc, char *argv[]) {
 
     printf("Successfully converted '%s' to 'styles.bin'\n", toml_path);
 
-    // --- 8. Cleanup ---
     toml_free(conf);
     flatcc_builder_clear(&builder);
     return 0;

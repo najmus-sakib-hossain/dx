@@ -13,10 +13,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-// Forward declaration for the tree-sitter language
 TSLanguage *tree_sitter_tsx(void);
 
-// --- Global Variables ---
 #define KNRM  "\x1B[0m"
 #define KRED  "\x1B[31m"
 #define KGRN  "\x1B[32m"
@@ -28,13 +26,10 @@ TSLanguage *tree_sitter_tsx(void);
 uv_loop_t *loop;
 TSParser *parser;
 
-// --- Function Prototypes ---
 void scan_all_and_generate_css(void* buffer);
 
-// --- Utility Functions ---
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "%sFatal Error at %s:%d%s\n", KRED, __FILE__, __LINE__, KNRM); exit(1); } } while (0)
 
-// Loads the styles.bin file into memory using mmap for efficiency.
 void *load_styles_bin(const char *filename, size_t *size) {
     int fd = open(filename, O_RDONLY);
     if (fd == -1) {
@@ -61,7 +56,6 @@ void *load_styles_bin(const char *filename, size_t *size) {
     return buf;
 }
 
-// Extracts all className values from a given TSX file using Tree-sitter.
 void extract_class_names(const char *filename, char ***class_names, size_t *count) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
@@ -91,7 +85,6 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     
     TSNode root = ts_tree_root_node(tree);
 
-    // Tree-sitter query to find className="..." attributes.
     const char *query_str = "(jsx_attribute (property_identifier) @name (string (string_fragment) @value))";
     uint32_t error_offset;
     TSQueryError error_type;
@@ -116,7 +109,6 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
         bool is_classname = false;
         uint32_t value_capture_index = -1;
 
-        // First, check if the attribute name is 'className'.
         for (uint32_t i = 0; i < match.capture_count; i++) {
             uint32_t capture_index = match.captures[i].index;
             uint32_t capture_name_len;
@@ -134,7 +126,6 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
             }
         }
 
-        // If it is 'className', extract the value and split it into individual classes.
         if (is_classname && value_capture_index != -1) {
             TSNode node = match.captures[value_capture_index].node;
             uint32_t start = ts_node_start_byte(node);
@@ -145,7 +136,6 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
             strncpy(value_str, source + start, end - start);
             value_str[end - start] = '\0';
 
-            // Tokenize the string by spaces to handle multiple class names
             char *token = strtok(value_str, " ");
             while (token) {
                 *class_names = realloc(*class_names, (*count + 1) * sizeof(char *));
@@ -165,7 +155,6 @@ void extract_class_names(const char *filename, char ***class_names, size_t *coun
     free(source);
 }
 
-// Writes the final CSS file by matching found class names against static and dynamic rules.
 void write_css_from_classes(char **class_names, size_t class_count, void *buffer) {
     if (!buffer) {
         fprintf(stderr, "%sError: Invalid buffer for styles%s\n", KRED, KNRM);
@@ -189,12 +178,10 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
     size_t static_rules_len = StaticRule_vec_len(static_rules);
     size_t dynamic_rules_len = DynamicRule_vec_len(dynamic_rules);
 
-    // Loop through every unique class name found in the source code.
     for (size_t i = 0; i < class_count; i++) {
         const char *current_class = class_names[i];
         bool matched = false;
 
-        // --- 1. Check for a STATIC rule match ---
         for (size_t j = 0; j < static_rules_len; j++) {
             StaticRule_table_t rule = StaticRule_vec_at(static_rules, j);
             const char *rule_name = StaticRule_name(rule);
@@ -207,12 +194,11 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
                 }
                 fprintf(css_file, "}\n\n");
                 matched = true;
-                break; // Found a match, no need to check other static rules.
+                break; 
             }
         }
         if (matched) continue;
 
-        // --- 2. Check for a DYNAMIC rule match ---
         for (size_t j = 0; j < dynamic_rules_len; j++) {
             DynamicRule_table_t rule = DynamicRule_vec_at(dynamic_rules, j);
             const char *prefix = DynamicRule_prefix(rule);
@@ -220,9 +206,8 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
 
             if (prefix && strncmp(current_class, prefix, prefix_len) == 0) {
                 const char *value_part = current_class + prefix_len;
-                // Ensure there's a separator like '-' or that the prefix is the whole class
                 if (*value_part == '-' || *value_part == '\0') {
-                     if(*value_part == '-') value_part++; // Skip the separator
+                    if(*value_part == '-') value_part++;
 
                     DynamicProperty_vec_t dyn_props = DynamicRule_properties(rule);
                     for (size_t k = 0; k < DynamicProperty_vec_len(dyn_props); k++) {
@@ -238,24 +223,22 @@ void write_css_from_classes(char **class_names, size_t class_count, void *buffer
                             }
                             fprintf(css_file, "}\n\n");
                             matched = true;
-                            break; // Found the matching property
+                            break; 
                         }
                     }
                 }
             }
-            if (matched) break; // Found the matching rule
+            if (matched) break; 
         }
     }
 
     fclose(css_file);
 }
 
-// Helper for qsort to sort and find unique class names.
 int compare_strings(const void *a, const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
 }
 
-// Scans all .tsx files, collects all class names, and triggers the CSS generation.
 void scan_all_and_generate_css(void* buffer) {
     char **all_class_names = NULL;
     size_t total_class_count = 0;
@@ -300,7 +283,6 @@ void scan_all_and_generate_css(void* buffer) {
         return;
     }
 
-    // Sort and remove duplicates
     qsort(all_class_names, total_class_count, sizeof(char*), compare_strings);
     size_t unique_count = 0;
     if (total_class_count > 0) {
@@ -309,21 +291,19 @@ void scan_all_and_generate_css(void* buffer) {
             if (strcmp(all_class_names[i], all_class_names[unique_count - 1]) != 0) {
                 all_class_names[unique_count++] = all_class_names[i];
             } else {
-                free(all_class_names[i]); // Free the duplicate string
+                free(all_class_names[i]); 
             }
         }
     }
     
     write_css_from_classes(all_class_names, unique_count, buffer);
 
-    // Cleanup the unique list of strings
     for (size_t i = 0; i < unique_count; i++) {
         free(all_class_names[i]);
     }
     free(all_class_names);
 }
 
-// Callback for when a file change is detected by libuv.
 void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int status) {
     if (status < 0) {
         fprintf(stderr, "%sError watching file: %s%s\n", KRED, uv_strerror(status), KNRM);
@@ -346,7 +326,6 @@ void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int
     }
 }
 
-// Main entry point for the application.
 int main(int argc, char *argv[]) {
     loop = uv_default_loop();
 
@@ -364,7 +343,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Verify the FlatBuffers data is valid before proceeding.
     if (Styles_verify_as_root(buffer, styles_bin_size) != 0) {
         fprintf(stderr, "%sError: styles.bin is corrupted or invalid. Exiting.%s\n", KRED, KNRM);
         munmap(buffer, styles_bin_size);
@@ -384,7 +362,6 @@ int main(int argc, char *argv[]) {
     
     uv_run(loop, UV_RUN_DEFAULT);
 
-    // Cleanup resources
     ts_parser_delete(parser);
     uv_fs_event_stop(&fs_event);
     uv_loop_close(loop);
