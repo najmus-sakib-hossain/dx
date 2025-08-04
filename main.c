@@ -1,112 +1,278 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
-// Use angle-bracket include as we will provide the path via compiler flags.
-#include <toml.h> 
+#if defined(_WIN32)
+    #define DX_PLATFORM_STANDARD
+#elif defined(__unix__) || defined(__APPLE__)
+    #define DX_PLATFORM_POSIX
+#else
+    #define DX_PLATFORM_STANDARD
+#endif
 
-// Flatcc and generated header includes
-#include <flatcc/flatcc_builder.h>
-#include "styles_generated.h"
+#if defined(DX_PLATFORM_STANDARD)
+    #if defined(_WIN32)
+        #include <direct.h>
+        #define MKDIR(path) _mkdir(path)
+    #else
+        #include <sys/stat.h>
+        #define MKDIR(path) mkdir(path, 0755)
+    #endif
+    #include <threads.h>
+#elif defined(DX_PLATFORM_POSIX)
+    #include <pthread.h>
+    #include <fcntl.h>
+    #include <unistd.h>
+    #include <sys/stat.h>
+    #include <sys/mman.h>
+    #ifndef O_DIRECTORY
+        #define O_DIRECTORY 0200000  /* Linux-specific value */
+    #endif
+    #define MKDIR(path) mkdir(path, 0755)
+#endif
 
-// Helper macro to check for errors and exit if something goes wrong.
-#define CHECK(x) do { \
-    if (!(x)) { \
-        fprintf(stderr, "Fatal Error at %s:%d\n", __FILE__, __LINE__); \
-        exit(1); \
-    } \
-} while (0)
+#define FOLDER "modules"
+#define FILE_PREFIX "file"
+#define FILE_SUFFIX ".txt"
 
-int main(int argc, char *argv[]) {
-    // --- 1. Argument and File Handling ---
-    const char *toml_path = (argc > 1) ? argv[1] : "styles.toml";
-    
-    FILE *fp = fopen(toml_path, "r");
-    if (!fp) {
-        fprintf(stderr, "Error: Cannot open input file '%s'.\n", toml_path);
-        fprintf(stderr, "Usage: %s [path_to_styles.toml]\n", argv[0]);
-        return 1;
+#if defined(DX_PLATFORM_STANDARD)
+#define CONTENT "Hello, Standard C I/O!"
+typedef struct {
+    const int *indices;
+    int start;
+    int end;
+} ThreadData_Standard;
+
+int create_files_worker_standard(void* arg) {
+    ThreadData_Standard *data = (ThreadData_Standard *)arg;
+    char filepath[256];
+    for (int i = data->start; i < data->end; ++i) {
+        snprintf(filepath, sizeof(filepath), "%s/%s%d%s", FOLDER, FILE_PREFIX, data->indices[i], FILE_SUFFIX);
+        FILE *fp = fopen(filepath, "w");
+        if (fp == NULL) {
+            fprintf(stderr, "Error: Could not open file %s\n", filepath);
+            continue;
+        }
+        fputs(CONTENT, fp);
+        fclose(fp);
     }
-    
-    // --- 2. TOML Parsing ---
-    char errbuf[200];
-    toml_table_t *conf = toml_parse_file(fp, errbuf, sizeof(errbuf));
-    fclose(fp);
-    
-    if (!conf) {
-        fprintf(stderr, "Error parsing TOML file '%s': %s\n", toml_path, errbuf);
-        return 1;
+    return 0;
+}
+
+double get_monotonic_time() {
+    struct timespec ts;
+    timespec_get(&ts, TIME_UTC);
+    return (double)ts.tv_sec + (double)ts.tv_nsec / 1.0e9;
+}
+
+#elif defined(DX_PLATFORM_POSIX)
+#define CREATE_CONTENT "Files Created!\n"
+#define OVERWRITE_CONTENT "Files Overwritten!\n"
+
+typedef struct {
+    const int *indices;
+    int start;
+    int end;
+    int dir_fd;
+    const char *content;
+    size_t content_len;
+} ThreadArgs_POSIX;
+
+static inline char* fast_itoa(int value, char* buffer_end) {
+    *buffer_end = '\0';
+    char* p = buffer_end;
+    if (value == 0) { *--p = '0'; return p; }
+    do { *--p = '0' + (value % 10); value /= 10; } while (value > 0);
+    return p;
+}
+
+void *create_files_worker_posix(void *arg) {
+    ThreadArgs_POSIX *args = (ThreadArgs_POSIX *)arg;
+    char filename[256];
+    const size_t prefix_len = strlen(FILE_PREFIX);
+    const size_t suffix_len = strlen(FILE_SUFFIX);
+    memcpy(filename, FILE_PREFIX, prefix_len);
+    char *num_start_ptr = filename + prefix_len;
+    for (int i = args->start; i < args->end; i++) {
+        char num_buf[12];
+        char* num_str = fast_itoa(args->indices[i], num_buf + sizeof(num_buf) - 1);
+        size_t num_len = (num_buf + sizeof(num_buf) - 1) - num_str;
+        memcpy(num_start_ptr, num_str, num_len);
+        memcpy(num_start_ptr + num_len, FILE_SUFFIX, suffix_len + 1);
+        int fd = openat(args->dir_fd, filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (fd == -1) continue;
+        ssize_t bytes_written = write(fd, args->content, args->content_len);
+        if (bytes_written < 0 || (size_t)bytes_written < args->content_len) {
+            perror("Write error");
+        }
+        close(fd);
+    }
+    return NULL;
+}
+
+void *overwrite_files_mmap_worker_posix(void *arg) {
+    ThreadArgs_POSIX *args = (ThreadArgs_POSIX *)arg;
+    char filename[256];
+    const size_t prefix_len = strlen(FILE_PREFIX);
+    const size_t suffix_len = strlen(FILE_SUFFIX);
+    memcpy(filename, FILE_PREFIX, prefix_len);
+    char *num_start_ptr = filename + prefix_len;
+    for (int i = args->start; i < args->end; i++) {
+        char num_buf[12];
+        char* num_str = fast_itoa(args->indices[i], num_buf + sizeof(num_buf) - 1);
+        size_t num_len = (num_buf + sizeof(num_buf) - 1) - num_str;
+        memcpy(num_start_ptr, num_str, num_len);
+        memcpy(num_start_ptr + num_len, FILE_SUFFIX, suffix_len + 1);
+        int fd = openat(args->dir_fd, filename, O_RDWR);
+        if (fd == -1) continue;
+        void *map = mmap(NULL, args->content_len, PROT_WRITE, MAP_SHARED, fd, 0);
+        if (map == MAP_FAILED) {
+            close(fd);
+            continue;
+        }
+        memcpy(map, args->content, args->content_len);
+        munmap(map, args->content_len);
+        close(fd);
+    }
+    return NULL;
+}
+#endif
+
+int run_file_generator(const int *indices, int num_files) {
+    if (num_files <= 0) {
+        printf("No files to create.\n");
+        return 0;
     }
 
-    // --- 3. FlatBuffers Builder Initialization ---
-    flatcc_builder_t builder;
-    flatcc_builder_init(&builder);
+    #define NUM_THREADS 8
+#if defined(DX_PLATFORM_STANDARD)
+    if (MKDIR(FOLDER) != 0) {
+        printf("Directory '%s' may already exist. Continuing...\n", FOLDER);
+    } else {
+        printf("Directory '%s' created successfully.\n", FOLDER);
+    }
 
-    // --- 4. Process Static Rules ---
-    StaticRule_vec_start(&builder);
-    toml_table_t *static_rules = toml_table_in(conf, "static_rules");
-    if (static_rules) {
-        for (int i = 0; ; i++) {
-            const char *key = toml_key_in(static_rules, i);
-            if (!key) break;
+    #if defined(_WIN32)
+        printf("Running on Windows: Using standard C11 I/O method.\n");
+    #else
+        printf("Running on an unrecognized OS: Using generic standard C11 I/O fallback.\n");
+    #endif
 
-            toml_table_t *rule = toml_table_in(static_rules, key);
-            if (!rule) {
-                fprintf(stderr, "Error: Could not find table for static_rule '%s' in '%s'.\n", key, toml_path);
-                exit(1);
-            }
+    double start_time = get_monotonic_time();
+    thrd_t threads[NUM_THREADS];
+    ThreadData_Standard thread_data_array[NUM_THREADS];
+    int files_per_thread = num_files / NUM_THREADS;
 
-            Property_vec_start(&builder);
-            for (int j = 0; ; j++) {
-                const char *prop_key = toml_key_in(rule, j);
-                if (!prop_key) break;
-
-                toml_datum_t prop_val = toml_string_in(rule, prop_key);
-                if (!prop_val.ok) {
-                    fprintf(stderr, "Error: Value for property '%s' in static_rule '%s' is not a string.\n", prop_key, key);
-                    exit(1);
-                }
-
-                Property_ref_t prop_ref = Property_create(&builder, 
-                    flatcc_builder_create_string_str(&builder, prop_key),
-                    flatcc_builder_create_string_str(&builder, prop_val.u.s));
-                Property_vec_push(&builder, prop_ref);
-                free(prop_val.u.s);
-            }
-            Property_vec_ref_t props_vec = Property_vec_end(&builder);
-
-            StaticRule_ref_t rule_ref = StaticRule_create(&builder, 
-                flatcc_builder_create_string_str(&builder, key), 
-                props_vec);
-            StaticRule_vec_push(&builder, rule_ref);
+    for (int i = 0; i < NUM_THREADS; ++i) {
+        thread_data_array[i].indices = indices;
+        thread_data_array[i].start = i * files_per_thread;
+        thread_data_array[i].end = (i == NUM_THREADS - 1) ? num_files : (i + 1) * files_per_thread;
+        if (thrd_create(&threads[i], create_files_worker_standard, &thread_data_array[i]) != thrd_success) {
+            fprintf(stderr, "Error: Failed to create thread %d.\n", i);
         }
     }
-    StaticRule_vec_ref_t static_rules_vec = StaticRule_vec_end(&builder);
 
-    // --- 5. Process Dynamic Rules (Temporarily Disabled) ---
-    DynamicRule_vec_start(&builder);
-    DynamicRule_vec_ref_t dynamic_rules_vec = DynamicRule_vec_end(&builder);
-
-    // --- 6. Finalize FlatBuffers ---
-    Styles_create_as_root(&builder, static_rules_vec, dynamic_rules_vec);
-
-    // Get the finalized buffer and its size
-    size_t size;
-    void *buf = flatcc_builder_get_direct_buffer(&builder, &size);
-    
-    // --- 7. Write to Output File ---
-    FILE *out = fopen("styles.bin", "wb");
-    if (!out) {
-        fprintf(stderr, "Error: Failed to open output file 'styles.bin' for writing.\n");
-        exit(1);
+    for (int i = 0; i < NUM_THREADS; ++i) {
+        thrd_join(threads[i], NULL);
     }
-    fwrite(buf, 1, size, out);
-    fclose(out);
 
-    printf("Successfully converted '%s' to 'styles.bin'\n", toml_path);
+    double end_time = get_monotonic_time();
+    double time_ms = (end_time - start_time) * 1000.0;
+    printf("\nFinished creating %d files.\n", num_files);
+    printf("Total time taken: %.2f ms\n", time_ms);
 
-    // --- 8. Cleanup ---
-    toml_free(conf);
-    flatcc_builder_clear(&builder);
+#elif defined(DX_PLATFORM_POSIX)
+    if (MKDIR(FOLDER) != 0) {
+        printf("Directory '%s' may already exist. Continuing...\n", FOLDER);
+    } else {
+        printf("Directory '%s' created successfully.\n", FOLDER);
+    }
+    printf("Running on POSIX: Using high-performance mmap/openat methods.\n");
+    struct timespec start_time, end_time;
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+    int dir_fd = open(FOLDER, O_RDONLY | O_DIRECTORY);
+    if (dir_fd == -1) {
+        perror("Fatal: Could not open directory " FOLDER);
+        return 1;
+    }
+    void *(*worker_func)(void *);
+    const char *content_to_write;
+    const char *action_description;
+    const size_t create_len = strlen(CREATE_CONTENT);
+    const size_t overwrite_len = strlen(OVERWRITE_CONTENT);
+    const size_t max_len = (create_len > overwrite_len) ? create_len : overwrite_len;
+    char padded_create_content[max_len + 1];
+    char padded_overwrite_content[max_len + 1];
+    memcpy(padded_create_content, CREATE_CONTENT, create_len);
+    memset(padded_create_content + create_len, ' ', max_len - create_len);
+    padded_create_content[max_len] = '\0';
+    memcpy(padded_overwrite_content, OVERWRITE_CONTENT, overwrite_len);
+    memset(padded_overwrite_content + overwrite_len, ' ', max_len - overwrite_len);
+    padded_overwrite_content[max_len] = '\0';
+    char first_filename[64];
+    snprintf(first_filename, sizeof(first_filename), "%s%d%s", FILE_PREFIX, indices[0], FILE_SUFFIX);
+    if (faccessat(dir_fd, first_filename, F_OK, 0) == 0) {
+        worker_func = overwrite_files_mmap_worker_posix;
+        content_to_write = padded_overwrite_content;
+        action_description = "overwriting";
+    } else {
+        worker_func = create_files_worker_posix;
+        content_to_write = padded_create_content;
+        action_description = "creating";
+    }
+    pthread_t threads[NUM_THREADS];
+    ThreadArgs_POSIX args[NUM_THREADS];
+    int files_per_thread = num_files / NUM_THREADS;
+    for (int i = 0; i < NUM_THREADS; i++) {
+        args[i].indices = indices;
+        args[i].start = i * files_per_thread;
+        args[i].end = (i == NUM_THREADS - 1) ? num_files : (i + 1) * files_per_thread;
+        args[i].dir_fd = dir_fd;
+        args[i].content = content_to_write;
+        args[i].content_len = max_len;
+        pthread_create(&threads[i], NULL, worker_func, &args[i]);
+    }
+    for (int i = 0; i < NUM_THREADS; i++) {
+        pthread_join(threads[i], NULL);
+    }
+    close(dir_fd);
+    clock_gettime(CLOCK_MONOTONIC, &end_time);
+    double time_ms = (end_time.tv_sec - start_time.tv_sec) * 1000.0 + (end_time.tv_nsec - start_time.tv_nsec) / 1000000.0;
+    printf("\nFinished %s %d files.\n", action_description, num_files);
+    printf("Total time taken: %.2f ms\n", time_ms);
+#endif
+
     return 0;
+}
+
+int main(int argc, char *argv[]) {
+    int num_files = 10000; // Default value
+    
+    // Parse command line argument if provided
+    if (argc > 1) {
+        num_files = atoi(argv[1]);
+        if (num_files <= 0) {
+            fprintf(stderr, "Invalid number of files: %s\n", argv[1]);
+            return 1;
+        }
+    }
+    
+    // Create an array of indices
+    int *indices = malloc(num_files * sizeof(int));
+    if (!indices) {
+        perror("Failed to allocate memory for indices");
+        return 1;
+    }
+    
+    // Initialize indices (sequential 1 to num_files)
+    for (int i = 0; i < num_files; i++) {
+        indices[i] = i + 1;
+    }
+    
+    int result = run_file_generator(indices, num_files);
+    
+    free(indices);
+    return result;
 }
