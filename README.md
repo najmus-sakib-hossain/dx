@@ -929,8 +929,8 @@ The change inticator beside the source file indicates how much id has changed. a
 
 
 
-
-
+./src/App.tsx (+0,-0) -> styles.css (+1,-0) • 0.33ms
+Use more bright red color and use a different color than green in the output file path
 
 
 

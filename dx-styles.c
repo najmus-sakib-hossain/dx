@@ -23,11 +23,12 @@
 #include "styles_generated.h"
 
 #define KNRM  "\x1B[0m"
-#define KRED  "\x1B[31m"
-#define KGRN  "\x1B[32m"
-#define KYEL  "\x1B[33m"
+#define KRED  "\x1B[1;31m" // Bright Red
+#define KGRN  "\x1B[32m"   // Green
 #define KBLU  "\x1B[34m"
-#define KCYN  "\x1B[36m"
+#define KMAG  "\x1B[1;35m" // Bright Magenta (for input file)
+#define KBCYN "\x1B[1;36m" // Bright Cyan (for output file)
+
 
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "%sFatal Error at %s:%d%s\n", KRED, __FILE__, __LINE__, KNRM); exit(1); } } while (0)
 
@@ -55,6 +56,8 @@ typedef struct {
     size_t id_count;
     size_t id_capacity;
 } DataLists;
+
+DataLists previous_data = {0};
 
 void sb_init(StringBuilder *sb, size_t initial_capacity);
 void sb_append_str(StringBuilder *sb, const char *str);
@@ -378,9 +381,18 @@ void write_final_css(const char* filename, DataLists* data, void* styles_buffer)
     sb_free(&sb);
 }
 
+void free_data_contents(DataLists* data) {
+    if (!data) return;
+    for(size_t i = 0; i < data->class_count; i++) free(data->class_names[i]);
+    for(size_t i = 0; i < data->id_count; i++) free(data->injected_ids[i]);
+    free(data->class_names);
+    free(data->injected_ids);
+    memset(data, 0, sizeof(DataLists));
+}
+
 void run_modification_cycle(const char* trigger_file) {
     uint64_t cycle_start_time = uv_hrtime();
-    int ids_added_total = 0;
+    int ids_injected_this_run = 0;
     AcronymCounter* acronym_head = NULL;
 
     size_t styles_bin_size;
@@ -397,30 +409,74 @@ void run_modification_cycle(const char* trigger_file) {
         if (dirent.type == UV_DIRENT_FILE && strstr(dirent.name, ".tsx")) {
             char full_path[512];
             snprintf(full_path, sizeof(full_path), "./src/%s", dirent.name);
-            ids_added_total += process_file(full_path, &acronym_head);
+            ids_injected_this_run += process_file(full_path, &acronym_head);
         }
     }
     uv_fs_req_cleanup(&scan_req);
 
-    DataLists data;
-    collect_data(&data);
-    write_final_css("styles.css", &data, styles_buffer);
+    DataLists current_data;
+    collect_data(&current_data);
+    write_final_css("styles.css", &current_data, styles_buffer);
 
     if (trigger_file) {
+        int ids_added = 0, ids_removed = 0;
+        int classes_added = 0, classes_removed = 0;
+
+        for (size_t i = 0; i < current_data.id_count; i++) {
+            bool found = false;
+            for (size_t j = 0; j < previous_data.id_count; j++) {
+                if (strcmp(current_data.injected_ids[i], previous_data.injected_ids[j]) == 0) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) ids_added++;
+        }
+        for (size_t i = 0; i < previous_data.id_count; i++) {
+            bool found = false;
+            for (size_t j = 0; j < current_data.id_count; j++) {
+                if (strcmp(previous_data.injected_ids[i], current_data.injected_ids[j]) == 0) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) ids_removed++;
+        }
+
+        for (size_t i = 0; i < current_data.class_count; i++) {
+            bool found = false;
+            for (size_t j = 0; j < previous_data.class_count; j++) {
+                if (strcmp(current_data.class_names[i], previous_data.class_names[j]) == 0) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) classes_added++;
+        }
+
+        for (size_t i = 0; i < previous_data.class_count; i++) {
+            bool found = false;
+            for (size_t j = 0; j < current_data.class_count; j++) {
+                if (strcmp(previous_data.class_names[i], current_data.class_names[j]) == 0) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) classes_removed++;
+        }
+
         double total_ms = (uv_hrtime() - cycle_start_time) / 1e6;
-        printf("%s%s%s -> %sSynced styles.css%s | Classes: %zu | IDs: %zu | New IDs: %d | %.2fms\n",
-            KCYN, trigger_file, KNRM,
-            KGRN, KNRM,
-            data.class_count,
-            data.id_count,
-            ids_added_total,
+        printf("%s%s%s (%s+%d%s,%s-%d%s) -> %sstyles.css%s (%s+%d%s,%s-%d%s) • %.2fms\n",
+            KMAG, trigger_file, KNRM,
+            KGRN, ids_added, KNRM, KRED, ids_removed, KNRM,
+            KBCYN, KNRM,
+            KGRN, classes_added, KNRM, KRED, classes_removed, KNRM,
             total_ms);
     }
+    
+    free_data_contents(&previous_data);
+    previous_data = current_data;
 
-    for(size_t i = 0; i < data.class_count; i++) free(data.class_names[i]);
-    for(size_t i = 0; i < data.id_count; i++) free(data.injected_ids[i]);
-    free(data.class_names);
-    free(data.injected_ids);
     free_acronym_list(&acronym_head);
     free(styles_buffer);
 }
@@ -451,6 +507,7 @@ void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int
 
 void cleanup() {
     if (last_changed_file) free(last_changed_file);
+    free_data_contents(&previous_data);
     uv_timer_stop(&debounce_timer);
     uv_close((uv_handle_t*)&debounce_timer, NULL);
     uv_run(loop, UV_RUN_NOWAIT);
