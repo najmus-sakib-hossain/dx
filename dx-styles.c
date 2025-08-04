@@ -8,19 +8,15 @@
 
 #if defined(_WIN32)
     #define DX_PLATFORM_WINDOWS
+    #include <windows.h>
 #elif defined(__unix__) || defined(__APPLE__)
     #define DX_PLATFORM_POSIX
-#else
-    #define DX_PLATFORM_STANDARD
-#endif
-
-#if defined(DX_PLATFORM_WINDOWS)
-    #include <windows.h>
-#elif defined(DX_PLATFORM_POSIX)
     #include <fcntl.h>
     #include <unistd.h>
     #include <sys/stat.h>
     #include <sys/mman.h>
+#else
+    #define DX_PLATFORM_STANDARD
 #endif
 
 #include <uv.h>
@@ -51,19 +47,19 @@ typedef struct AcronymCounter {
     struct AcronymCounter* next;
 } AcronymCounter;
 
-typedef struct DataLists {
+typedef struct {
     char** class_names;
     size_t class_count;
+    size_t class_capacity;
     char** injected_ids;
     size_t id_count;
+    size_t id_capacity;
 } DataLists;
 
 void sb_init(StringBuilder *sb, size_t initial_capacity);
 void sb_append_str(StringBuilder *sb, const char *str);
 void sb_append_n(StringBuilder *sb, const char *str, size_t n);
 void sb_free(StringBuilder *sb);
-
-// --- Human-Readable Acronym ID Generator ---
 
 void generate_id_string(char* buffer, size_t buffer_size, const char* class_name_base, AcronymCounter** head) {
     char acronym[256] = {0};
@@ -94,6 +90,7 @@ void generate_id_string(char* buffer, size_t buffer_size, const char* class_name
     AcronymCounter* new_node = (AcronymCounter*)malloc(sizeof(AcronymCounter));
     CHECK(new_node);
     new_node->acronym = strdup(acronym);
+    CHECK(new_node->acronym);
     new_node->count = 1;
     new_node->next = NULL;
 
@@ -115,8 +112,6 @@ void free_acronym_list(AcronymCounter** head) {
     }
     *head = NULL;
 }
-
-// --- End of ID Generator ---
 
 void *map_file_read(const char *filename, size_t *size) {
     FILE *fp = fopen(filename, "rb");
@@ -152,7 +147,7 @@ int process_file(const char* filename, AcronymCounter** acronym_head) {
     if (!source) return 0;
 
     StringBuilder sb;
-    sb_init(&sb, size + 2048);
+    sb_init(&sb, size + 4096);
     const char *cursor = source;
     int ids_added = 0;
 
@@ -170,7 +165,6 @@ int process_file(const char* filename, AcronymCounter** acronym_head) {
                 break;
             }
         }
-        
         if (!tag_start) {
             sb_append_n(&sb, cursor, class_name_ptr - cursor + 1);
             cursor = class_name_ptr + 1;
@@ -189,7 +183,6 @@ int process_file(const char* filename, AcronymCounter** acronym_head) {
         CHECK(tag_content);
         strncpy(tag_content, tag_start, tag_len);
         tag_content[tag_len] = '\0';
-        
         bool id_exists = strstr(tag_content, "id=") != NULL;
         free(tag_content);
 
@@ -219,6 +212,7 @@ int process_file(const char* filename, AcronymCounter** acronym_head) {
 
                 char generated_id[512];
                 generate_id_string(generated_id, sizeof(generated_id), class_name_val, acronym_head);
+                
                 char id_attr[576];
                 snprintf(id_attr, sizeof(id_attr), " id=\"%s\"", generated_id);
                 sb_append_str(&sb, id_attr);
@@ -241,13 +235,10 @@ bool is_dx_id(const char* id) {
     if (len < 2) return false;
     
     size_t i = 0;
-    while(i < len && isalpha(id[i])) {
-        i++;
-    }
+    while(i < len && isalpha(id[i])) i++;
     if (i == 0 || i == len) return false;
-    while(i < len && isdigit(id[i])) {
-        i++;
-    }
+    while(i < len && isdigit(id[i])) i++;
+    
     return i == len;
 }
 
@@ -256,6 +247,8 @@ void collect_data(DataLists* data) {
     data->injected_ids = NULL;
     data->class_count = 0;
     data->id_count = 0;
+    data->class_capacity = 0;
+    data->id_capacity = 0;
     
     uv_fs_t scan_req;
     uv_fs_scandir(NULL, &scan_req, "./src", 0, NULL);
@@ -275,14 +268,31 @@ void collect_data(DataLists* data) {
                 cursor += 11;
                 const char* end = strchr(cursor, '"');
                 if(!end) break;
-                char class_str[512];
-                if(end - cursor < sizeof(class_str)) {
-                    strncpy(class_str, cursor, end - cursor);
-                    class_str[end - cursor] = '\0';
-                    char* token = strtok(class_str, " ");
+                
+                char class_str_buffer[512];
+                if(end - cursor < sizeof(class_str_buffer)) {
+                    strncpy(class_str_buffer, cursor, end - cursor);
+                    class_str_buffer[end - cursor] = '\0';
+                    
+                    char* token = strtok(class_str_buffer, " ");
                     while(token) {
-                        data->class_names = realloc(data->class_names, (data->class_count + 1) * sizeof(char*));
-                        data->class_names[data->class_count++] = strdup(token);
+                        bool found = false;
+                        for (size_t j = 0; j < data->class_count; j++) {
+                            if (strcmp(data->class_names[j], token) == 0) {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (!found) {
+                            if (data->class_count >= data->class_capacity) {
+                                data->class_capacity = data->class_capacity == 0 ? 16 : data->class_capacity * 2;
+                                data->class_names = realloc(data->class_names, data->class_capacity * sizeof(char*));
+                                CHECK(data->class_names);
+                            }
+                            data->class_names[data->class_count++] = strdup(token);
+                            CHECK(data->class_names[data->class_count - 1]);
+                        }
                         token = strtok(NULL, " ");
                     }
                 }
@@ -301,8 +311,23 @@ void collect_data(DataLists* data) {
                     strncpy(id_val, cursor, len);
                     id_val[len] = '\0';
                     if (is_dx_id(id_val)) {
-                         data->injected_ids = realloc(data->injected_ids, (data->id_count + 1) * sizeof(char*));
-                         data->injected_ids[data->id_count++] = strdup(id_val);
+                        bool found = false;
+                        for (size_t k = 0; k < data->id_count; k++) {
+                            if (strcmp(data->injected_ids[k], id_val) == 0) {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (!found) {
+                            if (data->id_count >= data->id_capacity) {
+                                data->id_capacity = data->id_capacity == 0 ? 16 : data->id_capacity * 2;
+                                data->injected_ids = realloc(data->injected_ids, data->id_capacity * sizeof(char*));
+                                CHECK(data->injected_ids);
+                            }
+                            data->injected_ids[data->id_count++] = strdup(id_val);
+                            CHECK(data->injected_ids[data->id_count - 1]);
+                        }
                     }
                 }
                 cursor = end;
@@ -313,7 +338,6 @@ void collect_data(DataLists* data) {
     uv_fs_req_cleanup(&scan_req);
 }
 
-
 void write_final_css(const char* filename, DataLists* data, void* styles_buffer) {
     StringBuilder sb;
     sb_init(&sb, 8192);
@@ -321,11 +345,9 @@ void write_final_css(const char* filename, DataLists* data, void* styles_buffer)
     
     Styles_table_t styles = Styles_as_root(styles_buffer);
     StaticRule_vec_t static_rules = Styles_static_rules(styles);
-    DynamicRule_vec_t dynamic_rules = Styles_dynamic_rules(styles);
 
     for (size_t i = 0; i < data->class_count; i++) {
         const char* current_class = data->class_names[i];
-        bool matched = false;
         for (size_t j = 0; j < StaticRule_vec_len(static_rules); j++) {
             StaticRule_table_t rule = StaticRule_vec_at(static_rules, j);
             if (strcmp(current_class, StaticRule_name(rule)) == 0) {
@@ -338,12 +360,9 @@ void write_final_css(const char* filename, DataLists* data, void* styles_buffer)
                     sb_append_str(&sb, temp_buffer);
                 }
                 sb_append_str(&sb, "}\n\n");
-                matched = true;
                 break;
             }
         }
-        if(matched) continue;
-        // ... logic for dynamic rules ...
     }
 
     for (size_t i = 0; i < data->id_count; i++) {
@@ -351,11 +370,13 @@ void write_final_css(const char* filename, DataLists* data, void* styles_buffer)
         sb_append_str(&sb, temp_buffer);
     }
 
-    if (sb.len > 1) { sb.len -= 2; }
+    if (sb.len > 1) { 
+        sb.buffer[sb.len - 2] = '\0';
+        sb.len -= 2;
+    }
     write_file_fast(filename, sb.buffer, sb.len);
     sb_free(&sb);
 }
-
 
 void run_modification_cycle(const char* trigger_file) {
     uint64_t cycle_start_time = uv_hrtime();
@@ -371,7 +392,6 @@ void run_modification_cycle(const char* trigger_file) {
 
     uv_fs_t scan_req;
     uv_fs_scandir(NULL, &scan_req, "./src", 0, NULL);
-
     uv_dirent_t dirent;
     while (UV_EOF != uv_fs_scandir_next(&scan_req, &dirent)) {
         if (dirent.type == UV_DIRENT_FILE && strstr(dirent.name, ".tsx")) {
@@ -382,28 +402,27 @@ void run_modification_cycle(const char* trigger_file) {
     }
     uv_fs_req_cleanup(&scan_req);
 
-    DataLists data = { .class_names = NULL, .injected_ids = NULL };
+    DataLists data;
     collect_data(&data);
     write_final_css("styles.css", &data, styles_buffer);
+
+    if (trigger_file) {
+        double total_ms = (uv_hrtime() - cycle_start_time) / 1e6;
+        printf("%s%s%s -> %sSynced styles.css%s | Classes: %zu | IDs: %zu | New IDs: %d | %.2fms\n",
+            KCYN, trigger_file, KNRM,
+            KGRN, KNRM,
+            data.class_count,
+            data.id_count,
+            ids_added_total,
+            total_ms);
+    }
 
     for(size_t i = 0; i < data.class_count; i++) free(data.class_names[i]);
     for(size_t i = 0; i < data.id_count; i++) free(data.injected_ids[i]);
     free(data.class_names);
     free(data.injected_ids);
-
     free_acronym_list(&acronym_head);
     free(styles_buffer);
-
-    if (trigger_file) {
-        double total_ms = (uv_hrtime() - cycle_start_time) / 1e6;
-        if (ids_added_total > 0) {
-            printf("%s%s%s (" KGRN "+%d ID%s" KNRM ") -> Synced %sstyles.css%s in %.2fms\n",
-                   KCYN, trigger_file, KNRM, ids_added_total, ids_added_total > 1 ? "s" : "", KGRN, KNRM, total_ms);
-        } else {
-            printf("%s%s%s -> %sstyles.css%s is already in sync.\n",
-                   KCYN, trigger_file, KNRM, KGRN, KNRM);
-        }
-    }
 }
 
 void on_debounce_timeout(uv_timer_t *handle) {
@@ -416,6 +435,7 @@ void on_debounce_timeout(uv_timer_t *handle) {
 
 void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int status) {
     if (status < 0) { fprintf(stderr, "Error watching file: %s\n", uv_strerror(status)); return; }
+    
     if (filename && (events & UV_CHANGE) && strstr(filename, ".tsx")) {
         uv_timer_stop(&debounce_timer);
         if (last_changed_file) free(last_changed_file);
@@ -423,6 +443,7 @@ void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int
         char full_path[512];
         snprintf(full_path, sizeof(full_path), "./src/%s", filename);
         last_changed_file = strdup(full_path);
+        CHECK(last_changed_file);
         
         uv_timer_start(&debounce_timer, on_debounce_timeout, 50, 0);
     }
@@ -430,8 +451,9 @@ void on_file_change(uv_fs_event_t *handle, const char *filename, int events, int
 
 void cleanup() {
     if (last_changed_file) free(last_changed_file);
+    uv_timer_stop(&debounce_timer);
     uv_close((uv_handle_t*)&debounce_timer, NULL);
-    uv_run(loop, UV_RUN_ONCE);
+    uv_run(loop, UV_RUN_NOWAIT);
     uv_loop_close(loop);
 }
 

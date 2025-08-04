@@ -923,8 +923,8 @@ clean:
 
 
 
-
-
+./src/App.tsx (-3, -2) -> Synced styles.css (+1, -0) (here put the center ```.``` symbol) 0.63ms
+The change inticator beside the source file indicates how much id has changed. and changes indicator beside output file indicates how much classes has been changed with respect to the source file.
 
 
 
