@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/CMakeFiles/tree-sitter-typescript-populate"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/CMakeFiles/tree-sitter-typescript-populate.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/CMakeFiles/tree-sitter-typescript-populate-complete.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/tree-sitter-typescript-populate-prefix/src/tree-sitter-typescript-populate-stamp/tree-sitter-typescript-populate-build.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/tree-sitter-typescript-populate-prefix/src/tree-sitter-typescript-populate-stamp/tree-sitter-typescript-populate-configure.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/tree-sitter-typescript-populate-prefix/src/tree-sitter-typescript-populate-stamp/tree-sitter-typescript-populate-download.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/tree-sitter-typescript-populate-prefix/src/tree-sitter-typescript-populate-stamp/tree-sitter-typescript-populate-install.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/tree-sitter-typescript-populate-prefix/src/tree-sitter-typescript-populate-stamp/tree-sitter-typescript-populate-mkdir.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/tree-sitter-typescript-populate-prefix/src/tree-sitter-typescript-populate-stamp/tree-sitter-typescript-populate-patch.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/tree-sitter-typescript-populate-prefix/src/tree-sitter-typescript-populate-stamp/tree-sitter-typescript-populate-test.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/tree-sitter-typescript-populate-prefix/src/tree-sitter-typescript-populate-stamp/tree-sitter-typescript-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"tree-sitter-typescript-populate"
+		],
+		"name" : "tree-sitter-typescript-populate"
+	}
+}

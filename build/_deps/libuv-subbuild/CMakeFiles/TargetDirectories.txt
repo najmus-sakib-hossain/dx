@@ -1,0 +1,3 @@
+/workspaces/dx/build/_deps/libuv-subbuild/CMakeFiles/libuv-populate.dir
+/workspaces/dx/build/_deps/libuv-subbuild/CMakeFiles/edit_cache.dir
+/workspaces/dx/build/_deps/libuv-subbuild/CMakeFiles/rebuild_cache.dir

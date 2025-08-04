@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/workspaces/dx/build/_deps/tomlc99-subbuild/CMakeFiles/tomlc99-populate"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tomlc99-subbuild/CMakeFiles/tomlc99-populate.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tomlc99-subbuild/CMakeFiles/tomlc99-populate-complete.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tomlc99-subbuild/tomlc99-populate-prefix/src/tomlc99-populate-stamp/tomlc99-populate-build.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tomlc99-subbuild/tomlc99-populate-prefix/src/tomlc99-populate-stamp/tomlc99-populate-configure.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tomlc99-subbuild/tomlc99-populate-prefix/src/tomlc99-populate-stamp/tomlc99-populate-download.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tomlc99-subbuild/tomlc99-populate-prefix/src/tomlc99-populate-stamp/tomlc99-populate-install.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tomlc99-subbuild/tomlc99-populate-prefix/src/tomlc99-populate-stamp/tomlc99-populate-mkdir.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tomlc99-subbuild/tomlc99-populate-prefix/src/tomlc99-populate-stamp/tomlc99-populate-patch.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tomlc99-subbuild/tomlc99-populate-prefix/src/tomlc99-populate-stamp/tomlc99-populate-test.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tomlc99-subbuild/tomlc99-populate-prefix/src/tomlc99-populate-stamp/tomlc99-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"tomlc99-populate"
+		],
+		"name" : "tomlc99-populate"
+	}
+}

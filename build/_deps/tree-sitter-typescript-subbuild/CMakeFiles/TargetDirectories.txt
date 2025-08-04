@@ -1,0 +1,3 @@
+/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/CMakeFiles/tree-sitter-typescript-populate.dir
+/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/CMakeFiles/edit_cache.dir
+/workspaces/dx/build/_deps/tree-sitter-typescript-subbuild/CMakeFiles/rebuild_cache.dir

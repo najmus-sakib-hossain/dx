@@ -1,0 +1,49 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target",
+			"add_custom_command"
+		],
+		"files" : 
+		[
+			"build/_deps/flatcc-src/test/monster_test_concat/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 9,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 10,
+				"parent" : 0
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "flatcc_cli::@76d5294739883e9017de"
+		}
+	],
+	"id" : "gen_monster_test_concat::@e08b29ab38defedc0d0f",
+	"name" : "gen_monster_test_concat",
+	"paths" : 
+	{
+		"build" : "_deps/flatcc-build/test/monster_test_concat",
+		"source" : "build/_deps/flatcc-src/test/monster_test_concat"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}

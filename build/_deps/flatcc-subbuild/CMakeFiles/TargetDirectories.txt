@@ -1,0 +1,3 @@
+/workspaces/dx/build/_deps/flatcc-subbuild/CMakeFiles/flatcc-populate.dir
+/workspaces/dx/build/_deps/flatcc-subbuild/CMakeFiles/edit_cache.dir
+/workspaces/dx/build/_deps/flatcc-subbuild/CMakeFiles/rebuild_cache.dir

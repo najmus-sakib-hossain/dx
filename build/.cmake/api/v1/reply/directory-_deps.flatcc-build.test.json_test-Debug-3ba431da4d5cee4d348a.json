@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "_deps/flatcc-build/test/json_test",
+		"source" : "build/_deps/flatcc-src/test/json_test"
+	}
+}

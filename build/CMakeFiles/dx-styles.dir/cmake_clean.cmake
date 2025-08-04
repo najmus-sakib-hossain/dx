@@ -3,7 +3,6 @@ file(REMOVE_RECURSE
   "/workspaces/dx/dx-styles.pdb"
   "CMakeFiles/dx-styles.dir/dx-styles.c.o"
   "CMakeFiles/dx-styles.dir/dx-styles.c.o.d"
-  "styles_generated.h"
 )
 
 # Per-language clean rules from dependency scanning.

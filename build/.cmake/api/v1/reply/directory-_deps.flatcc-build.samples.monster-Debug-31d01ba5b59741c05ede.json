@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "_deps/flatcc-build/samples/monster",
+		"source" : "build/_deps/flatcc-src/samples/monster"
+	}
+}

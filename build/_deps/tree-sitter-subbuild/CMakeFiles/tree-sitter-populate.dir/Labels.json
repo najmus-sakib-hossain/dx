@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-subbuild/CMakeFiles/tree-sitter-populate"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-subbuild/CMakeFiles/tree-sitter-populate.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-subbuild/CMakeFiles/tree-sitter-populate-complete.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-subbuild/tree-sitter-populate-prefix/src/tree-sitter-populate-stamp/tree-sitter-populate-build.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-subbuild/tree-sitter-populate-prefix/src/tree-sitter-populate-stamp/tree-sitter-populate-configure.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-subbuild/tree-sitter-populate-prefix/src/tree-sitter-populate-stamp/tree-sitter-populate-download.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-subbuild/tree-sitter-populate-prefix/src/tree-sitter-populate-stamp/tree-sitter-populate-install.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-subbuild/tree-sitter-populate-prefix/src/tree-sitter-populate-stamp/tree-sitter-populate-mkdir.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-subbuild/tree-sitter-populate-prefix/src/tree-sitter-populate-stamp/tree-sitter-populate-patch.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-subbuild/tree-sitter-populate-prefix/src/tree-sitter-populate-stamp/tree-sitter-populate-test.rule"
+		},
+		{
+			"file" : "/workspaces/dx/build/_deps/tree-sitter-subbuild/tree-sitter-populate-prefix/src/tree-sitter-populate-stamp/tree-sitter-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"tree-sitter-populate"
+		],
+		"name" : "tree-sitter-populate"
+	}
+}

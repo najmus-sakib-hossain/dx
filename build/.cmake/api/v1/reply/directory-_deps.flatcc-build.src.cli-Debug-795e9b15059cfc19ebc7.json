@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "_deps/flatcc-build/src/cli",
+		"source" : "build/_deps/flatcc-src/src/cli"
+	}
+}

@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "_deps/flatcc-build/test/optional_scalars_test",
+		"source" : "build/_deps/flatcc-src/test/optional_scalars_test"
+	}
+}

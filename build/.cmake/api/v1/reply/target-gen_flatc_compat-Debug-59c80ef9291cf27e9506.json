@@ -1,0 +1,49 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target",
+			"add_custom_command"
+		],
+		"files" : 
+		[
+			"build/_deps/flatcc-src/test/flatc_compat/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 9,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 10,
+				"parent" : 0
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "flatcc_cli::@76d5294739883e9017de"
+		}
+	],
+	"id" : "gen_flatc_compat::@84583378256a8544f19e",
+	"name" : "gen_flatc_compat",
+	"paths" : 
+	{
+		"build" : "_deps/flatcc-build/test/flatc_compat",
+		"source" : "build/_deps/flatcc-src/test/flatc_compat"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}

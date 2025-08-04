@@ -4,7 +4,7 @@
 # compile C with /usr/bin/gcc
 C_DEFINES = 
 
-C_INCLUDES = -I/usr/local/include/tomlc99 -I/usr/local/include/flatcc -I/workspaces/dx/build
+C_INCLUDES = -I/workspaces/dx/build/_deps/flatcc-src/include -I/workspaces/dx/build/_deps/tree-sitter-src/lib/include -I/workspaces/dx/build -I/workspaces/dx/build/_deps/libuv-src/include
 
 C_FLAGS = -g
 

@@ -1,0 +1,49 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target",
+			"add_custom_command"
+		],
+		"files" : 
+		[
+			"build/_deps/flatcc-src/test/monster_test_cpp/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 12,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 13,
+				"parent" : 0
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "flatcc_cli::@76d5294739883e9017de"
+		}
+	],
+	"id" : "gen_monster_test_cpp::@d4a2dfafe21af114b096",
+	"name" : "gen_monster_test_cpp",
+	"paths" : 
+	{
+		"build" : "_deps/flatcc-build/test/monster_test_cpp",
+		"source" : "build/_deps/flatcc-src/test/monster_test_cpp"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}
