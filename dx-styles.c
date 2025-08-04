@@ -358,9 +358,9 @@ void run_generation_cycle(const char* trigger_file) {
     }
     
     if (trigger_file) {
-        double scan_ms = (scan_end_time - scan_start_time) / 1e6;
-        printf("%s%s%s changed -> %sstyles.css%s updated (+%d, -%d) in %.2fms (scan: %.2fms, search: %.2fms, write: %.2fms)\n",
-               KCYN, trigger_file, KNRM, KGRN, KNRM, added, removed, scan_ms + search_ms + write_ms, scan_ms, search_ms, write_ms);
+        double total_ms = (uv_hrtime() - scan_start_time) / 1e6;
+        printf("%s%s%s changed -> %sstyles.css%s updated (" KGRN "+%d" KNRM ", " KRED "-%d" KNRM ") in %.2fms\n",
+               KCYN, trigger_file, KNRM, KGRN, "styles.css", KNRM, added, removed, total_ms);
     }
     
     update_global_class_state(new_class_names, new_class_count);
