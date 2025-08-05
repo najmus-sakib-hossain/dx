@@ -1,0 +1,65 @@
+test/monster_test_prefix/CMakeFiles/monster_test_prefix.dir/monster_test_prefix.c.o: \
+ /workspaces/dx/flatcc/test/monster_test_prefix/monster_test_prefix.c \
+ /usr/include/stdc-predef.h \
+ /workspaces/dx/flatcc/test/monster_test_prefix/generated/zzz_monster_test.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_prologue.h \
+ /workspaces/dx/flatcc/include/flatcc/portable/pdiagnostic_push.h \
+ /workspaces/dx/flatcc/include/flatcc/portable/pdiagnostic.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_flatbuffers.h \
+ /workspaces/dx/flatcc/include/flatcc/portable/pstatic_assert.h \
+ /usr/include/assert.h /usr/include/features.h \
+ /usr/include/features-time64.h \
+ /usr/include/x86_64-linux-gnu/bits/wordsize.h \
+ /usr/include/x86_64-linux-gnu/bits/timesize.h \
+ /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+ /usr/include/x86_64-linux-gnu/bits/long-double.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+ /workspaces/dx/flatcc/include/flatcc/portable/pwarnings.h \
+ /workspaces/dx/flatcc/include/flatcc/portable/pstdalign.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/stdalign.h \
+ /workspaces/dx/flatcc/include/flatcc/portable/paligned_alloc.h \
+ /usr/include/stdlib.h \
+ /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
+ /usr/include/x86_64-linux-gnu/bits/floatn.h \
+ /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
+ /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
+ /workspaces/dx/flatcc/include/flatcc/portable/pattributes.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_alloc.h \
+ /workspaces/dx/flatcc/include/flatcc/portable/paligned_alloc.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_assert.h \
+ /workspaces/dx/flatcc/include/flatcc/portable/pendian.h \
+ /workspaces/dx/flatcc/include/flatcc/portable/pstdint.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/limits.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h \
+ /usr/include/limits.h /usr/include/signal.h \
+ /usr/include/x86_64-linux-gnu/bits/types.h \
+ /usr/include/x86_64-linux-gnu/bits/typesizes.h \
+ /usr/include/x86_64-linux-gnu/bits/time64.h \
+ /usr/include/x86_64-linux-gnu/bits/signum-generic.h \
+ /usr/include/x86_64-linux-gnu/bits/signum-arch.h \
+ /usr/include/x86_64-linux-gnu/bits/types/sig_atomic_t.h \
+ /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h /usr/include/stdint.h \
+ /usr/include/x86_64-linux-gnu/bits/wchar.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-least.h /usr/include/endian.h \
+ /usr/include/x86_64-linux-gnu/bits/endian.h \
+ /usr/include/x86_64-linux-gnu/bits/endianness.h \
+ /workspaces/dx/flatcc/include/flatcc/portable/pendian_detect.h \
+ /workspaces/dx/flatcc/include/flatcc/portable/pmemaccess.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_types.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_endian.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_accessors.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_identifier.h \
+ /usr/include/string.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_epilogue.h \
+ /workspaces/dx/flatcc/include/flatcc/portable/pdiagnostic_pop.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_builder.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_flatbuffers.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_emitter.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_iov.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_refmap.h \
+ /workspaces/dx/flatcc/include/flatcc/flatcc_verifier.h

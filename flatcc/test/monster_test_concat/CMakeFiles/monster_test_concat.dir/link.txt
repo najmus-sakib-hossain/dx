@@ -1,0 +1,1 @@
+/usr/bin/cc  -DFLATCC_REFLECTION=1 -std=c11 -Wall -Wextra -Wno-stringop-truncation -Wno-format-overflow -Wno-misleading-indentation -DPORTABLE_POSIX_MEMALIGN=1 -Werror -Wno-unused-function -Wsign-conversion CMakeFiles/monster_test_concat.dir/monster_test_concat.c.o -o monster_test_concat  ../../lib/libflatccrt.a 

@@ -1,0 +1,1 @@
+/usr/bin/cc  -DFLATCC_REFLECTION=1 -std=c11 -Wall -Wextra -Wno-stringop-truncation -Wno-format-overflow -Wno-misleading-indentation -DPORTABLE_POSIX_MEMALIGN=1 -Werror -Wno-unused-function -Wsign-conversion CMakeFiles/emit_test.dir/emit_test.c.o -o emit_test  ../../lib/libflatccrt.a 
