@@ -398,3 +398,14 @@ But use openclaw codebase files and don't recreate all of messaging and provider
 And use bun to do it!!!
 Yeah, copy all files and just run the thing with our "dx" branding and currently it doesn't works in our os system and it works in WSL so please make it work in our windows too correctly!!!
 Currenly at our openclaw-standalone folder please create a new command called chat and there please just implement a chat ui in bun using the exiting packages and make sure to use providers as set and with channels but make sure that it works as currentsly its not working correctly!!!
+|
+♦
+|
+Instea of this:
+│
+●  Select AI providers to configure:  
+│
+Please use this:
+|
+♦
+|

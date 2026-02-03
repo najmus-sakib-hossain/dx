@@ -456,3 +456,17 @@ Yeah, copy all files and just run the thing with our "dx" branding and currently
 
 
 Currenly at our openclaw-standalone folder please create a new command called chat and there please just implement a chat ui in bun using the exiting packages and make sure to use providers as set and with channels but make sure that it works as currentsly its not working correctly!!!
+
+|
+♦
+|
+
+Instea of this:
+│
+●  Select AI providers to configure:  
+│
+
+Please use this:
+|
+♦
+|

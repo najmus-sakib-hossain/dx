@@ -85,7 +85,7 @@ impl PromptInteraction for Confirm {
 
         match self.state {
             State::Active => {
-                // Title line (NO leading bar - just the ◇ symbol)
+                // Title line - diamond aligns with │ position
                 let bar = theme.dim.apply_to(symbols.bar);
                 let title_with_spaces = format!("  {}  ", self.message);
                 term.write_line(&format!("{}{}", 
