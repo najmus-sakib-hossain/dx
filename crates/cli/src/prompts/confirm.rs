@@ -98,24 +98,28 @@ impl PromptInteraction for Confirm {
                 term.write_line(&format!("{}", bar))?;
                 lines += 1;
 
-                // Options line (with bar)
+                // Options line (with bar) - show both Yes and No
                 let yes = if self.value {
                     theme.primary.apply_to("Yes").to_string()
                 } else {
                     theme.dim.apply_to("Yes").to_string()
                 };
-                term.write_line(&format!("{}  {}", bar, yes))?;
+                let no = if !self.value {
+                    theme.primary.apply_to("No").to_string()
+                } else {
+                    theme.dim.apply_to("No").to_string()
+                };
+                term.write_line(&format!("{}  {}  /  {}", bar, yes, no))?;
                 lines += 1;
             }
             State::Submit => {
-                let bar = theme.dim.apply_to(symbols.bar);
-                let symbol = theme.success.apply_to(symbols.step_submit);
+                let checkmark = theme.success.apply_to("✓");
                 let answer = if self.value { "Yes" } else { "No" };
                 let display = theme.dim.apply_to(answer);
-                term.write_line(&format!("{}{} {}  {}", bar, symbol, self.message.bold(), display))?;
+                term.write_line(&format!("{} {}  {}", checkmark, self.message, display))?;
                 lines += 1;
-                // Add spacing after completion
-                term.write_line("")?;
+                // Add blank line with bar after completion
+                term.write_line(&format!("{}", theme.dim.apply_to(symbols.bar)))?;
                 lines += 1;
             }
             State::Cancel => {

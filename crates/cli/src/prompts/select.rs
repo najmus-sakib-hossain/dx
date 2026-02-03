@@ -243,15 +243,14 @@ impl<T: Clone> PromptInteraction for Select<T> {
                 }
             }
             State::Submit => {
-                let bar = theme.dim.apply_to(symbols.bar);
-                let symbol = theme.success.apply_to(symbols.step_submit);
+                let checkmark = theme.success.apply_to("✓");
                 let selected =
                     self.selected_index().map(|i| self.items[i].label.clone()).unwrap_or_default();
                 let display = theme.dim.apply_to(&selected);
-                term.write_line(&format!("{}{} {}  {}", bar, symbol, self.message.bold(), display))?;
+                term.write_line(&format!("{} {}  {}", checkmark, self.message, display))?;
                 lines += 1;
-                // Add spacing after completion
-                term.write_line("")?;
+                // Add blank line with bar after completion
+                term.write_line(&format!("{}", theme.dim.apply_to(symbols.bar)))?;
                 lines += 1;
             }
             State::Cancel => {

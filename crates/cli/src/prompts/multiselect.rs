@@ -330,8 +330,7 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
                 }
             }
             State::Submit => {
-                let bar = theme.dim.apply_to(symbols.bar);
-                let symbol = theme.success.apply_to(symbols.step_submit);
+                let checkmark = theme.success.apply_to("✓");
                 let selected: Vec<_> =
                     self.items.iter().filter(|i| i.selected).map(|i| i.label.clone()).collect();
                 let display = if selected.is_empty() {
@@ -340,15 +339,14 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
                     selected.join(", ")
                 };
                 term.write_line(&format!(
-                    "{}{} {}  {}",
-                    bar,
-                    symbol,
-                    self.message.bold(),
+                    "{} {}  {}",
+                    checkmark,
+                    self.message,
                     theme.dim.apply_to(display)
                 ))?;
                 lines += 1;
-                // Add spacing after completion
-                term.write_line("")?;
+                // Add blank line with bar after completion
+                term.write_line(&format!("{}", theme.dim.apply_to(symbols.bar)))?;
                 lines += 1;
             }
             State::Cancel => {

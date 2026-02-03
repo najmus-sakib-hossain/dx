@@ -336,8 +336,6 @@ async fn run_onboarding() -> anyhow::Result<()> {
 
     if providers.is_empty() {
         log::warning("No providers selected. You can configure them later with 'dx connect <provider>'")?;
-    } else {
-        log::success(format!("Selected {} provider(s): {}", providers.len(), providers.join(", ")))?;
     }
 
     // Choose integrations
@@ -356,8 +354,6 @@ async fn run_onboarding() -> anyhow::Result<()> {
 
     if integrations.is_empty() {
         log::info("No integrations selected. You can add them later with 'dx connect <integration>'")?;
-    } else {
-        log::success(format!("Selected {} integration(s): {}", integrations.len(), integrations.join(", ")))?;
     }
 
     // Choose tools/capabilities
@@ -375,8 +371,6 @@ async fn run_onboarding() -> anyhow::Result<()> {
 
     if tools.is_empty() {
         log::info("No tools selected. All tools will be available by default.")?;
-    } else {
-        log::success(format!("Enabled {} tool(s): {}", tools.len(), tools.join(", ")))?;
     }
 
     // Choose default AI model
@@ -387,8 +381,6 @@ async fn run_onboarding() -> anyhow::Result<()> {
         .item("llama-3", "Llama 3 (Local)", "Privacy-focused, runs locally")
         .item("custom", "Custom model", "Specify your own model");
     let default_model = default_model_prompt.interact()?;
-
-    log::success(format!("Default model set to: {}", default_model))?;
 
     // Ask about daemon mode
     let mut start_daemon_prompt = confirm("Would you like to start the DX agent daemon now?")
