@@ -265,21 +265,24 @@ pub fn intro(title: impl Display) -> io::Result<()> {
         "{}  {}\n",
         theme.dim.apply_to(symbols.bar_start),
         title,
-    ))
+    ))?;
+    // Add a blank line with bar after intro
+    term_write(format!("{}\n", theme.dim.apply_to(symbols.bar)))
 }
 
 /// Prints a section header with horizontal line
-pub fn section(title: impl Display) -> io::Result<()> {
+fn section_with_width(title: impl Display, content_width: usize) -> io::Result<()> {
     let theme = THEME.read().unwrap();
     let symbols = &*SYMBOLS;
     let title_str = title.to_string();
-    let width: usize = 90; // Terminal width
     let title_with_spaces = format!("  {}  ", title_str);
-    let remaining = width.saturating_sub(title_with_spaces.len() + 2);
+    let title_len = title_with_spaces.chars().count();
+    // Calculate remaining width to match content
+    let remaining = content_width.saturating_sub(title_len);
     
+    // NO leading bar - just the ◇ symbol
     term_write(format!(
-        "{}{} {}{}{}",
-        theme.dim.apply_to(symbols.bar),
+        "{}{}{}{}",
         theme.primary.apply_to(symbols.step_submit),
         title_with_spaces,
         theme.dim.apply_to(symbols.box_horizontal.repeat(remaining)),
@@ -288,49 +291,52 @@ pub fn section(title: impl Display) -> io::Result<()> {
     term_write("\n")
 }
 
-/// Prints a boxed content section
+/// Prints a section header with horizontal line
+pub fn section(title: impl Display) -> io::Result<()> {
+    section_with_width(title, 85)
+}
+
+/// Prints a boxed content section (OpenClaw style)
 pub fn box_section(title: &str, lines: &[&str]) -> io::Result<()> {
     let theme = THEME.read().unwrap();
     let symbols = &*SYMBOLS;
-    let width: usize = 90;
+    let bar = theme.dim.apply_to(symbols.bar);
     
-    // Top border with title
-    section(title)?;
+    // Calculate actual content width
+    let max_content_len = lines.iter()
+        .map(|line| {
+            let content = format!("  {}", line);
+            content.len()  // Use byte length
+        })
+        .max()
+        .unwrap_or(83);
+    
+    // Top border with title - use matching width
+    section_with_width(title, max_content_len)?;
     
     // Empty line
-    term_write(format!("{}{}",
-        theme.dim.apply_to(symbols.bar),
-        " ".repeat(width)
-    ))?;
-    term_write("\n")?;
+    term_write(format!("{}{}{}\n", bar, " ".repeat(max_content_len), bar))?;
     
     // Content lines
     for line in lines {
-        let padded = format!("  {}", line);
-        let padding = width.saturating_sub(padded.len() + 1);
-        term_write(format!("{}{}{}{}",
-            theme.dim.apply_to(symbols.bar),
-            padded,
-            " ".repeat(padding),
-            theme.dim.apply_to(symbols.bar)
-        ))?;
-        term_write("\n")?;
+        let content = format!("  {}", line);
+        let content_len = content.len();
+        let spaces_needed = max_content_len.saturating_sub(content_len);
+        term_write(format!("{}{}{}{}\n", bar, content, " ".repeat(spaces_needed), bar))?;
     }
     
     // Empty line
-    term_write(format!("{}{}",
-        theme.dim.apply_to(symbols.bar),
-        " ".repeat(width)
-    ))?;
-    term_write("\n")?;
+    term_write(format!("{}{}{}\n", bar, " ".repeat(max_content_len), bar))?;
     
     // Bottom border
-    term_write(format!("{}{}{}",
+    term_write(format!("{}{}{}\n",
         theme.dim.apply_to(symbols.box_bottom_left),
-        theme.dim.apply_to(symbols.box_horizontal.repeat(width - 1)),
+        theme.dim.apply_to(symbols.box_horizontal.repeat(max_content_len)),
         theme.dim.apply_to(symbols.box_bottom_right)
     ))?;
-    term_write("\n")
+    
+    // Add ONE blank line with bar after box
+    term_write(format!("{}\n", bar))
 }
 
 /// Prints a footer for the prompt sequence.
@@ -475,9 +481,7 @@ pub mod log {
 
     /// Prints an info message.
     pub fn info(text: impl Display) -> io::Result<()> {
-        let theme = THEME.read().unwrap();
-        let symbols = &*SYMBOLS;
-        eprintln!("{}  {} {}", theme.dim.apply_to(symbols.bar), "●".blue(), text);
+        eprintln!("  {} {}", "●".blue(), text);
         Ok(())
     }
 

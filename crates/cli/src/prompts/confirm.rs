@@ -85,32 +85,26 @@ impl PromptInteraction for Confirm {
 
         match self.state {
             State::Active => {
-                // Title line with horizontal separator
+                // Title line (NO leading bar - just the ◇ symbol)
                 let bar = theme.dim.apply_to(symbols.bar);
                 let title_with_spaces = format!("  {}  ", self.message);
-                let width: usize = 90;
-                let remaining = width.saturating_sub(title_with_spaces.len() + 3);
-                term.write_line(&format!("{}{}{}{}{}", 
-                    bar,
+                term.write_line(&format!("{}{}", 
                     theme.primary.apply_to(symbols.step_submit),
-                    title_with_spaces.bold(),
-                    theme.dim.apply_to(symbols.box_horizontal.repeat(remaining)),
-                    theme.dim.apply_to(symbols.box_top_right)
+                    title_with_spaces.bold()
                 ))?;
                 lines += 1;
+                
+                // ONE blank line after title (with bar)
+                term.write_line(&format!("{}", bar))?;
+                lines += 1;
 
-                // Options line
+                // Options line (with bar)
                 let yes = if self.value {
-                    format!("[{}]", theme.primary.apply_to("Yes"))
+                    theme.primary.apply_to("Yes").to_string()
                 } else {
-                    format!("[{}]", theme.dim.apply_to("Yes"))
+                    theme.dim.apply_to("Yes").to_string()
                 };
-                let no = if !self.value {
-                    format!("[{}]", theme.primary.apply_to("No"))
-                } else {
-                    format!("[{}]", theme.dim.apply_to("No"))
-                };
-                term.write_line(&format!("{}  {} / {}", bar, yes, no))?;
+                term.write_line(&format!("{}  {}", bar, yes))?;
                 lines += 1;
             }
             State::Submit => {
@@ -119,6 +113,9 @@ impl PromptInteraction for Confirm {
                 let answer = if self.value { "Yes" } else { "No" };
                 let display = theme.dim.apply_to(answer);
                 term.write_line(&format!("{}{} {}  {}", bar, symbol, self.message.bold(), display))?;
+                lines += 1;
+                // Add spacing after completion
+                term.write_line("")?;
                 lines += 1;
             }
             State::Cancel => {

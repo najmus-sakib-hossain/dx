@@ -1,0 +1,164 @@
+Since the **DX Serializer** is already complete, here is the master plan to build the **DX Engine** (Runtime, Plugins, Daemon, and CLI) around it.
+
+This plan focuses on wiring your existing serializer into the **Polyglot WASM Runtime** and setting up the **24/7 Low-CPU Daemon**.
+
+### 🏗️ The Project Structure (Integrating your Serializer)
+
+We assume your serializer is in `crates/serializer`. We will build the rest around it.
+
+```text
+dx/
+├── Cargo.toml                  # Workspace Root
+├── config.sr                   # Global Config
+├── crates/
+│   ├── serializer/             # [DONE] Your existing code
+│   ├── core/                   # [TODO] Shared Types, Ghost Logger, Security
+│   ├── plugins/                # [TODO] Compiler (Javy/Componentize-py) & Runtime
+│   ├── daemon/                 # [TODO] 24/7 Async Orchestrator
+│   └── cli/                    # [TODO] Command Line Interface
+└── plugins/                    # [TODO] The WASM Source Ecosystem
+    ├── integrations/           # Node.js (Messaging)
+    ├── providers/              # Python (LLMs)
+    └── tools/                  # Rust/Native (High Perf)
+```
+
+---
+
+### 🗺️ Phase 1: The Core (The Nervous System)
+**Goal:** Define safety rules and AI visibility ("Ghost Mode").
+
+**Key Components:**
+1.  **`Ghost` Logger:** A structured `stderr` logger so Copilot knows what's happening without seeing the screen.
+2.  **`SecurityPolicy`:** Logic that returns `Action::Allowed` or `Action::RequireConfirmation` based on the command (e.g., `rm` vs `ls`).
+3.  **`Exchange Format`:** Re-export your `dx-serializer` types here so all crates speak the same language.
+
+**Action:**
+*   Create `crates/core`.
+*   Define the `ExtensionType` enum (`Integration`, `Provider`, `Tool`).
+*   Implement `Ghost::log(level, context, msg)` for the feedback loop.
+
+---
+
+### 🔌 Phase 2: The Plugin Runtime (The Polyglot Engine)
+**Goal:** Make Node.js, Python, and Rust compile to WASM and run securely.
+
+**This is the most critical part of your specific stack:**
+
+1.  **The Builder (Auto-Compilation):**
+    *   **Node.js (Integrations):** Detects `package.json`. Runs `esbuild` -> `javy` -> `.wasm`.
+    *   **Python (Providers):** Detects `pyproject.toml`. Runs `componentize-py` -> `.wasm`.
+    *   **Rust (Tools):** Detects `Cargo.toml`. Runs `cargo build --target wasm32-wasi` -> `.wasm`.
+
+2.  **The Host (Wasmtime):**
+    *   Initialize `wasmtime::Engine`.
+    *   **Sandboxing:** Map the `workspace/` directory to the WASM instance. **Do not map root (`/`).**
+    *   **Linking:** Expose host functions (like `dx_host_log` or `dx_host_http`) to the guests.
+
+**Action:**
+*   Create `crates/plugins`.
+*   Implement `Builder::compile(path) -> Vec<u8>`.
+*   Implement `Runtime::load(wasm_bytes)`.
+
+---
+
+### 🧠 Phase 3: The Daemon (The 24/7 Brain)
+**Goal:** A persistent process using Tokio that sleeps (0% CPU) until an event occurs.
+
+**Architecture:**
+1.  **IPC Server:** Listen on a Unix Domain Socket (`/tmp/dx.sock`) or Windows Named Pipe.
+2.  **State Manager:** Keep track of active Agents and loaded WASM modules in memory to avoid cold-starts.
+3.  **The Event Loop:**
+    *   `tokio::select!` on:
+        *   Incoming Socket Connections (Commands from CLI).
+        *   Incoming Webhooks (if exposed).
+        *   Timer (Scheduled tasks).
+
+**Optimization:**
+*   When no tasks are running, the Tokio runtime parks the thread. Energy usage is near zero.
+
+**Action:**
+*   Create `crates/daemon`.
+*   Set up the `UnixListener`.
+*   Implement the message handling loop using your `dx-serializer` binary format for IPC.
+
+---
+
+### 💻 Phase 4: The CLI (The Interface)
+**Goal:** User interaction and Safety enforcement.
+
+**Responsibilities:**
+1.  **Command Parsing:** Parse `dx run`, `dx plugin add`, etc.
+2.  **Daemon Client:** Connect to `/tmp/dx.sock`, serialize the command (using `dx-serializer`), send it, print response.
+3.  **The Gatekeeper (UI):**
+    *   If the Daemon responds with `AuthorizationRequired { risk: High }` (e.g., for a delete op), the CLI **must** render a TUI prompt:
+    *   *"⚠️ Agent wants to DELETE /production/db. Are you sure? [y/N]"*
+
+**Action:**
+*   Create `crates/cli`.
+*   Implement the client logic.
+*   Implement the TUI confirmation dialog.
+
+---
+
+### 📅 Implementation Roadmap
+
+Here is the step-by-step order to build this efficiently:
+
+1.  **Core:** Define the `Ghost` logger immediately so you can debug the rest.
+2.  **Plugins (Builder):** Write the Rust code that calls `javy` and `componentize-py`. Test that you can turn a JS file and a Python file into WASM.
+3.  **Plugins (Runtime):** Write the Wasmtime host code to run those WASM files.
+4.  **Daemon:** Set up the listener. Connect the Runtime to the Daemon.
+5.  **CLI:** Build the client to talk to the Daemon.
+
+### 🚀 Immediate "Fast Feedback" Dev Script
+
+To help you develop this rapidly with AI, create a script `dev-loop.sh` in your root:
+
+```bash
+#!/bin/bash
+# dx/dev-loop.sh
+
+# 1. Build everything
+cargo build
+
+# 2. Start Daemon in background (Ghost Mode ON)
+# This lets Copilot see the daemon's internal logs in the terminal
+./target/debug/dx daemon start --foreground &
+DAEMON_PID=$!
+
+# 3. Wait for boot
+sleep 1
+
+# 4. Run a test command via CLI
+./target/debug/dx run --agent "test-agent"
+
+# 5. Kill Daemon
+kill $DAEMON_PID
+```
+
+Running this script gives your AI a full "Run -> Log -> Result" cycle in text format, perfect for the GitHub Copilot terminal integration.
+
+
+
+
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║   ██████╗ ██╗  ██╗     █████╗  ██████╗ ███████╗███╗   ██╗████████╗║
+║   ██╔══██╗╚██╗██╔╝    ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝║
+║   ██║  ██║ ╚███╔╝     ███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║   ║
+║   ██║  ██║ ██╔██╗     ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║   ║
+║   ██████╔╝██╔╝ ██╗    ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║   ║
+║   ╚═════╝ ╚═╝  ╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝   ║
+║                                                                   ║
+║   🤖 AGI-like AI Agent | Connect to ANY app | 70% token savings   ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+┌  Welcome to DX - Your AGI-like AI Agent
+│  ● Let's set up your AI chat experience with multiple providers, tools, and integrations.
+◇  Select AI providers to configure:  
+│  ◻ OpenAI (GPT-4, GPT-3.5) Most popular, great for general tasks
+│  ◻ Anthropic (Claude) Excellent for analysis and writing
+│  ◻ Google (Gemini) Fast and cost-effective
+│  ◻ Ollama (Local models) Run models locally for privacy
+│  ◻ Custom API endpoint Connect to any OpenAI-compatible API

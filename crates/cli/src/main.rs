@@ -316,11 +316,14 @@ async fn main() -> anyhow::Result<()> {
 }
 
 async fn run_onboarding() -> anyhow::Result<()> {
-    use prompts::{confirm, intro, log, multiselect, outro, select, PromptInteraction};
+    use prompts::{box_section, confirm, intro, log, multiselect, outro, select, PromptInteraction};
 
     intro("Welcome to DX - Your AGI-like AI Agent")?;
 
-    log::info("Let's set up your AI chat experience with multiple providers, tools, and integrations.")?;
+    box_section(
+        "Setup",
+        &["Let's set up your AI chat experience with multiple providers, tools, and integrations."]
+    )?;
 
     // Choose AI providers
     let mut providers_prompt = multiselect("Select AI providers to configure:")
