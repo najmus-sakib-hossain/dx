@@ -1,0 +1,28 @@
+# DX Configuration
+# This file configures the DX Agent for this workspace
+
+# Agent settings
+[agent]
+auto_start = false
+auto_pr = true
+max_concurrent_tasks = 10
+
+# LLM settings
+[llm]
+provider = "anthropic"
+model = "claude-sonnet-4-20250514"
+# api_key = "sk-..." # Set via DX_API_KEY env var
+
+# Default integrations to enable
+[integrations]
+browser = true
+github = false
+telegram = false
+notion = false
+spotify = false
+
+# Scheduled tasks
+# [tasks.check_email]
+# cron = "0 * * * *"
+# skill = "check_email"
+# context = "count=10"

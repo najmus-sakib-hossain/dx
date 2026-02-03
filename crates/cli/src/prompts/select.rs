@@ -226,7 +226,7 @@ impl<T: Clone> PromptInteraction for Select<T> {
                         .map(|h| format!(" {}", theme.dim.apply_to(h)))
                         .unwrap_or_default();
 
-                    term.write_line(&format!("{}  {}{}{}", bar, radio, label, hint))?;
+                    term.write_line(&format!("{}  {} {}{}", bar, radio, label, hint))?;
                     lines += 1;
                 }
 

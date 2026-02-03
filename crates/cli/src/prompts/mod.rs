@@ -261,9 +261,8 @@ fn term_write(line: impl Display) -> io::Result<()> {
 pub fn intro(title: impl Display) -> io::Result<()> {
     let theme = THEME.read().unwrap();
     let symbols = &*SYMBOLS;
-    // No newline after intro - next prompt will continue immediately
     term_write(format!(
-        "{}  {}",
+        "{}  {}\n",
         theme.dim.apply_to(symbols.bar_start),
         title,
     ))
@@ -476,19 +475,25 @@ pub mod log {
 
     /// Prints an info message.
     pub fn info(text: impl Display) -> io::Result<()> {
-        eprintln!("  {} {}", "●".blue(), text);
+        let theme = THEME.read().unwrap();
+        let symbols = &*SYMBOLS;
+        eprintln!("{}  {} {}", theme.dim.apply_to(symbols.bar), "●".blue(), text);
         Ok(())
     }
 
     /// Prints a success message.
     pub fn success(text: impl Display) -> io::Result<()> {
-        eprintln!("  {} {}", "✓".green().bold(), text);
+        let theme = THEME.read().unwrap();
+        let symbols = &*SYMBOLS;
+        eprintln!("{}  {} {}", theme.dim.apply_to(symbols.bar), "✓".green().bold(), text);
         Ok(())
     }
 
     /// Prints a warning message.
     pub fn warning(text: impl Display) -> io::Result<()> {
-        eprintln!("  {} {}", "⚠".yellow().bold(), text);
+        let theme = THEME.read().unwrap();
+        let symbols = &*SYMBOLS;
+        eprintln!("{}  {} {}", theme.dim.apply_to(symbols.bar), "⚠".yellow().bold(), text);
         Ok(())
     }
 

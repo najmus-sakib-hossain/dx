@@ -313,7 +313,7 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
                         .map(|h| format!(" {}", theme.dim.apply_to(h)))
                         .unwrap_or_default();
 
-                    term.write_line(&format!("{}  {}{}{}", bar, checkbox, label, hint))?;
+                    term.write_line(&format!("{}  {} {}{}", bar, checkbox, label, hint))?;
                     lines += 1;
                 }
 
