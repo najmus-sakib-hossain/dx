@@ -316,13 +316,90 @@ async fn main() -> anyhow::Result<()> {
 }
 
 async fn run_onboarding() -> anyhow::Result<()> {
-    use prompts::{box_section, confirm, intro, log, multiselect, outro, select, PromptInteraction};
+    use prompts::{
+        autocomplete, box_section, confirm, intro, list_editor, log, multiselect, number, outro,
+        rating, select, slider, tags, text, toggle, PromptInteraction, Validate,
+    };
 
     intro("Welcome to DX - Your AGI-like AI Agent")?;
 
     box_section(
-        "Setup",
-        &["Let's set up your AI chat experience with multiple providers, tools, and integrations."]
+        "Interactive Prompt Showcase",
+        &[
+            "Experience our beautiful CLI prompt system!",
+            "We'll demonstrate 15+ different input types with our design system.",
+        ],
+    )?;
+
+    // Text Input Demo
+    let mut name_prompt = text("What's your name?")
+        .placeholder("Enter your name")
+        .validate(|input: &str| {
+            if input.trim().is_empty() {
+                Validate::Invalid("Name cannot be empty".to_string())
+            } else if input.len() < 2 {
+                Validate::Invalid("Name must be at least 2 characters".to_string())
+            } else {
+                Validate::Valid
+            }
+        });
+    let name = name_prompt.interact()?;
+
+    log::success(format!("Welcome, {}! Let's continue with the setup.", name))?;
+
+    // Rating Demo
+    let mut satisfaction_prompt = rating("How satisfied are you with CLI tools?").max(5);
+    let _satisfaction = satisfaction_prompt.interact()?;
+
+    // Toggle Demo
+    let mut notifications_prompt = toggle("Enable desktop notifications?")
+        .labels("Enabled", "Disabled")
+        .initial_value(true);
+    let _notifications = notifications_prompt.interact()?;
+
+    // Slider Demo
+    let mut confidence_prompt = slider("Set AI confidence threshold (0-100)", 0, 100)
+        .step(5)
+        .initial_value(75);
+    let _confidence = confidence_prompt.interact()?;
+
+    log::info("Great choices! Now let's configure your team settings.")?;
+
+    // Number Input Demo
+    let mut team_size_prompt = number("How many team members will use DX?").min(1).max(1000);
+    let team_size = team_size_prompt.interact()?;
+
+    if team_size > 10 {
+        log::info("Great! DX scales perfectly for large teams.")?;
+    }
+
+    // Tags Demo
+    let mut skills_prompt = tags("Enter your team's skills")
+        .placeholder("Type a skill and press Enter or comma");
+    let _skills = skills_prompt.interact()?;
+
+    // List Editor Demo
+    let mut goals_prompt = list_editor("Manage your project goals")
+        .initial_items(vec!["Launch MVP".to_string(), "Get 100 users".to_string()]);
+    let _goals = goals_prompt.interact()?;
+
+    // Autocomplete Demo
+    let mut framework_prompt = autocomplete("Select your primary development framework:")
+        .item_with_description("react", "React", "A JavaScript library for building UIs")
+        .item_with_description("vue", "Vue.js", "The Progressive JavaScript Framework")
+        .item_with_description("angular", "Angular", "Platform for building mobile and desktop apps")
+        .item_with_description("svelte", "Svelte", "Cybernetically enhanced web apps")
+        .item_with_description("nextjs", "Next.js", "The React Framework for Production")
+        .item_with_description("nuxt", "Nuxt", "The Intuitive Vue Framework")
+        .item_with_description("astro", "Astro", "Build faster websites")
+        .item_with_description("remix", "Remix", "Full stack web framework")
+        .item_with_description("solid", "SolidJS", "Simple and performant reactivity")
+        .item_with_description("qwik", "Qwik", "Resumable framework");
+    let _framework = framework_prompt.interact()?;
+
+    box_section(
+        "AI Configuration",
+        &["Now let's configure your AI providers and integrations."],
     )?;
 
     // Choose AI providers

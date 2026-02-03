@@ -15,19 +15,35 @@ pub mod cursor;
 pub mod interaction;
 
 #[allow(unused)]
+pub mod autocomplete;
+#[allow(unused)]
 pub mod confirm;
 #[allow(unused)]
 pub mod input;
 #[allow(unused)]
+pub mod list;
+#[allow(unused)]
 pub mod multiselect;
+#[allow(unused)]
+pub mod number;
 #[allow(unused)]
 pub mod password;
 #[allow(unused)]
 pub mod progress;
 #[allow(unused)]
+pub mod rating;
+#[allow(unused)]
 pub mod select;
 #[allow(unused)]
+pub mod slider;
+#[allow(unused)]
 pub mod spinner;
+#[allow(unused)]
+pub mod tags;
+#[allow(unused)]
+pub mod text;
+#[allow(unused)]
+pub mod toggle;
 
 use console::Term;
 use once_cell::sync::Lazy;
@@ -36,21 +52,37 @@ use std::io;
 use std::sync::RwLock;
 
 #[allow(unused)]
+pub use autocomplete::{autocomplete, Autocomplete, AutocompleteItem};
+#[allow(unused)]
 pub use confirm::Confirm;
 #[allow(unused)]
 pub use input::Input;
 #[allow(unused)]
 pub use interaction::{PromptInteraction, State, Validate};
 #[allow(unused)]
+pub use list::{list_editor, ListEditor};
+#[allow(unused)]
 pub use multiselect::{MultiSelect, MultiSelectItem};
+#[allow(unused)]
+pub use number::{number, Number};
 #[allow(unused)]
 pub use password::Password;
 #[allow(unused)]
 pub use progress::ProgressBar;
 #[allow(unused)]
+pub use rating::{rating, Rating};
+#[allow(unused)]
 pub use select::{Select, SelectItem};
 #[allow(unused)]
+pub use slider::{slider, Slider};
+#[allow(unused)]
 pub use spinner::Spinner;
+#[allow(unused)]
+pub use tags::{tags, Tags};
+#[allow(unused)]
+pub use text::{text, Text};
+#[allow(unused)]
+pub use toggle::{toggle, Toggle};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Theme Configuration
