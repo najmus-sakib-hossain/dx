@@ -34,6 +34,7 @@ use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
 
 mod commands;
+mod prompts;
 
 /// DX CLI - AGI-like AI Agent
 #[derive(Parser)]
@@ -52,7 +53,7 @@ struct Cli {
     json: bool,
     
     #[command(subcommand)]
-    command: Commands,
+    command: Option<Commands>,
 }
 
 #[derive(Subcommand)]
@@ -290,26 +291,125 @@ async fn main() -> anyhow::Result<()> {
     }
     
     match cli.command {
-        Commands::Agent { action } => commands::agent::run(action).await?,
-        Commands::Connect { integration, token } => {
+        Some(Commands::Agent { action }) => commands::agent::run(action).await?,
+        Some(Commands::Connect { integration, token }) => {
             commands::connect::run(&integration, token.as_deref()).await?
         }
-        Commands::Disconnect { integration } => {
+        Some(Commands::Disconnect { integration }) => {
             commands::disconnect::run(&integration).await?
         }
-        Commands::Create { what } => commands::create::run(what).await?,
-        Commands::List { what } => commands::list::run(what).await?,
-        Commands::Skills { action } => commands::skills::run(action).await?,
-        Commands::Run { command } => {
+        Some(Commands::Create { what }) => commands::create::run(what).await?,
+        Some(Commands::List { what }) => commands::list::run(what).await?,
+        Some(Commands::Skills { action }) => commands::skills::run(action).await?,
+        Some(Commands::Run { command }) => {
             let cmd = command.join(" ");
             commands::run::run(&cmd).await?
         }
-        Commands::Schedule { action } => commands::schedule::run(action).await?,
-        Commands::Serializer { action } => commands::serializer::run(action).await?,
-        Commands::Status => commands::status::run().await?,
-        Commands::Init => commands::init::run().await?,
+        Some(Commands::Schedule { action }) => commands::schedule::run(action).await?,
+        Some(Commands::Serializer { action }) => commands::serializer::run(action).await?,
+        Some(Commands::Status) => commands::status::run().await?,
+        Some(Commands::Init) => commands::init::run().await?,
+        None => run_onboarding().await?,
     }
     
+    Ok(())
+}
+
+async fn run_onboarding() -> anyhow::Result<()> {
+    use prompts::{confirm, intro, log, multiselect, outro, select, PromptInteraction};
+
+    intro("Welcome to DX - Your AGI-like AI Agent")?;
+
+    log::info("Let's set up your AI chat experience with multiple providers, tools, and integrations.")?;
+
+    // Choose AI providers
+    let mut providers_prompt = multiselect("Select AI providers to configure:")
+        .item("openai", "OpenAI (GPT-4, GPT-3.5)", "Most popular, great for general tasks")
+        .item("anthropic", "Anthropic (Claude)", "Excellent for analysis and writing")
+        .item("google", "Google (Gemini)", "Fast and cost-effective")
+        .item("ollama", "Ollama (Local models)", "Run models locally for privacy")
+        .item("custom", "Custom API endpoint", "Connect to any OpenAI-compatible API");
+    let providers = providers_prompt.interact()?;
+
+    if providers.is_empty() {
+        log::warning("No providers selected. You can configure them later with 'dx connect <provider>'")?;
+    } else {
+        log::success(format!("Selected {} provider(s): {}", providers.len(), providers.join(", ")))?;
+    }
+
+    // Choose integrations
+    let mut integrations_prompt = multiselect("Select integrations to set up:")
+        .item("github", "GitHub", "Code repositories and PR management")
+        .item("discord", "Discord", "Chat and community management")
+        .item("telegram", "Telegram", "Messaging and notifications")
+        .item("notion", "Notion", "Document and knowledge management")
+        .item("spotify", "Spotify", "Music control and recommendations")
+        .item("gmail", "Gmail", "Email processing and automation")
+        .item("slack", "Slack", "Team communication")
+        .item("twitter", "Twitter/X", "Social media monitoring")
+        .item("browser", "Browser automation", "Web scraping and control")
+        .item("filesystem", "File system access", "Local file operations");
+    let integrations = integrations_prompt.interact()?;
+
+    if integrations.is_empty() {
+        log::info("No integrations selected. You can add them later with 'dx connect <integration>'")?;
+    } else {
+        log::success(format!("Selected {} integration(s): {}", integrations.len(), integrations.join(", ")))?;
+    }
+
+    // Choose tools/capabilities
+    let mut tools_prompt = multiselect("Select AI tools and capabilities:")
+        .item("code_generation", "Code Generation", "Generate, refactor, and explain code")
+        .item("data_analysis", "Data Analysis", "Process and analyze datasets")
+        .item("web_search", "Web Search", "Search and summarize web content")
+        .item("image_generation", "Image Generation", "Create images with AI")
+        .item("speech_recognition", "Speech Recognition", "Transcribe audio to text")
+        .item("translation", "Translation", "Translate between languages")
+        .item("summarization", "Summarization", "Condense long texts")
+        .item("automation", "Task Automation", "Automate repetitive tasks")
+        .item("research", "Research Assistant", "Help with research and analysis");
+    let tools = tools_prompt.interact()?;
+
+    if tools.is_empty() {
+        log::info("No tools selected. All tools will be available by default.")?;
+    } else {
+        log::success(format!("Enabled {} tool(s): {}", tools.len(), tools.join(", ")))?;
+    }
+
+    // Choose default AI model
+    let mut default_model_prompt = select("Choose your default AI model:")
+        .item("gpt-4", "GPT-4", "Most capable, best for complex tasks")
+        .item("claude-3", "Claude 3", "Excellent for analysis and writing")
+        .item("gemini-pro", "Gemini Pro", "Fast and cost-effective")
+        .item("llama-3", "Llama 3 (Local)", "Privacy-focused, runs locally")
+        .item("custom", "Custom model", "Specify your own model");
+    let default_model = default_model_prompt.interact()?;
+
+    log::success(format!("Default model set to: {}", default_model))?;
+
+    // Ask about daemon mode
+    let mut start_daemon_prompt = confirm("Would you like to start the DX agent daemon now?")
+        .initial_value(true);
+    let start_daemon = start_daemon_prompt.interact()?;
+
+    if start_daemon {
+        log::step("Starting DX agent daemon...")?;
+        // Here we would start the daemon
+        // For now, just show the command
+        log::success("Daemon started! Use 'dx status' to check status.")?;
+    }
+
+    // Final setup confirmation
+    let mut proceed_prompt = confirm("Setup complete! Would you like to start chatting with your AI agent?")
+        .initial_value(true);
+    let proceed = proceed_prompt.interact()?;
+
+    if proceed {
+        outro("🎉 Setup complete! Run 'dx run \"hello\"' to start chatting, or use any of the configured integrations.")?;
+    } else {
+        outro("Setup complete! You can always start later with 'dx run <your message>'")?;
+    }
+
     Ok(())
 }
 

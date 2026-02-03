@@ -9,6 +9,7 @@ members = [
     "crates/serializer",
     "crates/wasm",
 ]
+default-members = ["crates/cli"]
 
 [workspace.lints.rust]
 unsafe_code = "warn"

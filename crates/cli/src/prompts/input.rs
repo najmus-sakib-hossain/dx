@@ -154,10 +154,10 @@ where
                 }
                 console::Key::Tab => {
                     // Use default value if input is empty
-                    if self.cursor.is_empty()
-                        && let Some(ref default) = self.default_value
-                    {
-                        self.cursor = StringCursor::from(default.clone());
+                    if self.cursor.is_empty() {
+                        if let Some(ref default) = self.default_value {
+                            self.cursor = StringCursor::from(default.clone());
+                        }
                     }
                 }
                 console::Key::Char(c) => {

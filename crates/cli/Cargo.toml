@@ -1,5 +1,5 @@
 [package]
-name = "dx-cli"
+name = "dx"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -32,3 +32,9 @@ indicatif = "0.17"
 
 # Config file parsing
 toml = "0.8"
+
+# Interactive prompts
+console = "0.15"
+owo-colors = "4"
+once_cell = "1"
+zeroize = "1"

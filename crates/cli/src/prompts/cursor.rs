@@ -1,13 +1,20 @@
 //! String cursor for text editing
 
 use std::fmt::{Display, Formatter, Result};
-use zeroize::ZeroizeOnDrop;
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// A cursor for editing text strings with full navigation support.
-#[derive(Default, ZeroizeOnDrop, Clone)]
+#[derive(Default, Clone)]
 pub struct StringCursor {
     value: Vec<char>,
     cursor: usize,
+}
+
+impl Zeroize for StringCursor {
+    fn zeroize(&mut self) {
+        self.value.zeroize();
+        self.cursor = 0;
+    }
 }
 
 /// Returns the indices of word boundaries in the given string.
@@ -240,3 +247,5 @@ impl From<String> for StringCursor {
         Self::from(s.as_str())
     }
 }
+
+impl ZeroizeOnDrop for StringCursor {}
