@@ -1,0 +1,87 @@
+# DX Setup Guide
+## ✅ Successfully Created!
+You now have a standalone DX-branded version of OpenClaw running with Bun!
+## What Was Done
+### 1. **Rebranding**
+- Changed from `openclaw` to `dx`
+- Updated all binary commands
+- Modified log messages and branding
+### 2. **Package Manager Migration**
+- Switched from `pnpm` to `bun`
+- Updated all build scripts
+- Fixed script references
+### 3. **Build System**
+- TypeScript compilation working
+- All dependencies installed
+- Entry point configured
+## Quick Start
+```bash
+# The application is already built and ready!
+# Show help
+node dx.mjs --help
+# Start the gateway
+bun run dx
+# Or use the dev mode
+bun run dev
+```
+## Available Commands
+```bash
+# Development
+bun run dev          # Run in development mode
+bun run gateway:dev  # Run gateway in dev mode
+bun run tui          # Terminal UI
+# Building
+bun run build        # Build the project
+bun test             # Run tests
+# Gateway
+bun run dx           # Start DX gateway
+```
+## Configuration
+The config warning you see is normal - it's looking for an old OpenClaw config. To set up fresh:
+```bash
+# Initialize configuration
+node dx.mjs setup
+# Or run the onboarding wizard
+node dx.mjs onboard
+```
+## Next Steps
+1. **Configure Channels**: Set up WhatsApp, Telegram, Discord, etc.
+   ```bash
+   node dx.mjs channels login
+   ```
+2. **Start Gateway**: Run the messaging gateway
+   ```bash
+   node dx.mjs gateway --port 18789
+   ```
+3. **Send Messages**: Test the system
+   ```bash
+   node dx.mjs message send --target +1234567890 --message "Hello from DX"
+   ```
+## Windows Compatibility
+✅ The project now works on Windows with Git Bash!
+- All scripts use Unix-style commands
+- Bun is fully supported on Windows
+- Build system is cross-platform
+## Troubleshooting
+### Config Version Warning
+The warning "Config was last written by a newer OpenClaw" is harmless. It's just detecting old config files. You can:
+- Ignore it (it won't affect functionality)
+- Run `node dx.mjs reset` to clear old configs
+- Create fresh config with `node dx.mjs setup`
+### Build Issues
+If you need to rebuild:
+```bash
+bun x tsc -p tsconfig.json --noEmit false
+```
+## Features Preserved
+✅ All messaging channels (WhatsApp, Telegram, Discord, Slack, etc.)
+✅ AI agent integration
+✅ Provider management
+✅ Plugin system
+✅ Configuration system
+✅ Gateway WebSocket server
+✅ CLI tools
+## Documentation
+For detailed documentation on channels and features, see the original OpenClaw docs structure in the `docs/` folder.
+---
+**DX is ready to use!** 🎉

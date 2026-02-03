@@ -1,0 +1,80 @@
+# DX - Multi-Channel Messaging Gateway
+DX is a powerful multi-channel messaging gateway with AI agent support, built on the OpenClaw foundation.
+## Features
+- **Multi-Channel Support**: WhatsApp, Telegram, Slack, Discord, Google Chat, Signal, iMessage, and more
+- **AI Agent Integration**: Built-in support for AI-powered conversations
+- **Provider Support**: Works with multiple messaging providers and channels
+- **Extensible**: Plugin system for custom integrations
+## Quick Start
+### Prerequisites
+- Bun >= 1.0.0
+- Node.js >= 22.12.0
+### Installation
+```bash
+# Install dependencies
+bun install
+# Build the project
+bun run build
+# Start the gateway
+bun run start
+```
+### Development
+```bash
+# Run in development mode
+bun run dev
+# Run the gateway with auto-reload
+bun run gateway:watch
+# Run tests
+bun test
+```
+## Configuration
+Configuration files are located in `~/.dx/` directory. The main configuration file is `dx.json`.
+Example minimal configuration:
+```json
+{
+  "agent": {
+    "model": "anthropic/claude-opus-4-5"
+  },
+  "channels": {
+    "telegram": {
+      "botToken": "YOUR_BOT_TOKEN"
+    }
+  }
+}
+```
+## Available Commands
+- `bun scripts/run-node.mjs gateway` - Start the gateway server
+- `bun scripts/run-node.mjs chat` - Simple terminal chat interface (NEW!)
+- `bun scripts/run-node.mjs tui` - Full-featured terminal UI
+- `bun scripts/run-node.mjs agent` - Run agent commands
+- `bun scripts/run-node.mjs channels` - Manage messaging channels
+- `bun scripts/run-node.mjs status` - Check system status
+- `bun run build` - Build the project
+- `bun test` - Run tests
+### Chat Command (Quick Start)
+The new `chat` command provides a simple way to interact with your AI agent:
+```bash
+# Start the gateway first
+bun scripts/run-node.mjs gateway
+# In another terminal, start chat
+bun scripts/run-node.mjs chat
+# With options
+bun scripts/run-node.mjs chat --session work --model google-antigravity/claude-opus-4-5-thinking
+```
+See [CHAT_USAGE.md](./CHAT_USAGE.md) for complete documentation.
+## Channels
+DX supports the following messaging channels:
+- WhatsApp (via Baileys)
+- Telegram
+- Discord
+- Slack
+- Google Chat
+- Signal
+- iMessage
+- Microsoft Teams
+- Matrix
+- And more...
+## License
+MIT
+## Credits
+Built on the OpenClaw foundation with DX branding.

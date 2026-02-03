@@ -1,0 +1,45 @@
+# DX CLI Agent System Instructions
+## Overview
+DX CLI is an advanced Rust-based AI agent designed for AGI-like functionality. It connects to various user-facing applications (WhatsApp, Telegram, Discord, Messenger, Facebook, X, GitHub, Notion, Spotify, etc.), controls user tools (browser, command execution), and provides a secure, fast, and efficient platform for automation and integration.
+## Core Principles
+- **Token Efficiency**: Uses DX Serializer for 70%+ token savings over JSON.
+- **Performance**: Built with Rust for 10-80x faster execution than Node.js/TypeScript alternatives.
+- **Security**: Memory-safe, zero-GC, compile-time guarantees.
+- **Extensibility**: Supports WASM injection for integrations, allowing compilation of Python/Node.js code to WASM for seamless integration.
+- **Self-Updating**: Can modify its own code via config files to add new capabilities instantly.
+- **Multi-Workspace**: Handles multiple tasks simultaneously (emails, todos, coding).
+## Architecture
+- **Dual-Daemon System**:
+  - Agent Daemon: Personal assistant running 24/7.
+  - Project Daemon: Coding assistant activated per workspace.
+- **DX Serializer**: 3-format system (Human → LLM → Machine) with 52-73% token savings.
+- **WASM Runtime**: Injects WASM modules for cross-language integrations.
+- **Machine Format**: Fastest binary format using RKYV (~48ns serialize).
+## Development Guidelines
+- **Always use latest Rust crates**: Research and update to the newest versions from crates.io for optimal performance and security.
+- **Default Terminal**: Use Git Bash Unix commands for all terminal operations.
+- **WASM Integrations**: Compile Python/Node.js code to WASM using tools like Pyodide or wasm-pack for seamless integration.
+- **DX Serializer Usage**: Prefer DX LLM format over JSON in all AI interactions to save tokens.
+- **Plugins**: Create plugins in any language, compile to WASM, and integrate via DX Serializer config.
+## Capabilities
+- Connect to messaging apps, social platforms, and productivity tools.
+- Control browser, run system commands, manage files.
+- Auto-detect integrations and create PRs for new features.
+- Handle multiple workspaces concurrently.
+- Provide secure, one-click installable binary.
+## Instructions for AI Agent
+1. When adding new integrations: Create WASM module, update DX config, reload.
+2. For Python features: Compile to WASM and integrate via DX Serializer.
+3. Use Git Bash for all command-line operations.
+4. Always check for latest Rust crate versions before updates.
+5. Prioritize DX Serializer format in all LLM communications.
+6. Ensure all changes are backward-compatible and secure.
+## Competitive Advantages
+- Beats OpenClaw in performance, token efficiency, and self-updating capabilities.
+- Rust foundation provides unmatched speed and safety.
+- Config-driven architecture enables infinite extensibility.
+## Maintenance
+- Regularly update Rust crates to latest versions.
+- Monitor WASM runtime for new language support.
+- Ensure DX Serializer optimizations are applied across all formats.
+This system is designed to evolve into a full AGI platform, capable of autonomous operation and infinite feature expansion.

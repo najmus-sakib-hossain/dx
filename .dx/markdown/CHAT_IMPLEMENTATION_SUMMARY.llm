@@ -1,0 +1,150 @@
+# Chat Command Implementation Summary
+## What Was Created
+A new `chat` command for OpenClaw that provides a simple, terminal-based interface for interacting with the AI agent.
+## Files Created/Modified
+### New Files
+1. **`openclaw-standalone/src/cli/chat-cli.ts`** - Main chat command implementation
+2. **`openclaw-standalone/CHAT_COMMAND.md`** - Quick reference guide
+3. **`openclaw-standalone/CHAT_USAGE.md`** - Complete usage documentation
+4. **`openclaw-standalone/test-chat.sh`** - Test script for the chat command
+### Modified Files
+1. **`openclaw-standalone/src/cli/program/command-registry.ts`** - Registered the chat command
+2. **`openclaw-standalone/README.md`** - Added chat command to documentation
+## Features Implemented
+✅ **Simple Terminal Interface** - Clean readline-based chat UI
+✅ **Gateway Integration** - Uses existing GatewayChatClient for WebSocket communication
+✅ **Real-time Streaming** - Displays AI responses as they're generated
+✅ **Session Management** - Supports custom session keys for context isolation
+✅ **Model Override** - Can specify different models per chat session
+✅ **Configuration Integration** - Reads from existing OpenClaw config
+✅ **Error Handling** - Clear error messages and connection status
+✅ **Graceful Exit** - Multiple exit methods (exit, quit, Ctrl+C)
+✅ **Provider Support** - Works with all configured providers (Google Antigravity, etc.)
+✅ **Channel Delivery** - Optional flag to send responses to messaging channels
+## Usage
+```bash
+# Basic usage
+bun scripts/run-node.mjs chat
+# With options
+bun scripts/run-node.mjs chat --session work --model google-antigravity/claude-opus-4-5-thinking
+# Remote gateway
+bun scripts/run-node.mjs chat --url ws://remote:18789 --token TOKEN
+# Enable channel delivery
+bun scripts/run-node.mjs chat --deliver
+```
+## Command Options
+t:5(Option,Description,Default)[`--url <url>`,Gateway WebSocket URL,`ws://127.0.0.1:18789` `--token <token>`,Gateway auth token,From config `--session <key>`,Session identifier,`main` `--model <model>`,AI model to use,From config `--deliver`,Send to channels,`false`]
+## Architecture
+```
+Chat CLI (chat-cli.ts)
+    ↓
+GatewayChatClient (tui/gateway-chat.ts)
+    ↓
+GatewayClient (gateway/client.js)
+    ↓
+WebSocket Connection
+    ↓
+Gateway Server (running on ws://127.0.0.1:18789)
+    ↓
+AI Agent (with configured model/provider)
+```
+## How It Works
+1. **Initialization**
+   - Loads OpenClaw configuration
+   - Resolves gateway URL, token, agent ID, and session key
+   - Creates GatewayChatClient instance
+2. **Connection**
+   - Connects to gateway via WebSocket
+   - Waits for "connected" event
+   - Displays connection status
+3. **Message Loop**
+   - Uses Node.js readline for input
+   - Sends user messages via `client.sendChat()`
+   - Listens for `agent.chunk` events for streaming responses
+   - Handles `agent.done` and `agent.error` events
+4. **Exit**
+   - User types "exit" or "quit"
+   - Or presses Ctrl+C
+   - Stops client and closes readline interface
+## Key Implementation Details
+### Event Handling
+```typescript
+client.onEvent = (evt) => {
+  if (evt.event === "agent.chunk") {
+    // Stream text chunks to stdout
+    process.stdout.write(payload.text);
+  } else if (evt.event === "agent.done") {
+    // Response complete, show prompt
+    rl.prompt();
+  } else if (evt.event === "agent.error") {
+    // Display error and recover
+    console.error(error);
+  }
+};
+```
+### Message Sending
+```typescript
+await client.sendChat({
+  sessionKey,
+  message: input,
+  deliver: opts.deliver,
+  thinking: undefined,
+  timeoutMs: undefined,
+});
+```
+### Configuration Resolution
+- Uses existing `loadConfig()` from OpenClaw
+- Resolves agent ID with `resolveDefaultAgentId()`
+- Normalizes session key with `normalizeMainKey()`
+- Falls back to sensible defaults
+## Testing
+The chat command has been tested with:
+- ✅ Gateway connection
+- ✅ Message sending
+- ✅ Response streaming
+- ✅ Exit commands
+- ✅ Error handling
+- ✅ Configuration loading
+## Comparison with TUI
+t:7(Feature,Chat Command,TUI Command)[Complexity,Minimal (~200 lines),Full-featured (~1000+ lines) Interface,Simple readline,Rich TUI with panels Dependencies,Built-in readline,@mariozechner/pi-tui Use Case,Quick chats,Extended sessions History,Session-based,Full history view Commands,Basic (exit/quit),Slash commands (/new, /reset, etc.) Setup,Zero config,May need additional setup]
+## Benefits
+1. **Simplicity** - No complex UI, just type and chat
+2. **Fast** - Quick to start, minimal overhead
+3. **Familiar** - Standard terminal interface
+4. **Portable** - Works anywhere with Node.js/Bun
+5. **Integrated** - Uses existing OpenClaw infrastructure
+6. **Flexible** - Supports all OpenClaw features (sessions, models, providers)
+## Future Enhancements
+Possible improvements:
+- [ ] Command history (up/down arrows)
+- [ ] Multi-line input support
+- [ ] Syntax highlighting for code blocks
+- [ ] Save conversation to file
+- [ ] Load conversation from file
+- [ ] Slash commands (/help, /clear, /model, etc.)
+- [ ] Auto-completion for commands
+- [ ] Color themes
+- [ ] Markdown rendering
+## Troubleshooting
+### Gateway not running
+```bash
+# Start gateway
+bun scripts/run-node.mjs gateway
+```
+### Connection refused
+```bash
+# Check gateway port
+cat ~/.openclaw/openclaw.json | grep -A 3 '"gateway"'
+# Verify gateway is listening
+netstat -an | grep 18789
+```
+### No response from agent
+```bash
+# Check gateway logs
+tail -f /tmp/openclaw/openclaw-*.log
+# Verify model configuration
+cat ~/.openclaw/openclaw.json | grep -A 5 '"agents"'
+```
+## Conclusion
+The chat command provides a simple, effective way to interact with OpenClaw's AI agent directly from the terminal. It's perfect for quick conversations, testing, and debugging without needing to set up messaging channels.
+The implementation is minimal (~200 lines), uses existing OpenClaw infrastructure, and provides a clean user experience.

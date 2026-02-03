@@ -1,0 +1,136 @@
+# OpenClaw Chat Command - Complete Guide
+## Quick Start
+```bash
+# 1. Make sure the gateway is running
+bun scripts/run-node.mjs gateway
+# 2. In another terminal, start chat
+bun scripts/run-node.mjs chat
+```
+## What is the Chat Command?
+The `chat` command provides a simple, terminal-based interface to interact with your OpenClaw AI agent. It's perfect for:
+- Quick conversations with your AI
+- Testing agent responses
+- Debugging agent behavior
+- Interactive sessions without needing a messaging app
+## Installation & Setup
+### Prerequisites
+1. **Build the project**:
+   ```bash
+   cd openclaw-standalone
+   bun install
+   bun run build
+   ```
+2. **Start the gateway**:
+   ```bash
+   bun scripts/run-node.mjs gateway
+   ```
+   
+   The gateway must be running for chat to work.
+3. **Verify configuration** (`~/.openclaw/openclaw.json`):
+   - Gateway port and auth token are set
+   - Default model is configured
+   - Provider credentials are valid
+## Usage Examples
+### Basic Chat
+```bash
+bun scripts/run-node.mjs chat
+```
+### Custom Session
+Keep separate conversation contexts:
+```bash
+bun scripts/run-node.mjs chat --session work
+bun scripts/run-node.mjs chat --session personal
+```
+### Different Model
+```bash
+bun scripts/run-node.mjs chat --model google-antigravity/claude-opus-4-5-thinking
+```
+### Remote Gateway
+```bash
+bun scripts/run-node.mjs chat --url ws://192.168.1.100:18789 --token YOUR_TOKEN
+```
+### Enable Channel Delivery
+Send responses to configured channels (WhatsApp, Telegram, etc.):
+```bash
+bun scripts/run-node.mjs chat --deliver
+```
+## Command Reference
+t:5(Option,Description,Default)[`--url <url>`,Gateway WebSocket URL,`ws://127.0.0.1:18789` `--token <token>`,Gateway auth token,From config `--session <key>`,Session identifier,`main` `--model <model>`,AI model to use,From config `--deliver`,Send to channels,`false`]
+## Interactive Commands
+While in chat:
+- **Type a message** - Send to the AI agent
+- **`exit`** - Leave the chat gracefully  
+- **`quit`** - Same as exit
+- **Ctrl+C** - Force quit immediately
+## Troubleshooting
+### "Failed to connect to gateway"
+**Problem**: Gateway is not running or wrong URL/port
+**Solution**:
+```bash
+# Check if gateway is running
+ps aux | grep gateway
+# Start gateway if not running
+bun scripts/run-node.mjs gateway
+# Check gateway port in config
+cat ~/.openclaw/openclaw.json | grep -A 3 '"gateway"'
+```
+### "Agent error: ..."
+**Problem**: Model or provider configuration issue
+**Solution**:
+```bash
+# Check agent configuration
+cat ~/.openclaw/openclaw.json | grep -A 10 '"agents"'
+# Verify provider credentials
+bun scripts/run-node.mjs configure
+```
+### No response from agent
+**Problem**: Model not configured or provider auth failed
+**Solution**:
+1. Check gateway logs: `tail -f /tmp/openclaw/openclaw-*.log`
+2. Verify model is set: `cat ~/.openclaw/openclaw.json | grep model`
+3. Test provider: `bun scripts/run-node.mjs doctor`
+### Connection drops
+**Problem**: Gateway crashed or network issue
+**Solution**:
+```bash
+# Check gateway process
+ps aux | grep gateway
+# Restart gateway
+bun scripts/run-node.mjs gateway --force
+```
+## Architecture
+```
+┌─────────────┐         WebSocket          ┌─────────────┐
+│             │ ───────────────────────────>│             │
+│  Chat CLI   │                             │   Gateway   │
+│             │ <───────────────────────────│             │
+└─────────────┘      (streaming events)     └─────────────┘
+                                                    │
+                                                    │
+                                                    v
+                                            ┌─────────────┐
+                                            │   AI Agent  │
+                                            │   (Model)   │
+                                            └─────────────┘
+```
+## Features
+✅ **Real-time streaming** - See responses as they're generated
+✅ **Session persistence** - Conversation context maintained
+✅ **Multiple sessions** - Separate contexts with `--session`
+✅ **Model flexibility** - Override default model per chat
+✅ **Clean interface** - Simple, distraction-free terminal UI
+✅ **Error handling** - Clear error messages and recovery
+✅ **Graceful exit** - Multiple ways to quit safely
+## Comparison with TUI
+t:5(Feature,Chat Command,TUI Command)[Interface,Simple readline,Full TUI with panels History,Session-based,Full history view Commands,Basic,Slash commands Complexity,Minimal,Feature-rich Use Case,Quick chats,Extended sessions]
+## Tips
+1. **Use sessions** for different contexts (work, personal, testing)
+2. **Keep gateway running** in a separate terminal or background
+3. **Check logs** if something goes wrong: `/tmp/openclaw/openclaw-*.log`
+4. **Test with simple messages** first to verify setup
+5. **Use `--deliver`** only when you want responses sent to channels
+## Next Steps
+- Try the full TUI: `bun scripts/run-node.mjs tui`
+- Configure channels: `bun scripts/run-node.mjs channels`
+- Check status: `bun scripts/run-node.mjs status`
+- View sessions: `bun scripts/run-node.mjs sessions`

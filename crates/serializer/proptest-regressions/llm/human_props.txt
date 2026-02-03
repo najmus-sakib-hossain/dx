@@ -1,0 +1,9 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc f89de5f0fe81b78f93212fc2ae3ba0d10b4bf1fa58cf414d59d65ea4e6f6fc4d # shrinks to _dummy = ()
+cc 62cdfe6b01921942ee27250e8c0484cc860fbe5b7f1722ce22294821d67030d7 # shrinks to b = false
+cc 4f9f0b69aa7bc1963bd0c1312902ae6e5c77491a52dc49481c537068687105d7 # shrinks to doc = DxDocument { context: {}, refs: {}, sections: {'h': DxSection { schema: ["nm"], rows: [] }} }

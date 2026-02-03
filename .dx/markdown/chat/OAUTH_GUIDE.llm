@@ -1,0 +1,117 @@
+# OAuth Authentication Guide
+This chat application supports two OAuth flows, matching the OpenClaw integration implementation.
+## Overview
+Both OAuth methods use **PKCE (Proof Key for Code Exchange)** for secure authentication without requiring client secrets to be stored securely.
+## OAuth Methods
+### 1. Gemini CLI OAuth
+**Port**: `8085`  
+**Redirect URI**: `http://localhost:8085/oauth2callback`  
+**Scopes**:
+- `https://www.googleapis.com/auth/cloud-platform`
+- `https://www.googleapis.com/auth/userinfo.email`
+- `https://www.googleapis.com/auth/userinfo.profile`
+**Use Case**: Same credentials as the official Google Gemini CLI tool
+**Implementation**: `oauth-gemini.ts`
+### 2. Antigravity OAuth
+**Port**: `51121`  
+**Redirect URI**: `http://localhost:51121/oauth-callback`  
+**Scopes**:
+- `https://www.googleapis.com/auth/cloud-platform`
+- `https://www.googleapis.com/auth/userinfo.email`
+- `https://www.googleapis.com/auth/userinfo.profile`
+- `https://www.googleapis.com/auth/cclog`
+- `https://www.googleapis.com/auth/experimentsandconfigs`
+**Use Case**: Google Cloud Code Assist (Antigravity) credentials  
+**Default Project**: `rising-fact-p41fc`
+**Implementation**: `oauth-antigravity.ts`
+## How OAuth Works
+1. **Generate PKCE Challenge**
+   - Create random verifier (64 hex chars)
+   - Hash with SHA-256 and base64url encode
+2. **Build Authorization URL**
+   - Include client ID, scopes, challenge, redirect URI
+   - Set `access_type=offline` for refresh token
+   - Set `prompt=consent` to force consent screen
+3. **Start Local Callback Server**
+   - Listen on localhost at specified port
+   - Wait for OAuth callback with authorization code
+4. **Open Browser**
+   - User signs in with Google account
+   - Grants requested permissions
+   - Redirected back to localhost
+5. **Exchange Code for Tokens**
+   - Send authorization code + verifier to token endpoint
+   - Receive access token, refresh token, expiry
+6. **Save Tokens**
+   - Store in `.tokens.json` for reuse
+   - Access token used for API calls
+   - Refresh token for getting new access tokens
+## Token Storage
+Tokens are saved to `.tokens.json` in the chat directory:
+```json
+{
+  "access": "ya29.a0...",
+  "refresh": "1//0g...",
+  "expires": 1738612345678,
+  "projectId": "rising-fact-p41fc"
+}
+```
+**Security Note**: This file contains sensitive credentials. It's gitignored by default.
+## Token Refresh
+Access tokens typically expire after 1 hour. The app currently doesn't implement automatic refresh, but you can:
+1. Re-run OAuth flow when token expires
+2. Implement refresh logic using the refresh token
+3. Use the refresh token with Google's token endpoint
+## Comparison with OpenClaw
+### Similarities
+- Same OAuth client credentials
+- Same PKCE flow implementation
+- Same redirect URIs and ports
+- Same scope requests
+- Token persistence pattern
+### Differences
+- **Simpler**: No plugin system integration
+- **Standalone**: Direct OAuth implementation
+- **Manual refresh**: No automatic token refresh (yet)
+- **Single user**: No profile management
+## Troubleshooting
+### Port Already in Use
+If you see "EADDRINUSE" error:
+```bash
+# Check what's using the port (Linux/Mac)
+lsof -i :8085
+lsof -i :51121
+# Windows
+netstat -ano | findstr :8085
+netstat -ano | findstr :51121
+```
+Kill the process or wait a moment and try again.
+### Browser Doesn't Open
+The app will print the URL to the console. Copy and paste it into your browser manually.
+### OAuth Timeout
+You have 5 minutes to complete the sign-in. If you timeout, just restart the app and try again.
+### Invalid Grant Error
+This usually means:
+- The authorization code was already used
+- The code expired (10 minutes)
+- The verifier doesn't match the challenge
+Solution: Restart the OAuth flow.
+## Advanced: Manual OAuth Flow
+If automatic callback doesn't work (remote server, WSL2, etc.), the app will:
+1. Print the authorization URL
+2. Ask you to paste the full redirect URL
+3. Extract the code and state from your input
+Example redirect URL:
+```
+http://localhost:8085/oauth2callback?code=4/0AY0e-g7...&state=abc123...
+```
+## Security Considerations
+1. **Client Credentials**: Embedded in code (same as OpenClaw)
+2. **PKCE**: Protects against authorization code interception
+3. **Localhost Only**: Callback server only binds to 127.0.0.1
+4. **Token Storage**: Stored locally in `.tokens.json` (gitignored)
+5. **Scopes**: Only requests necessary permissions
+## References
+- [Google OAuth 2.0 Documentation](https://developers.google.com/identity/protocols/oauth2)
+- [PKCE RFC 7636](https://tools.ietf.org/html/rfc7636)
+- [OpenClaw Google Integrations](../openclaw-standalone/extensions/)

@@ -1,0 +1,34 @@
+[package]
+name = "dx-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "DX CLI - AGI-like AI Agent that connects to any app and creates its own integrations"
+
+[[bin]]
+name = "dx"
+path = "src/main.rs"
+
+[dependencies]
+# Internal crates
+dx-core = { path = "../core" }
+dx-agent = { path = "../agent" }
+dx-serializer = { path = "../serializer" }
+dx-integrations = { path = "../integrations" }
+dx-wasm = { path = "../wasm" }
+
+# Workspace dependencies
+clap.workspace = true
+anyhow.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+# Rich terminal output
+colored = "2"
+indicatif = "0.17"
+
+# Config file parsing
+toml = "0.8"

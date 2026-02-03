@@ -1,0 +1,55 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/agent",
+    "crates/api",
+    "crates/cli",
+    "crates/core",
+    "crates/integrations",
+    "crates/serializer",
+    "crates/wasm",
+]
+
+[workspace.lints.rust]
+unsafe_code = "warn"
+unused_imports = "warn"
+
+[workspace.lints.clippy]
+all = "warn"
+pedantic = "warn"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/yourusername/your-repo"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1.49.0", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+
+# Error handling
+anyhow = "1.0.100"
+thiserror = "2.0.18"
+
+# Logging
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
+
+# HTTP client/server
+axum = "0.8.8"
+reqwest = { version = "0.12.28", features = ["json", "multipart"] }
+
+# Database
+sqlx = { version = "0.8.6", features = ["runtime-tokio", "postgres", "sqlite"] }
+
+# CLI
+clap = { version = "4.5.56", features = ["derive"] }
+
+# Testing
+mockall = "0.14.0"

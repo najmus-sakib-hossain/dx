@@ -1,0 +1,12 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 60b70ba8aea22c7dddb7fcff10dfcdfa1d7b28fe11049cbb97f8be36ef4796d2 # shrinks to doc = DxDocument { context: {}, refs: {}, sections: {'a': DxSection { schema: ["aa"], rows: [] }} }
+cc 9a1e871aa024e5d68f2249581989334e15ffceaf9b6504bd4ce4cd16b69d9fa5 # shrinks to items = []
+cc 3e634d3392b4fa2291779c1e4124f624e9c1b267ada3695148f655c7147c66bf # shrinks to doc = DxDocument { context: {}, refs: {}, sections: {'b': DxSection { schema: ["a_"], rows: [] }} }
+cc dfa7d4f807021d2b0289328d2349327746a5e85a9d6ba9fcf484ef84ac237b8c # shrinks to doc = DxDocument { context: {}, refs: {"KVC5M": "f_A6875i2UIlSs1r____"}, sections: {'a': DxSection { schema: ["cog"], rows: [[Str("A_A")]] }} }
+cc 330556f425794e12e7f8c04730b42a7cfa9badf825473beb4f2df4c152cb054b # shrinks to doc = DxDocument { context: {}, refs: {}, sections: {'a': DxSection { schema: ["re_ol", "k155yap7"], rows: [[Str("AA_Aa"), Bool(true)]] }} }
+cc e899e0e20b85d705ebf748e6d7e5384e350bf4249727dd40f2f7a22723e87c89 # shrinks to doc = DxDocument { context: {}, refs: {"ZYA": "Qt7BKk__", "M5_PZ": "95_jc"}, sections: {'a': DxSection { schema: ["ii383"], rows: [[Str("Aa_Aa")]] }} }

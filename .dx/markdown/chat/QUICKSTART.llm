@@ -1,0 +1,92 @@
+# Quick Start Guide
+## Authentication Options
+The chat app supports three authentication methods:
+### 1. API Key (Easiest)
+Get your API key from https://aistudio.google.com/apikey
+**Option A** - Use .env file (recommended):
+```bash
+echo "GOOGLE_API_KEY=your_actual_key_here" > .env
+```
+**Option B** - Export as environment variable:
+```bash
+export GOOGLE_API_KEY=your_actual_key_here
+```
+**Option C** - Enter manually when prompted
+### 2. OAuth (Gemini CLI)
+- No setup required
+- Browser will open automatically
+- Sign in with your Google account
+- Tokens saved to `.tokens.json`
+- Same OAuth as official Gemini CLI
+### 3. OAuth (Antigravity)
+- No setup required
+- Browser will open automatically
+- Sign in with your Google account
+- Tokens saved to `.tokens.json`
+- Uses Google Cloud Code Assist credentials
+## Run the Chat
+```bash
+bun start
+```
+## Example Session
+```
+🤖 Google Gemini Chat
+? Choose authentication method: › 
+  ❯ API Key (Simple & fast)
+    OAuth (Gemini CLI) (Google OAuth for Gemini)
+    OAuth (Antigravity) (Google Cloud Code Assist)
+# If you choose API Key:
+? Enter your Google API Key: › AIza...
+# If you choose OAuth:
+◇  Starting OAuth flow...
+   [Browser opens automatically]
+◆  ✓ OAuth authentication successful
+? Select a model: › 
+  ❯ Gemini 2.0 Flash (Experimental) (Latest & fastest)
+    Gemini 1.5 Pro (Most capable)
+    Gemini 1.5 Flash (Fast & efficient)
+    Gemini 1.5 Flash 8B (Lightweight)
+┌  Ready to chat
+│  Model: Gemini 2.0 Flash (Experimental)
+│  Type 'exit' or press Ctrl+C to quit
+└
+? You: › Hello! What can you help me with?
+◇  Thinking...
+◆  ✓ Response received
+┌  🤖 Assistant
+│  Hello! I'm a large language model, and I can help you with many things...
+└
+   Tokens: 12 in, 45 out
+? You: › 
+```
+## Tips
+- Press Ctrl+C or type `exit` to quit
+- Chat history is maintained during the session
+- Choose faster models (Flash, Flash 8B) for quicker responses
+- Choose Pro models for more complex tasks
+## Troubleshooting
+### API Key Issues
+**"Invalid API key format"**
+- Make sure your key starts with "AIza"
+- Check for extra spaces or quotes
+**"API key not valid"**
+- Verify the key at https://aistudio.google.com/apikey
+- Make sure Gemini API is enabled for your project
+### OAuth Issues
+**"OAuth timeout"**
+- Make sure you complete the browser sign-in within 5 minutes
+- Check that ports 8085 (Gemini) or 51121 (Antigravity) are not in use
+**"OAuth callback failed"**
+- Ensure your browser can access localhost
+- Try disabling VPN or firewall temporarily
+- Check that the callback server can bind to the port
+**"Token exchange failed"**
+- Verify your Google account has appropriate permissions
+- For Antigravity: Ensure Cloud Code Assist is enabled
+### General Issues
+**"Model not found"**
+- Some models may not be available in all regions
+- Try a different model from the list
+**Port already in use**
+- Close other applications using ports 8085 or 51121
+- Or wait a moment and try again

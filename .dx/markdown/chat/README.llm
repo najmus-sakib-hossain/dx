@@ -1,0 +1,87 @@
+# Google Gemini Chat
+A simple, fast chat interface for Google Gemini models using Bun and Clack Prompts.
+## Features
+- 🚀 Fast startup with Bun runtime
+- 🎨 Beautiful CLI interface with Clack Prompts
+- 🤖 Multiple Gemini models support
+- 🔐 Four authentication methods:
+  - **API Key** - Simple and fast ⭐ **Recommended for Quick Start**
+  - **OAuth (Device Flow)** - Like GitHub CLI ⭐ **Most Reliable OAuth!**
+  - **OAuth (Gemini CLI)** - Google OAuth for Gemini (may have issues)
+  - **OAuth (Antigravity)** - Google Cloud Code Assist (may have issues)
+- 💬 Conversational chat with history
+- 🔑 Token management and persistence
+> **OAuth Recommendation**: Use **Device Flow** for OAuth - it's the most reliable method, works everywhere (SSH, WSL, Docker, remote servers), and doesn't require localhost callbacks. The other OAuth methods may encounter 404 errors due to redirect URI configuration.
+## Setup
+1. Install Bun (if not already installed):
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+2. Install dependencies:
+```bash
+bun install
+```
+3. Test the installation:
+```bash
+bun test
+```
+4. Create a `.env` file (optional):
+```bash
+cp .env.example .env
+```
+5. Add your Google API key to `.env`:
+```
+GOOGLE_API_KEY=your_api_key_here
+```
+Get your API key from: https://aistudio.google.com/apikey
+## Usage
+Run the chat:
+```bash
+bun start
+```
+You'll be prompted to choose an authentication method:
+### Option 1: API Key (Quickest)
+- Simplest method
+- Get your key from: https://aistudio.google.com/apikey
+- Can be stored in `.env` file or entered interactively
+### Option 2: OAuth (Device Flow) ⭐ Recommended for OAuth
+- **Most reliable OAuth method**
+- Works like GitHub CLI
+- No localhost server needed
+- Works everywhere: SSH, WSL, Docker, remote servers
+- Simple: just enter a code in your browser
+- Steps:
+  1. App shows you a URL and code
+  2. Visit the URL in any browser
+  3. Enter the code
+  4. Approve access
+  5. Done!
+### Option 3: OAuth (Gemini CLI)
+- Uses Google OAuth flow
+- Opens browser for authentication
+- Requires localhost callback (may have issues)
+- Tokens are saved and reused
+### Option 4: OAuth (Antigravity)
+- Google Cloud Code Assist OAuth
+- Opens browser for authentication
+- Requires localhost callback (may have issues)
+- Uses Google Cloud project quotas
+Or directly:
+```bash
+bun run index.ts
+```
+## Available Models
+- Gemini 2.0 Flash (Experimental) - Latest experimental model
+- Gemini 1.5 Pro - Most capable model
+- Gemini 1.5 Flash - Fast and efficient
+- Gemini 1.5 Flash 8B - Lightweight model
+## Commands
+- Choose authentication method on startup
+- Select your preferred Gemini model
+- Type your message and press Enter to chat
+- Type `exit` or press Ctrl+C to quit
+- OAuth tokens are automatically saved to `.tokens.json`
+## Requirements
+- Bun runtime (https://bun.sh)
+- For API Key: Google API key with Gemini API access
+- For OAuth: Google account with appropriate permissions

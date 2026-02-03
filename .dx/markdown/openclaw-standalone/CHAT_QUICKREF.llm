@@ -1,0 +1,45 @@
+# OpenClaw Chat - Quick Reference
+## Start Chat
+```bash
+bun scripts/run-node.mjs chat
+```
+## Options
+```bash
+--url <url>        # Gateway URL (default: ws://127.0.0.1:18789)
+--token <token>    # Auth token (default: from config)
+--session <key>    # Session name (default: main)
+--model <model>    # AI model (default: from config)
+--deliver          # Send to channels (default: false)
+```
+## Examples
+```bash
+# Basic
+bun scripts/run-node.mjs chat
+# Custom session
+bun scripts/run-node.mjs chat --session work
+# Different model
+bun scripts/run-node.mjs chat --model google-antigravity/claude-opus-4-5-thinking
+# With delivery
+bun scripts/run-node.mjs chat --deliver
+```
+## In Chat
+- Type message → Send to AI
+- `exit` or `quit` → Leave chat
+- `Ctrl+C` → Force quit
+## Prerequisites
+```bash
+# Gateway must be running
+bun scripts/run-node.mjs gateway
+```
+## Troubleshooting
+```bash
+# Check gateway
+ps aux | grep gateway
+# View logs
+tail -f /tmp/openclaw/openclaw-*.log
+# Check config
+cat ~/.openclaw/openclaw.json
+```
+## Full Docs
+- Complete guide: `CHAT_USAGE.md`
+- Implementation: `CHAT_IMPLEMENTATION_SUMMARY.md`

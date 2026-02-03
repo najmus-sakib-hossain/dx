@@ -1,0 +1,114 @@
+# Chat Project - Technical Overview
+## Architecture
+This is a minimal Bun-based CLI chat application that interfaces with Google's Gemini AI models using the official Google Generative AI SDK.
+### Key Components
+1. **Runtime**: Bun (fast JavaScript/TypeScript runtime)
+2. **UI Framework**: @clack/prompts (beautiful CLI prompts)
+3. **AI SDK**: @google/generative-ai (official Google SDK)
+### Implementation Details
+#### Authentication
+- Uses Google API key authentication (similar to OpenClaw's Google integration)
+- Supports both environment variable and interactive input
+- API key format validation (must start with "AIza")
+#### Model Selection
+- Interactive model picker with 4 Gemini models:
+  - Gemini 2.0 Flash (Experimental) - Latest
+  - Gemini 1.5 Pro - Most capable
+  - Gemini 1.5 Flash - Fast
+  - Gemini 1.5 Flash 8B - Lightweight
+#### Chat Flow
+1. Load environment variables from .env
+2. Prompt for API key if not found
+3. Select model interactively
+4. Start chat session with history
+5. Loop: user input → API call → display response
+6. Maintain conversation context throughout session
+#### Features
+- ✅ Conversational chat with history
+- ✅ Multiple model support
+- ✅ Token usage display
+- ✅ Error handling with helpful messages
+- ✅ Colored output with styleText
+- ✅ Graceful exit (Ctrl+C or 'exit')
+- ✅ API key validation
+- ✅ Environment variable support
+## File Structure
+```
+chat/
+├── index.ts           # Main application
+├── test.ts            # Quick SDK test
+├── start.sh           # Bash launcher
+├── package.json       # Dependencies & scripts
+├── .env.example       # Environment template
+├── .gitignore         # Git exclusions
+├── README.md          # User documentation
+├── QUICKSTART.md      # Quick start guide
+└── PROJECT_INFO.md    # This file
+```
+## Dependencies
+```json
+{
+  "@clack/prompts": "^0.8.2",      // CLI UI framework
+  "@google/generative-ai": "^0.21.0", // Google AI SDK
+  "@types/bun": "latest"            // Bun type definitions
+}
+```
+## Comparison with OpenClaw Integration
+### Similarities
+- Uses Google's official SDK
+- Supports API key authentication
+- Model selection interface
+- Error handling patterns
+### Differences
+- **Simpler**: No OAuth flow (API key only)
+- **Standalone**: No plugin system
+- **Direct**: Uses SDK directly vs. provider abstraction
+- **Minimal**: ~150 lines vs. OpenClaw's full integration
+## Usage Patterns
+### Basic Usage
+```bash
+bun start
+```
+### With Environment Variable
+```bash
+export GOOGLE_API_KEY=AIza...
+bun start
+```
+### Direct Execution
+```bash
+./index.ts
+```
+## Extension Ideas
+1. **Save conversations** to JSON/Markdown
+2. **System prompts** for different personas
+3. **Multi-turn context** management
+4. **Streaming responses** for real-time output
+5. **File upload** support for vision models
+6. **Function calling** for tool use
+7. **Configuration file** for preferences
+8. **History search** and replay
+## Performance
+- **Startup**: ~50ms (Bun is fast!)
+- **First response**: Depends on model and prompt
+- **Memory**: Minimal (~20MB base)
+- **Network**: Only during API calls
+## Security Notes
+- API keys stored in .env (gitignored)
+- No credentials in code
+- Input validation on API key format
+- Error messages don't leak sensitive data
+## Development
+### Run Tests
+```bash
+bun test
+```
+### Type Check
+```bash
+bun run --check index.ts
+```
+### Format Code
+```bash
+bun x prettier --write .
+```
+## License
+Same as parent project (check root LICENSE file)

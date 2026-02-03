@@ -1,0 +1,94 @@
+# OpenClaw Setup Fixes
+## Issues Fixed
+### 1. Control UI Assets Missing
+**Problem:** The Control UI assets were not built, causing the web interface to fail.
+**Solution:** Built the UI assets:
+```bash
+cd openclaw-standalone/ui
+bun install
+bun run build
+```
+### 2. Gateway Token Undefined
+**Problem:** The gateway authentication token was literally set to "undefined" in the config file.
+**Solution:** Generated a proper random token and updated `~/.openclaw/openclaw.json`:
+```bash
+# Token generated: df0c17ef351e73ed92637fd17a16fa3348163542c1084c150f4c3a515802f4d5
+```
+### 3. Build Script Using pnpm Instead of bun
+**Problem:** The `bundle-a2ui.sh` script was trying to use `pnpm` but the project is configured for `bun`.
+**Solution:** Modified `openclaw-standalone/scripts/bundle-a2ui.sh`:
+- Changed `pnpm -s exec tsc` to `bun x tsc`
+- Changed `rolldown` to `bun x rolldown`
+### 4. Version Mismatch
+**Problem:** Config was written by version 2026.1.29 but package.json had version 1.0.0.
+**Solution:** Updated `openclaw-standalone/package.json`:
+```json
+"version": "2026.1.29"
+```
+### 5. Missing pnpm-lock.yaml
+**Problem:** Build script expected `pnpm-lock.yaml` for hash calculation.
+**Solution:** Created a copy from `bun.lock`:
+```bash
+cp bun.lock pnpm-lock.yaml
+```
+## How to Run OpenClaw
+### Build the Project
+```bash
+cd openclaw-standalone
+bun install
+bun run build
+```
+### Start the Gateway
+```bash
+# Option 1: Run gateway directly
+bun scripts/run-node.mjs gateway
+# Option 2: Run in development mode (skips channels)
+bun run gateway:dev
+```
+### Access the Control UI
+Open your browser and navigate to:
+```
+http://127.0.0.1:18789/?token=df0c17ef351e73ed92637fd17a16fa3348163542c1084c150f4c3a515802f4d5
+```
+## Current Status
+✅ Gateway is running on `ws://127.0.0.1:18789`
+✅ Control UI is accessible at `http://127.0.0.1:18789/`
+✅ Canvas host mounted at `http://127.0.0.1:18789/__openclaw__/canvas/`
+✅ WhatsApp provider starting
+⚠️ Telegram has invalid bot token (needs proper token from @BotFather)
+## Configuration Location
+All configuration is stored in:
+```
+~/.openclaw/openclaw.json
+```
+Workspace directory:
+```
+~/.openclaw/workspace
+```
+## Next Steps
+1. **Fix Telegram Bot Token**: Get a proper token from @BotFather and update the config
+2. **Configure Additional Channels**: Set up Discord, Slack, or other messaging platforms
+3. **Install Skills**: Run `openclaw configure --section skills` to set up additional capabilities
+4. **Set Up API Keys**: Configure API keys for services like Google Places, OpenAI, etc.
+## Troubleshooting
+### Gateway Won't Start
+```bash
+# Check if port is in use
+netstat -ano | grep 18789
+# Force kill and restart
+openclaw gateway --force
+```
+### Build Fails
+```bash
+# Clean and rebuild
+rm -rf dist node_modules
+bun install
+bun run build
+```
+### Health Check Fails
+```bash
+# Run diagnostics
+openclaw doctor
+# Check gateway logs
+openclaw logs
+```

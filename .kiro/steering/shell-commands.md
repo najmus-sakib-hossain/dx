@@ -1,0 +1,56 @@
+# Shell Command Policy
+
+## Environment
+
+This project is developed on **Windows with Git Bash (MINGW64)**.
+
+## Required Shell Commands
+
+**Always use Unix-style commands** that work in Git Bash, NOT Windows CMD or PowerShell commands.
+
+### File Operations
+
+```bash
+# Good - Unix/Git Bash commands
+mv source destination          # Move/rename files or directories
+cp source destination          # Copy files
+cp -r source destination       # Copy directories recursively
+rm file                        # Remove file
+rm -rf directory               # Remove directory recursively
+mkdir directory                # Create directory
+touch file                     # Create empty file
+cat file                       # Display file contents
+ls                            # List directory contents
+ls -la                        # List with details
+
+# Bad - Windows CMD commands (DO NOT USE)
+move source destination        # ❌ Don't use
+copy source destination        # ❌ Don't use
+del file                       # ❌ Don't use
+rmdir /s /q directory         # ❌ Don't use
+dir                           # ❌ Don't use
+
+# Bad - PowerShell commands (DO NOT USE)
+Move-Item                      # ❌ Don't use
+Copy-Item                      # ❌ Don't use
+Remove-Item                    # ❌ Don't use
+```
+
+### Path Separators
+
+```bash
+# Good - Forward slashes (Unix-style)
+cd crates/app
+cargo run --manifest-path crates/app/Cargo.toml
+
+# Acceptable - Backslashes work in some contexts but prefer forward slashes
+cd crates\app
+```
+
+## Rationale
+
+Git Bash provides a Unix-like environment on Windows, making commands portable across platforms. Using Unix commands ensures:
+- Cross-platform compatibility
+- Consistency with Linux/macOS development
+- Better integration with Git and development tools
+- Simpler, more intuitive command syntax

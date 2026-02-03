@@ -1,0 +1,135 @@
+# Troubleshooting OAuth Issues
+## 404 Error from Google
+If you see a 404 error page from Google during OAuth, this means:
+### Root Cause
+The OAuth client credentials are not configured with the redirect URI being used.
+### Why This Happens
+- The client ID/secret are extracted from OpenClaw's implementation
+- Those credentials may be configured for specific redirect URIs only
+- Google's OAuth requires exact URI matches (including port and path)
+### Solutions
+#### Option 1: Use API Key Instead (Recommended)
+The simplest solution is to use API Key authentication:
+1. Get an API key from https://aistudio.google.com/apikey
+2. Run `bun start`
+3. Select "API Key" as authentication method
+4. Enter your key
+This bypasses OAuth entirely and works immediately.
+#### Option 2: Use Your Own OAuth Credentials
+Create your own OAuth client:
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing
+3. Enable "Generative Language API"
+4. Go to "APIs & Services" → "Credentials"
+5. Click "Create Credentials" → "OAuth 2.0 Client ID"
+6. Application type: "Desktop app" or "Web application"
+7. Add authorized redirect URIs:
+   - `http://localhost:8085/oauth2callback` (for Gemini)
+   - `http://localhost:51121/oauth-callback` (for Antigravity)
+8. Download the credentials JSON
+Then update the OAuth files:
+**For Gemini (`oauth-gemini.ts`)**:
+```typescript
+const CLIENT_ID = "YOUR_CLIENT_ID_HERE";
+const CLIENT_SECRET = "YOUR_CLIENT_SECRET_HERE";
+```
+**For Antigravity (`oauth-antigravity.ts`)**:
+```typescript
+const CLIENT_ID = "YOUR_CLIENT_ID_HERE";
+const CLIENT_SECRET = "YOUR_CLIENT_SECRET_HERE";
+```
+#### Option 3: Manual OAuth Flow
+If automatic callback doesn't work, you can manually copy the redirect URL:
+1. Start the OAuth flow
+2. When you see the 404 or after signing in, look at the browser URL
+3. It should look like: `http://localhost:XXXX/path?code=...&state=...`
+4. Copy the entire URL
+5. The app will ask you to paste it (future enhancement)
+## Other Common Issues
+### Port Already in Use
+**Error**: `EADDRINUSE` or "port already in use"
+**Solution**:
+```bash
+# Find what's using the port
+lsof -i :8085    # Gemini
+lsof -i :51121   # Antigravity
+# Kill the process or wait and try again
+```
+### Browser Doesn't Open
+**Solution**: The OAuth URL is printed to console. Copy and paste it into your browser manually.
+### Token Exchange Failed
+**Error**: "Token exchange failed: invalid_grant"
+**Causes**:
+- Authorization code already used
+- Code expired (10 minutes)
+- Verifier doesn't match challenge
+**Solution**: Restart the OAuth flow from the beginning.
+### Access Denied
+**Error**: "access_denied" in callback
+**Causes**:
+- User clicked "Cancel" or "Deny"
+- Account doesn't have required permissions
+**Solution**: 
+- Try again and click "Allow"
+- Ensure your Google account has access to the service
+### Invalid Client
+**Error**: "invalid_client" during token exchange
+**Causes**:
+- Client ID or secret is wrong
+- Client credentials don't match the redirect URI
+**Solution**: Use your own OAuth credentials (see Option 2 above)
+## Debugging Tips
+### Enable Verbose Logging
+The OAuth modules now log:
+- Callback server status
+- Received requests
+- Error details
+Watch the console output for clues.
+### Check the OAuth URL
+The full OAuth URL is printed. Check that:
+- `client_id` matches your credentials
+- `redirect_uri` is exactly right (including protocol, port, path)
+- `scope` includes necessary permissions
+### Test the Callback Server
+Before starting OAuth, test that the port is available:
+```bash
+# Try to bind to the port
+nc -l 8085    # Gemini
+nc -l 51121   # Antigravity
+# If it works, press Ctrl+C and try OAuth again
+```
+### Inspect Browser Network Tab
+1. Open browser DevTools (F12)
+2. Go to Network tab
+3. Start OAuth flow
+4. Watch for:
+   - 302 redirects
+   - Final callback request
+   - Any error responses
+## Still Having Issues?
+### Quick Workaround: API Key
+The fastest way to get chatting:
+```bash
+# Create .env file
+echo "GOOGLE_API_KEY=AIza..." > .env
+# Run with API key
+bun start
+# Select "API Key" option
+```
+### Report the Issue
+If OAuth still doesn't work:
+1. Note the exact error message
+2. Check browser console for errors
+3. Check terminal output
+4. Try with your own OAuth credentials
+5. Consider using API key authentication instead
+## Why OAuth is Complex
+OAuth is designed for security, which means:
+- Exact URI matching required
+- Client credentials must be pre-registered
+- Tokens expire for safety
+- Multiple steps can fail
+For a simple chat app, **API Key authentication is often easier** unless you specifically need OAuth features like:
+- Refresh tokens for long-running sessions
+- Access to user-specific Google Cloud resources
+- Enterprise authentication requirements

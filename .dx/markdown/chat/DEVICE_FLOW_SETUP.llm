@@ -1,0 +1,96 @@
+# Device Flow OAuth Setup Guide
+Device Flow OAuth requires creating your own OAuth credentials in Google Cloud Console because the application type must be specifically configured as "TVs and Limited Input devices".
+## Why You Need Your Own Credentials
+The OpenClaw credentials we extracted are configured for "Web application" or "Desktop app" types, which don't support device flow. Device flow requires a specific application type in Google Cloud Console.
+## Setup Steps
+### 1. Create a Google Cloud Project
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Click "Select a project" → "New Project"
+3. Name it (e.g., "Gemini Chat")
+4. Click "Create"
+### 2. Enable Required APIs
+1. Go to "APIs & Services" → "Library"
+2. Search for and enable:
+   - **Generative Language API** (for Gemini)
+   - **Cloud Platform API** (optional, for advanced features)
+### 3. Create OAuth Credentials
+1. Go to "APIs & Services" → "Credentials"
+2. Click "Create Credentials" → "OAuth client ID"
+3. **Important**: Select application type: **"TVs and Limited Input devices"**
+4. Name it (e.g., "Gemini Chat Device Flow")
+5. Click "Create"
+### 4. Get Your Credentials
+After creation, you'll see:
+- **Client ID**: Something like `123456789-abc123.apps.googleusercontent.com`
+- **Client Secret**: Something like `GOCSPX-abc123xyz`
+Copy both values.
+### 5. Configure the Chat App
+**Option A: Environment Variables (Recommended)**
+```bash
+cd chat
+echo "GOOGLE_DEVICE_CLIENT_ID=your_client_id_here" >> .env
+echo "GOOGLE_DEVICE_CLIENT_SECRET=your_client_secret_here" >> .env
+```
+**Option B: Edit oauth-device.ts**
+Open `oauth-device.ts` and replace:
+```typescript
+const CLIENT_ID = "YOUR_CLIENT_ID_HERE";
+const CLIENT_SECRET = "YOUR_CLIENT_SECRET_HERE";
+```
+With your actual credentials:
+```typescript
+const CLIENT_ID = "123456789-abc123.apps.googleusercontent.com";
+const CLIENT_SECRET = "GOCSPX-abc123xyz";
+```
+### 6. Test It
+```bash
+bun start
+# Select "OAuth (Device Flow)"
+```
+You should see:
+```
+📱 Google Device Authorization
+============================================================
+1. Visit: https://www.google.com/device
+2. Enter code: ABCD-EFGH
+Code expires in 30 minutes
+============================================================
+```
+## Troubleshooting
+### "The OAuth client was not found"
+- Make sure you selected "TVs and Limited Input devices" as the application type
+- Verify your CLIENT_ID is correct
+- Check that the API is enabled in your project
+### "invalid_client"
+- The client ID or secret is wrong
+- The application type is not "TVs and Limited Input devices"
+- Try creating a new OAuth client
+### "access_denied"
+- You clicked "Deny" in the browser
+- Try again and click "Allow"
+### "invalid_scope"
+- The scopes requested aren't available for your project
+- Make sure you enabled the Generative Language API
+## Alternative: Use API Key Instead
+If setting up OAuth is too complex, just use API Key authentication:
+1. Get an API key from https://aistudio.google.com/apikey
+2. Add to `.env`: `GOOGLE_API_KEY=your_key_here`
+3. Run `bun start` and select "API Key"
+API Key is simpler and works immediately!
+## Why Device Flow is Worth It
+Once set up, device flow:
+- ✅ Works everywhere (SSH, WSL, Docker, remote servers)
+- ✅ No localhost server needed
+- ✅ No port conflicts
+- ✅ No firewall issues
+- ✅ Refresh tokens for long-term access
+- ✅ More secure than API keys
+## Security Notes
+- Keep your client secret private
+- Don't commit credentials to git (they're in .gitignore)
+- Rotate credentials if compromised
+- Use environment variables for production
+## References
+- [Google OAuth 2.0 for TV and Limited-Input Devices](https://developers.google.com/identity/protocols/oauth2/limited-input-device)
+- [Google Cloud Console](https://console.cloud.google.com/)
+- [Generative Language API](https://ai.google.dev/)

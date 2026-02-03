@@ -1,0 +1,6 @@
+# DX CLI - AGI-like Rust Agent
+A modern Rust workspace implementing an advanced AI agent with token-efficient serialization, WASM integrations, and self-updating capabilities.
+Please look at integrations/openclaw folder and make sure in our rust dx project we have everything that openclaw has like soul.md and other ai agent systems but not the useless static whatsapp, telegram, discord integrations and other useless nodejs stuffs as we can beat them with our AGI like:
+1. Integrations
+2. Providers
+3. Tools

@@ -1,0 +1,55 @@
+# OpenClaw Chat Command
+A simple terminal-based chat interface for interacting with the OpenClaw AI agent.
+## Usage
+```bash
+# Basic usage (uses default configuration)
+bun scripts/run-node.mjs chat
+# Or after building
+node dist/index.js chat
+# With custom session
+bun scripts/run-node.mjs chat --session my-session
+# With custom model
+bun scripts/run-node.mjs chat --model google-antigravity/claude-opus-4-5-thinking
+# Connect to remote gateway
+bun scripts/run-node.mjs chat --url ws://remote-host:18789 --token YOUR_TOKEN
+# Enable message delivery to channels
+bun scripts/run-node.mjs chat --deliver
+```
+## Options
+- `--url <url>` - Gateway WebSocket URL (defaults to local gateway at ws://127.0.0.1:18789)
+- `--token <token>` - Gateway authentication token (reads from config if not provided)
+- `--session <key>` - Session key for conversation context (default: "main")
+- `--model <model>` - Override the default AI model
+- `--deliver` - Deliver assistant replies to configured channels
+## Features
+- **Simple Interface**: Clean terminal-based chat with readline support
+- **Session Management**: Maintains conversation context across messages
+- **Real-time Streaming**: See AI responses as they're generated
+- **Graceful Exit**: Type `exit` or `quit` to leave, or press Ctrl+C
+- **Error Handling**: Clear error messages and connection status
+- **Configuration**: Uses existing OpenClaw config for gateway and model settings
+## Commands
+While in chat:
+- Type any message and press Enter to send
+- Type `exit` or `quit` to leave the chat
+- Press Ctrl+C to exit immediately
+## Prerequisites
+1. **Gateway must be running**:
+   ```bash
+   bun scripts/run-node.mjs gateway
+   ```
+2. **Configuration**: Ensure `~/.openclaw/openclaw.json` is properly configured with:
+   - Gateway settings (port, auth token)
+   - Agent configuration (default model)
+   - Provider credentials (Google Antigravity, etc.)
+## Example Session
+```
+🦞 OpenClaw Chat
+──────────────────────────────────────────────────
+Agent: main
+Session: main
+Model: google-antigravity/gemini-3-flash
+──────────────────────────────────────────────────
+Type your message and press Enter. Type 'exit' or 'quit' to leave.
+✓ Connected to gateway (ws://127.0.0.1:18789)
+You: Hello! How are you?
