@@ -9,15 +9,24 @@
 //! - [`Spinner`] - Animated spinner for async operations
 //! - [`ProgressBar`] - Progress bar for tracking completion
 
+#[allow(unused)]
 pub mod cursor;
+#[allow(unused)]
 pub mod interaction;
 
+#[allow(unused)]
 pub mod confirm;
+#[allow(unused)]
 pub mod input;
+#[allow(unused)]
 pub mod multiselect;
+#[allow(unused)]
 pub mod password;
+#[allow(unused)]
 pub mod progress;
+#[allow(unused)]
 pub mod select;
+#[allow(unused)]
 pub mod spinner;
 
 use console::Term;
@@ -26,13 +35,21 @@ use std::fmt::Display;
 use std::io;
 use std::sync::RwLock;
 
+#[allow(unused)]
 pub use confirm::Confirm;
+#[allow(unused)]
 pub use input::Input;
+#[allow(unused)]
 pub use interaction::{PromptInteraction, State, Validate};
+#[allow(unused)]
 pub use multiselect::{MultiSelect, MultiSelectItem};
+#[allow(unused)]
 pub use password::Password;
+#[allow(unused)]
 pub use progress::ProgressBar;
+#[allow(unused)]
 pub use select::{Select, SelectItem};
+#[allow(unused)]
 pub use spinner::Spinner;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -40,9 +57,11 @@ pub use spinner::Spinner;
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// DX CLI Theme - Vercel-like aesthetic
+#[allow(unused)]
 pub struct DxTheme {
     pub primary: console::Style,
     pub success: console::Style,
+    #[allow(unused)]
     pub warning: console::Style,
     pub error: console::Style,
     pub dim: console::Style,
@@ -67,7 +86,9 @@ pub static THEME: Lazy<RwLock<DxTheme>> = Lazy::new(|| RwLock::new(DxTheme::defa
 // ─────────────────────────────────────────────────────────────────────────────
 
 pub const S_STEP_ACTIVE: &str = "◆";
+#[allow(unused)]
 pub const S_STEP_CANCEL: &str = "■";
+#[allow(unused)]
 pub const S_STEP_ERROR: &str = "▲";
 pub const S_STEP_SUBMIT: &str = "◇";
 
@@ -81,11 +102,16 @@ pub const S_CHECKBOX_ACTIVE: &str = "◻";
 pub const S_CHECKBOX_SELECTED: &str = "◼";
 pub const S_CHECKBOX_INACTIVE: &str = "◻";
 
+#[allow(unused)]
 pub const S_PASSWORD_MASK: char = '•';
 
+#[allow(unused)]
 pub const S_BAR_H: &str = "─";
+#[allow(unused)]
 pub const S_CORNER_TOP_RIGHT: &str = "╮";
+#[allow(unused)]
 pub const S_CONNECT_LEFT: &str = "├";
+#[allow(unused)]
 pub const S_CORNER_BOTTOM_RIGHT: &str = "╯";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -100,10 +126,9 @@ fn term_write(line: impl Display) -> io::Result<()> {
 pub fn intro(title: impl Display) -> io::Result<()> {
     let theme = THEME.read().unwrap();
     term_write(format!(
-        "{}  {}\n{}\n",
+        "{}  {}\n\n",
         theme.dim.apply_to(S_BAR_START),
         title,
-        theme.dim.apply_to(S_BAR),
     ))
 }
 
@@ -114,6 +139,7 @@ pub fn outro(message: impl Display) -> io::Result<()> {
 }
 
 /// Prints a cancelled footer for the prompt sequence.
+#[allow(unused)]
 pub fn outro_cancel(message: impl Display) -> io::Result<()> {
     let theme = THEME.read().unwrap();
     term_write(format!(
@@ -124,11 +150,13 @@ pub fn outro_cancel(message: impl Display) -> io::Result<()> {
 }
 
 /// Creates a new text input prompt.
+#[allow(unused)]
 pub fn input(prompt: impl Into<String>) -> input::Input<fn(&str) -> interaction::Validate<String>> {
     input::input(prompt.into())
 }
 
 /// Creates a new password prompt.
+#[allow(unused)]
 pub fn password(
     prompt: impl Into<String>,
 ) -> password::Password<fn(&str) -> interaction::Validate<String>> {
@@ -151,11 +179,13 @@ pub fn multiselect<T: Clone>(prompt: impl Into<String>) -> MultiSelect<T> {
 }
 
 /// Creates a new spinner for async operations.
+#[allow(unused)]
 pub fn spinner(message: impl Into<String>) -> Spinner {
     Spinner::new(message)
 }
 
 /// Creates a new progress bar.
+#[allow(unused)]
 pub fn progress(message: impl Into<String>, total: u64) -> ProgressBar {
     ProgressBar::new(message, total)
 }
@@ -184,6 +214,7 @@ pub mod log {
     }
 
     /// Prints an error message.
+    #[allow(unused)]
     pub fn error(text: impl Display) -> io::Result<()> {
         eprintln!("  {} {}", "✕".red().bold(), text);
         Ok(())
@@ -196,6 +227,7 @@ pub mod log {
     }
 
     /// Prints a remark message.
+    #[allow(unused)]
     pub fn remark(text: impl Display) -> io::Result<()> {
         eprintln!("  {} {}", "├".bright_black(), text);
         Ok(())

@@ -8,6 +8,7 @@ use owo_colors::OwoColorize;
 use std::io;
 
 /// A text input prompt with placeholder and validation support.
+#[allow(unused)]
 pub struct Input<V>
 where
     V: Fn(&str) -> Validate<String>,
@@ -23,6 +24,7 @@ where
     multiline: bool,
 }
 
+#[allow(unused)]
 impl<V> Input<V>
 where
     V: Fn(&str) -> Validate<String>,
@@ -264,6 +266,7 @@ where
 }
 
 /// Creates a new text input prompt.
+#[allow(unused)]
 pub fn input(message: impl Into<String>) -> Input<fn(&str) -> Validate<String>> {
     Input::new(message)
 }

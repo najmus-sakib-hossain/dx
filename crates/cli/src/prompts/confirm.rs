@@ -148,6 +148,7 @@ impl PromptInteraction for Confirm {
 }
 
 /// Creates a new confirmation prompt.
+#[allow(unused)]
 pub fn confirm(message: impl Into<String>) -> Confirm {
     Confirm::new(message)
 }

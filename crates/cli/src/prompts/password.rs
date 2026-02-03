@@ -9,6 +9,7 @@ use std::io;
 use zeroize::Zeroizing;
 
 /// A masked password input prompt.
+#[allow(unused)]
 pub struct Password<V>
 where
     V: Fn(&str) -> Validate<String>,
@@ -22,6 +23,7 @@ where
     last_render_lines: usize,
 }
 
+#[allow(unused)]
 impl<V> Password<V>
 where
     V: Fn(&str) -> Validate<String>,
@@ -227,6 +229,7 @@ where
 }
 
 /// Creates a new password prompt.
+#[allow(unused)]
 pub fn password(message: impl Into<String>) -> Password<fn(&str) -> Validate<String>> {
     Password::new(message)
 }

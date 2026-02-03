@@ -414,18 +414,36 @@ async fn run_onboarding() -> anyhow::Result<()> {
 }
 
 fn print_banner() {
+    // Build banner lines and pad them to a consistent visual width using unicode-width
+    use unicode_width::UnicodeWidthStr;
+
+    let lines: Vec<&str> = vec![
+        "",
+        "   ██████╗ ██╗  ██╗     █████╗  ██████╗ ███████╗███╗   ██╗████████╗",
+        "   ██╔══██╗╚██╗██╔╝    ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝",
+        "   ██║  ██║ ╚███╔╝     ███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║",
+        "   ██║  ██║ ██╔██╗     ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║",
+        "   ██████╔╝██╔╝ ██╗    ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║",
+        "   ╚═════╝ ╚═╝  ╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝",
+        "",
+        "   🤖 AGI-like AI Agent | Connect to ANY app | 70% token savings",
+        "",
+    ];
+
+    let max_width = lines.iter().map(|s| UnicodeWidthStr::width(*s)).max().unwrap_or(0);
+    let top = format!("╔{}╗", "═".repeat(max_width));
+    let bottom = format!("╚{}╝", "═".repeat(max_width));
+
     println!();
-    println!("{}", "╔═══════════════════════════════════════════════════════════════╗".bright_cyan());
-    println!("{}", "║                                                               ║".bright_cyan());
-    println!("{}", "║   ██████╗ ██╗  ██╗     █████╗  ██████╗ ███████╗███╗   ██╗████████╗  ║".bright_cyan());
-    println!("{}", "║   ██╔══██╗╚██╗██╔╝    ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝  ║".bright_cyan());
-    println!("{}", "║   ██║  ██║ ╚███╔╝     ███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║     ║".bright_cyan());
-    println!("{}", "║   ██║  ██║ ██╔██╗     ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║     ║".bright_cyan());
-    println!("{}", "║   ██████╔╝██╔╝ ██╗    ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║     ║".bright_cyan());
-    println!("{}", "║   ╚═════╝ ╚═╝  ╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝     ║".bright_cyan());
-    println!("{}", "║                                                               ║".bright_cyan());
-    println!("{}", "║   🤖 AGI-like AI Agent | Connect to ANY app | 70% token savings  ║".bright_cyan());
-    println!("{}", "║                                                               ║".bright_cyan());
-    println!("{}", "╚═══════════════════════════════════════════════════════════════╝".bright_cyan());
+    println!("{}", top.bright_cyan());
+    for line in &lines {
+        let cur = UnicodeWidthStr::width(*line);
+        let mut s = (*line).to_string();
+        if cur < max_width {
+            s.push_str(&" ".repeat(max_width - cur));
+        }
+        println!("{}", format!("║{}║", s).bright_cyan());
+    }
+    println!("{}", bottom.bright_cyan());
     println!();
 }

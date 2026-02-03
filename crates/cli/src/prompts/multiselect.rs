@@ -40,6 +40,7 @@ impl<T: Clone> MultiSelectItem<T> {
     }
 
     /// Sets the item as initially selected.
+    #[allow(unused)]
     pub fn selected(mut self, selected: bool) -> Self {
         self.selected = selected;
         self
@@ -88,6 +89,7 @@ impl<T: Clone> MultiSelect<T> {
     }
 
     /// Adds an initially selected item to the selection list.
+    #[allow(unused)]
     pub fn item_selected(
         mut self,
         value: T,
@@ -108,6 +110,7 @@ impl<T: Clone> MultiSelect<T> {
     }
 
     /// Sets all items at once.
+    #[allow(unused)]
     pub fn items(mut self, items: Vec<MultiSelectItem<T>>) -> Self {
         let count = items.len();
         self.items = items;
@@ -116,12 +119,14 @@ impl<T: Clone> MultiSelect<T> {
     }
 
     /// Requires at least one selection.
+    #[allow(unused)]
     pub fn required(mut self, required: bool) -> Self {
         self.required = required;
         self
     }
 
     /// Sets the initial cursor position.
+    #[allow(unused)]
     pub fn initial_value(mut self, index: usize) -> Self {
         self.cursor = index.min(self.items.len().saturating_sub(1));
         self
@@ -390,6 +395,7 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
 }
 
 /// Creates a new multiselect prompt.
+#[allow(unused)]
 pub fn multiselect<T: Clone>(message: impl Into<String>) -> MultiSelect<T> {
     MultiSelect::new(message)
 }

@@ -22,6 +22,7 @@ pub enum Event {
     /// A key was pressed.
     Key(Key),
     /// An error occurred.
+    #[allow(unused)]
     Error,
 }
 
@@ -80,6 +81,7 @@ pub trait PromptInteraction {
 }
 
 /// A validation result for prompt inputs.
+#[allow(unused)]
 pub enum Validate<T> {
     /// The input is valid.
     Valid,
@@ -97,6 +99,7 @@ impl<T> From<Result<(), T>> for Validate<T> {
 }
 
 /// Clears lines above the cursor.
+#[allow(unused)]
 pub fn clear_lines(term: &console::Term, count: usize) -> io::Result<()> {
     for _ in 0..count {
         term.move_cursor_up(1)?;
@@ -106,6 +109,7 @@ pub fn clear_lines(term: &console::Term, count: usize) -> io::Result<()> {
 }
 
 /// Writes a line with ANSI support.
+#[allow(unused)]
 pub fn write_line(term: &console::Term, text: &str) -> io::Result<()> {
     term.write_line(text)
 }

@@ -5,6 +5,7 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// A cursor for editing text strings with full navigation support.
 #[derive(Default, Clone)]
+#[allow(unused)]
 pub struct StringCursor {
     value: Vec<char>,
     cursor: usize,
@@ -18,6 +19,7 @@ impl Zeroize for StringCursor {
 }
 
 /// Returns the indices of word boundaries in the given string.
+#[allow(unused)]
 fn word_jump_indices(value: &[char]) -> Vec<usize> {
     let mut indices = vec![0];
     let mut in_word = false;
@@ -36,6 +38,7 @@ fn word_jump_indices(value: &[char]) -> Vec<usize> {
 }
 
 /// Returns the indices of line starts in the given string.
+#[allow(unused)]
 fn line_jump_indices(value: &[char]) -> Vec<usize> {
     value.split(|c| *c == '\n').fold(vec![0], |mut acc, line| {
         acc.push(acc.last().unwrap() + line.len() + 1);
@@ -43,6 +46,7 @@ fn line_jump_indices(value: &[char]) -> Vec<usize> {
     })
 }
 
+#[allow(unused)]
 impl StringCursor {
     /// Creates a new empty cursor.
     pub fn new() -> Self {

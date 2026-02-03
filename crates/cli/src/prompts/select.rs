@@ -76,6 +76,7 @@ impl<T: Clone> Select<T> {
     }
 
     /// Sets all items at once.
+    #[allow(unused)]
     pub fn items(mut self, items: Vec<SelectItem<T>>) -> Self {
         let count = items.len();
         self.items = items;
@@ -84,6 +85,7 @@ impl<T: Clone> Select<T> {
     }
 
     /// Sets the initial cursor position.
+    #[allow(unused)]
     pub fn initial_value(mut self, index: usize) -> Self {
         self.cursor = index.min(self.items.len().saturating_sub(1));
         self
@@ -291,6 +293,7 @@ impl<T: Clone> PromptInteraction for Select<T> {
 }
 
 /// Creates a new select prompt.
+#[allow(unused)]
 pub fn select<T: Clone>(message: impl Into<String>) -> Select<T> {
     Select::new(message)
 }

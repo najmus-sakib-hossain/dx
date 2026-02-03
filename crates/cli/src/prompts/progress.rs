@@ -6,6 +6,7 @@ use owo_colors::OwoColorize;
 use std::io;
 
 /// A progress bar for tracking completion of tasks.
+#[allow(unused)]
 pub struct ProgressBar {
     message: String,
     current: u64,
@@ -15,6 +16,7 @@ pub struct ProgressBar {
     last_render_lines: usize,
 }
 
+#[allow(unused)]
 impl ProgressBar {
     /// Creates a new progress bar.
     pub fn new(message: impl Into<String>, total: u64) -> Self {
@@ -138,6 +140,7 @@ impl ProgressBar {
 }
 
 /// Creates a new progress bar.
+#[allow(unused)]
 pub fn progress(message: impl Into<String>, total: u64) -> ProgressBar {
     ProgressBar::new(message, total)
 }

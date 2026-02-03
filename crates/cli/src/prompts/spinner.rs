@@ -12,9 +12,11 @@ use std::thread;
 use std::time::Duration;
 
 /// Spinner animation frames
+#[allow(unused)]
 const SPINNER_FRAMES: &[&str] = &["◒", "◐", "◓", "◑"];
 
 /// An animated spinner for showing async progress.
+#[allow(unused)]
 pub struct Spinner {
     message: String,
     term: Term,
@@ -22,6 +24,7 @@ pub struct Spinner {
     handle: Option<thread::JoinHandle<()>>,
 }
 
+#[allow(unused)]
 impl Spinner {
     /// Creates a new spinner with the given message.
     pub fn new(message: impl Into<String>) -> Self {
@@ -124,6 +127,7 @@ impl Drop for Spinner {
 }
 
 /// Creates a new spinner.
+#[allow(unused)]
 pub fn spinner(message: impl Into<String>) -> Spinner {
     Spinner::new(message)
 }
