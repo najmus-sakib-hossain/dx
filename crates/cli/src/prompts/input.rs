@@ -2,7 +2,7 @@
 
 use super::cursor::StringCursor;
 use super::interaction::{Event, PromptInteraction, State, Validate};
-use super::{S_BAR, S_BAR_END, S_STEP_ACTIVE, S_STEP_SUBMIT, THEME};
+use super::{SYMBOLS, THEME};
 use console::Term;
 use owo_colors::OwoColorize;
 use std::io;
@@ -184,17 +184,18 @@ where
         }
 
         let theme = THEME.read().unwrap();
+        let symbols = &*SYMBOLS;
         let mut lines = 0;
 
         match self.state {
             State::Active => {
                 // Title line
-                let symbol = theme.primary.apply_to(S_STEP_ACTIVE);
+                let symbol = theme.primary.apply_to(symbols.step_active);
                 term.write_line(&format!("{} {}", symbol, self.message.bold()))?;
                 lines += 1;
 
                 // Input line
-                let bar = theme.dim.apply_to(S_BAR);
+                let bar = theme.dim.apply_to(symbols.bar);
                 let value = self.cursor.value();
                 let display = if value.is_empty() {
                     theme.dim.apply_to(&self.placeholder).to_string()
@@ -223,19 +224,19 @@ where
                 }
 
                 // Bottom bar
-                let bar_end = theme.dim.apply_to(S_BAR_END);
+                let bar_end = theme.dim.apply_to(symbols.bar_end);
                 term.write_line(&format!("{}", bar_end))?;
                 lines += 1;
             }
             State::Submit => {
-                let symbol = theme.success.apply_to(S_STEP_SUBMIT);
+                let symbol = theme.success.apply_to(symbols.step_submit);
                 let value = self.get_value();
                 let display = theme.dim.apply_to(&value);
                 term.write_line(&format!("{} {}  {}", symbol, self.message.bold(), display))?;
                 lines += 1;
             }
             State::Cancel => {
-                let symbol = theme.error.apply_to(S_STEP_SUBMIT);
+                let symbol = theme.error.apply_to(symbols.step_submit);
                 term.write_line(&format!(
                     "{} {}  {}",
                     symbol,
@@ -245,7 +246,7 @@ where
                 lines += 1;
             }
             State::Error => {
-                let symbol = theme.error.apply_to(S_STEP_SUBMIT);
+                let symbol = theme.error.apply_to(symbols.step_submit);
                 term.write_line(&format!(
                     "{} {}  {}",
                     symbol,

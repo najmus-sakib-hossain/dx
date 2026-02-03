@@ -1,10 +1,7 @@
 //! Multiple selection prompt
 
 use super::interaction::{Event, PromptInteraction, State};
-use super::{
-    S_BAR, S_BAR_END, S_CHECKBOX_ACTIVE, S_CHECKBOX_INACTIVE, S_CHECKBOX_SELECTED, S_STEP_ACTIVE,
-    S_STEP_SUBMIT, THEME,
-};
+use super::{SYMBOLS, THEME};
 use console::Term;
 use owo_colors::OwoColorize;
 use std::io;
@@ -257,25 +254,15 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
         }
 
         let theme = THEME.read().unwrap();
+        let symbols = &*SYMBOLS;
         let mut lines = 0;
 
         match self.state {
             State::Active => {
-                // Title line
-                let symbol = theme.primary.apply_to(S_STEP_ACTIVE);
-                term.write_line(&format!("{} {}", symbol, self.message.bold()))?;
+                // Title line with step indicator
+                let bar = theme.dim.apply_to(symbols.bar);
+                term.write_line(&format!("{}{} {}", bar, theme.primary.apply_to(symbols.step_submit), self.message.bold()))?;
                 lines += 1;
-
-                // Filter line (if any)
-                let bar = theme.dim.apply_to(S_BAR);
-                if !self.filter.is_empty() {
-                    term.write_line(&format!(
-                        "{}  {}",
-                        bar,
-                        theme.dim.apply_to(format!("Filter: {}", self.filter))
-                    ))?;
-                    lines += 1;
-                }
 
                 // Items
                 let max_visible = 8;
@@ -293,14 +280,14 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
 
                     let checkbox = if item.selected {
                         if is_cursor {
-                            theme.primary.apply_to(S_CHECKBOX_SELECTED).to_string()
+                            theme.primary.apply_to(symbols.checkbox_selected).to_string()
                         } else {
-                            theme.success.apply_to(S_CHECKBOX_SELECTED).to_string()
+                            theme.success.apply_to(symbols.checkbox_selected).to_string()
                         }
                     } else if is_cursor {
-                        theme.primary.apply_to(S_CHECKBOX_ACTIVE).to_string()
+                        theme.primary.apply_to(symbols.checkbox_active).to_string()
                     } else {
-                        theme.dim.apply_to(S_CHECKBOX_INACTIVE).to_string()
+                        theme.dim.apply_to(symbols.checkbox_inactive).to_string()
                     };
 
                     let label = if is_cursor {
@@ -317,7 +304,7 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
                         .map(|h| format!(" {}", theme.dim.apply_to(h)))
                         .unwrap_or_default();
 
-                    term.write_line(&format!("{}  {} {}{}", bar, checkbox, label, hint))?;
+                    term.write_line(&format!("{}  {}{}{}", bar, checkbox, label, hint))?;
                     lines += 1;
                 }
 
@@ -328,7 +315,7 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
                         term.write_line(&format!(
                             "{}  {}",
                             bar,
-                            theme.dim.apply_to(format!("  ... {} more", remaining))
+                            theme.dim.apply_to(format!("... {} more", remaining))
                         ))?;
                         lines += 1;
                     }
@@ -340,14 +327,9 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
                     format!("↑/↓ navigate • space select • a toggle all • {} selected", selected);
                 term.write_line(&format!("{}  {}", bar, theme.dim.apply_to(hint_text)))?;
                 lines += 1;
-
-                // Bottom bar
-                let bar_end = theme.dim.apply_to(S_BAR_END);
-                term.write_line(&format!("{}", bar_end))?;
-                lines += 1;
             }
             State::Submit => {
-                let symbol = theme.success.apply_to(S_STEP_SUBMIT);
+                let symbol = theme.success.apply_to(symbols.step_submit);
                 let selected: Vec<_> =
                     self.items.iter().filter(|i| i.selected).map(|i| i.label.clone()).collect();
                 let display = if selected.is_empty() {
@@ -356,7 +338,8 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
                     selected.join(", ")
                 };
                 term.write_line(&format!(
-                    "{} {}  {}",
+                    "{}{} {}  {}",
+                    theme.dim.apply_to(symbols.bar),
                     symbol,
                     self.message.bold(),
                     theme.dim.apply_to(display)
@@ -364,9 +347,10 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
                 lines += 1;
             }
             State::Cancel => {
-                let symbol = theme.error.apply_to(S_STEP_SUBMIT);
+                let symbol = theme.error.apply_to(symbols.step_submit);
                 term.write_line(&format!(
-                    "{} {}  {}",
+                    "{}{}  {}  {}",
+                    theme.dim.apply_to(symbols.bar),
                     symbol,
                     self.message.strikethrough(),
                     theme.dim.apply_to("cancelled")
@@ -374,9 +358,10 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
                 lines += 1;
             }
             State::Error => {
-                let symbol = theme.error.apply_to(S_STEP_SUBMIT);
+                let symbol = theme.error.apply_to(symbols.step_submit);
                 term.write_line(&format!(
-                    "{} {}  {}",
+                    "{}{}  {}  {}",
+                    theme.dim.apply_to(symbols.bar),
                     symbol,
                     self.message.bold(),
                     theme.error.apply_to("error")

@@ -1,0 +1,2864 @@
+Good, now dx serializer 3 formats looks like this:
+LLM FORMAT: 70%+ more token efficient than json
+```llm
+author=essensefromexistence
+version=0.0.1
+name=dx
+description=Orchestrate_dont_just_own_your_code
+title=Enhanced_Developing_Experience
+driven:1[path=@/driven]
+editors:2[default=neovim items[7]=neovim zed vscode cursor antigravity replit firebase-studio]
+font:2[path=@/fonts default[3]=Inter Jetbrain_Mono all]
+forge:5[container=null pipeline=null repository=https://dx.vercel.app/essensefromexistence/dx tasks=null tools[7]=cli docs examples packages scripts style tests]
+generator:1[path=@/generator]
+i18n_locales:4[default=en-US dev=en-US path=@/locales prod=all]
+i18n_ttses:4[default=en-US path=@/media/sounds prod=all dev[2]=en-US bn-BD]
+icon:3[path=@/icons variant=default pack[3]=Lucide Hugeicons all]
+js_dependencies:2[next=16.0.1 react=19.0.1]
+media:4[assets=@/media/assets images=@/media/images sounds=@/media/sounds videos=@/media/videos]
+python_dependencies:2[django=latest numpy=latest]
+scripts:3[build=dx_workspace_build dev=www_dev status=dx_forge_status]
+style:2[path=@/style themes=dx]
+ui:3[default=button path=@/components/ui components[6]=button card modal navbar footer all]
+workspace:1[paths[2]=@/www @/backend]
+dependencies:2(name version)[dx-package-1 0.0.1, dx-package-2 0.0.1]
+```
+
+HUMAN FORMAT: Most beautiful human format
+```human
+author                       = essensefromexistence
+version                      = 0.0.1
+name                         = dx
+description                  = Orchestrate dont just own your code
+title                        = Enhanced Developing Experience
+
+[driven]
+path                         = @/driven
+
+[editors]
+default                      = neovim
+items:
+- neovim
+- zed
+- vscode
+- cursor
+- antigravity
+- replit
+- firebase-studio
+
+[font]
+path                         = @/fonts
+default:
+- Inter
+- Jetbrain Mono
+- all
+
+[forge]
+container                    = none
+pipeline                     = none
+repository                   = https://dx.vercel.app/essensefromexistence/dx
+tasks                        = none
+tools:
+- cli
+- docs
+- examples
+- packages
+- scripts
+- style
+- tests
+
+[generator]
+path                         = @/generator
+
+[i18n.locales]
+default                      = en-US
+dev                          = en-US
+path                         = @/locales
+prod                         = all
+
+[i18n.ttses]
+default                      = en-US
+path                         = @/media/sounds
+prod                         = all
+dev:
+- en-US
+- bn-BD
+
+[icon]
+path                         = @/icons
+variant                      = default
+pack:
+- Lucide
+- Hugeicons
+- all
+
+[js.dependencies]
+next                         = 16.0.1
+react                        = 19.0.1
+
+[media]
+assets                       = @/media/assets
+images                       = @/media/images
+sounds                       = @/media/sounds
+videos                       = @/media/videos
+
+[python.dependencies]
+django                       = latest
+numpy                        = latest
+
+[scripts]
+build                        = dx workspace build
+dev                          = www dev
+status                       = dx forge status
+
+[style]
+path                         = @/style
+themes                       = dx
+
+[ui]
+default                      = button
+path                         = @/components/ui
+components:
+- button
+- card
+- modal
+- navbar
+- footer
+- all
+
+[workspace]
+paths:
+- @/www
+- @/backend
+
+[dependencies:1]
+name                         = dx-package-1
+version                      = 0.0.1
+
+[dependencies:2]
+name                         = dx-package-2
+version                      = 0.0.1
+```
+
+MACHINE FORMAT: Its binary that uses rust rkyv to be the fastest machines serialization, deserialization and round-trip in the world with binary compressor with LZ4 cratest to compress the binary!!!
+
+Use this dx details:
+```markdown
+# DX AI CLI - Restructured Project
+
+## Updated Project Structure
+
+```
+dx/
+├── Cargo.toml
+├── .cargo/config.toml
+├── rust-toolchain.toml
+├── config.sr
+├── .gitignore
+├── crates/
+│   ├── cli/                    # Main CLI binary
+│   ├── core/                   # Core types & utilities
+│   ├── serializer/             # DX Serializer (3 formats)
+│   ├── workspace/              # Parallel workspace manager
+│   ├── sandbox/                # Sandboxed execution
+│   ├── plugins/                # Plugin host (WASM runtime)
+│   ├── agent/                  # Self-updating agent
+│   └── daemon/                 # 24/7 daemon (minimal CPU when idle)
+├── plugins/
+│   ├── integrations/           # Node.js → WASM (messaging)
+│   │   ├── whatsapp/
+│   │   ├── telegram/
+│   │   ├── discord/
+│   │   ├── x/
+│   │   └── slack/
+│   ├── providers/              # Python → WASM (LLMs)
+│   │   ├── openai/
+│   │   ├── anthropic/
+│   │   ├── ollama/
+│   │   ├── gemini/
+│   │   └── huggingface/
+│   └── tools/                  # Rust/Go/C/Zig → WASM (performance)
+│       ├── mcp/                # MCP server tool
+│       ├── filesystem/
+│       ├── network/
+│       ├── http/
+│       └── shell/
+├── deploy/
+│   ├── docker/
+│   └── scripts/
+└── scripts/
+```
+
+---
+
+## Root Files
+
+### `Cargo.toml`
+
+```toml
+[workspace]
+resolver = "2"
+members = [
+    "crates/cli",
+    "crates/core",
+    "crates/serializer",
+    "crates/workspace",
+    "crates/sandbox",
+    "crates/plugins",
+    "crates/agent",
+    "crates/daemon",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+authors = ["DX Team"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/dx-ai/dx"
+description = "AGI-capable CLI with self-evolving WASM plugins"
+
+[workspace.dependencies]
+# Async Runtime
+tokio = { version = "1.43", features = ["full", "tracing", "parking_lot"] }
+
+# CPU Parallelism
+rayon = "1.10"
+
+# Serialization - DX Serializer foundations
+rkyv = { version = "0.8", features = ["validation", "bytecheck"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+toml = "0.8"
+
+# WASM Runtime
+wasmtime = { version = "28", features = ["component-model", "async", "cache"] }
+
+# CLI
+clap = { version = "4.5", features = ["derive", "env", "wrap_help"] }
+
+# Terminal UI
+ratatui = "0.29"
+crossterm = "0.28"
+
+# Error Handling
+thiserror = "2.0"
+anyhow = "1.0"
+
+# Async utilities
+async-trait = "0.1"
+futures = "0.3"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# File watching
+notify = "7.0"
+
+# UUID
+uuid = { version = "1.11", features = ["v4", "serde"] }
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Signal handling
+signal-hook = "0.3"
+signal-hook-tokio = { version = "0.3", features = ["futures-v0_3"] }
+
+# Workspace crates
+core = { path = "crates/core", package = "dx-core" }
+serializer = { path = "crates/serializer", package = "dx-serializer" }
+workspace = { path = "crates/workspace", package = "dx-workspace" }
+sandbox = { path = "crates/sandbox", package = "dx-sandbox" }
+plugins = { path = "crates/plugins", package = "dx-plugins" }
+agent = { path = "crates/agent", package = "dx-agent" }
+daemon = { path = "crates/daemon", package = "dx-daemon" }
+
+[profile.dev]
+opt-level = 0
+debug = true
+incremental = true
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.dev.package."*"]
+opt-level = 3
+```
+
+### `.cargo/config.toml`
+
+```toml
+[target.x86_64-unknown-linux-gnu]
+linker = "clang"
+rustflags = ["-C", "link-arg=-fuse-ld=mold"]
+
+[target.x86_64-unknown-linux-musl]
+linker = "clang"
+rustflags = ["-C", "link-arg=-fuse-ld=mold", "-C", "target-feature=+crt-static"]
+
+[target.x86_64-apple-darwin]
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
+[target.aarch64-apple-darwin]
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
+[build]
+jobs = 8
+
+[env]
+CARGO_INCREMENTAL = "1"
+
+[alias]
+dev = "run -p dx-cli --"
+b = "build -p dx-cli"
+r = "run -p dx-cli --release --"
+t = "test --workspace"
+d = "run -p dx-daemon --release --"
+```
+
+### `rust-toolchain.toml`
+
+```toml
+[toolchain]
+channel = "stable"
+components = ["rustfmt", "clippy", "rust-analyzer"]
+targets = [
+    "x86_64-unknown-linux-gnu",
+    "x86_64-unknown-linux-musl",
+    "x86_64-apple-darwin",
+    "aarch64-apple-darwin",
+    "x86_64-pc-windows-msvc",
+    "wasm32-wasip2",
+]
+```
+
+### `config.sr`
+
+```ini
+name                        = dx
+version                     = 0.1.0
+title                       = DX AI CLI
+
+[daemon]
+enabled                     = true
+idle_poll_interval_ms       = 100
+max_idle_cpu_percent        = 0.1
+auto_start                  = true
+
+[agent]
+self_update                 = true
+auto_install_deps           = true
+max_parallel_agents         = 100
+
+[sandbox]
+default_mode                = semi_isolated
+confirm_destructive         = true
+audit_log                   = true
+
+[serializer]
+token_savings_target        = 70
+formats:
+    - human
+    - llm
+    - machine
+
+[plugins]
+integrations_lang           = nodejs
+providers_lang              = python
+tools_langs:
+    - rust
+    - go
+    - c
+    - cpp
+    - zig
+
+[workspace]
+max_workspaces              = 100
+memory_per_workspace_mb     = 512
+persist_state               = true
+```
+
+### `.gitignore`
+
+```gitignore
+# Build
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# DX generated
+.dx/
+*.llm
+*.machine
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+
+# Plugins compiled
+plugins/**/*.wasm
+plugins/integrations/*/node_modules/
+plugins/integrations/*/dist/
+plugins/providers/*/__pycache__/
+plugins/providers/*/.venv/
+
+# Daemon
+dx.pid
+dx.sock
+```
+
+---
+
+## Crate: cli
+
+### `crates/cli/Cargo.toml`
+
+```toml
+[package]
+name = "dx-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "DX AI CLI - Main binary"
+
+[[bin]]
+name = "dx"
+path = "src/main.rs"
+
+[dependencies]
+core.workspace = true
+serializer.workspace = true
+workspace.workspace = true
+sandbox.workspace = true
+plugins.workspace = true
+agent.workspace = true
+daemon.workspace = true
+
+tokio.workspace = true
+clap.workspace = true
+ratatui.workspace = true
+crossterm.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[features]
+default = []
+dev = []
+```
+
+### `crates/cli/src/main.rs`
+
+```rust
+use anyhow::Result;
+use clap::Parser;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
+mod commands;
+mod status;
+
+use commands::{Cli, Commands};
+use status::{OutputFormat, StatusReporter};
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    // Initialize tracing
+    tracing_subscriber::registry()
+        .with(tracing_subscriber::EnvFilter::new(
+            std::env::var("DX_LOG").unwrap_or_else(|_| "dx=info".into()),
+        ))
+        .with(tracing_subscriber::fmt::layer())
+        .init();
+
+    let cli = Cli::parse();
+    let status = StatusReporter::new(cli.output_format());
+
+    let result = match cli.command {
+        Commands::Init(args) => commands::init::run(args, &status).await,
+        Commands::Run(args) => commands::run::run(args, &status).await,
+        Commands::Daemon(args) => commands::daemon::run(args, &status).await,
+        Commands::Serializer(args) => commands::serializer::run(args, &status).await,
+        Commands::Workspace(args) => commands::workspace::run(args, &status).await,
+        Commands::Plugin(args) => commands::plugin::run(args, &status).await,
+        Commands::Agent(args) => commands::agent::run(args, &status).await,
+        Commands::Status(args) => commands::status::run(args, &status).await,
+    };
+
+    if let Err(e) = result {
+        status.error(&e.to_string());
+        std::process::exit(1);
+    }
+
+    Ok(())
+}
+```
+
+### `crates/cli/src/commands/mod.rs`
+
+```rust
+use clap::{Parser, Subcommand};
+
+pub mod init;
+pub mod run;
+pub mod daemon;
+pub mod serializer;
+pub mod workspace;
+pub mod plugin;
+pub mod agent;
+pub mod status;
+
+use crate::status::OutputFormat;
+
+#[derive(Parser)]
+#[command(name = "dx")]
+#[command(author, version, about = "DX AI CLI - Self-evolving AGI agent", long_about = None)]
+pub struct Cli {
+    /// Output format for AI integration
+    #[arg(long, global = true, default_value = "auto")]
+    pub format: String,
+
+    /// Enable AI-optimized output (DX Serializer LLM format)
+    #[arg(long, global = true)]
+    pub ai: bool,
+
+    #[command(subcommand)]
+    pub command: Commands,
+}
+
+impl Cli {
+    pub fn output_format(&self) -> OutputFormat {
+        if self.ai || std::env::var("DX_AI_MODE").is_ok() {
+            OutputFormat::DxLlm
+        } else {
+            match self.format.as_str() {
+                "json" => OutputFormat::Json,
+                "llm" | "dx" => OutputFormat::DxLlm,
+                "pretty" => OutputFormat::Pretty,
+                _ => {
+                    if atty::is(atty::Stream::Stdout) {
+                        OutputFormat::Pretty
+                    } else {
+                        OutputFormat::Json
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[derive(Subcommand)]
+pub enum Commands {
+    /// Initialize a new DX project
+    Init(init::InitArgs),
+
+    /// Run DX agent interactively
+    Run(run::RunArgs),
+
+    /// Manage the 24/7 daemon
+    Daemon(daemon::DaemonArgs),
+
+    /// Process DX Serializer files (.sr → .llm + .machine)
+    Serializer(serializer::SerializerArgs),
+
+    /// Manage workspaces (parallel agent execution)
+    Workspace(workspace::WorkspaceArgs),
+
+    /// Manage plugins (integrations/providers/tools)
+    Plugin(plugin::PluginArgs),
+
+    /// Agent self-modification commands
+    Agent(agent::AgentArgs),
+
+    /// Show current status
+    Status(status::StatusArgs),
+}
+```
+
+### `crates/cli/src/commands/daemon.rs`
+
+```rust
+use anyhow::Result;
+use clap::{Args, Subcommand};
+
+use crate::status::StatusReporter;
+
+#[derive(Args)]
+pub struct DaemonArgs {
+    #[command(subcommand)]
+    pub command: DaemonCommands,
+}
+
+#[derive(Subcommand)]
+pub enum DaemonCommands {
+    /// Start the daemon (runs 24/7, minimal CPU when idle)
+    Start {
+        /// Run in foreground (don't daemonize)
+        #[arg(short, long)]
+        foreground: bool,
+
+        /// PID file path
+        #[arg(long, default_value = "dx.pid")]
+        pid_file: String,
+    },
+
+    /// Stop the daemon
+    Stop,
+
+    /// Restart the daemon
+    Restart,
+
+    /// Show daemon status
+    Status,
+
+    /// Send a command to the running daemon
+    Send {
+        /// Command to send
+        command: String,
+    },
+}
+
+pub async fn run(args: DaemonArgs, status: &StatusReporter) -> Result<()> {
+    match args.command {
+        DaemonCommands::Start { foreground, pid_file } => {
+            if foreground {
+                status.info("Starting daemon in foreground...");
+                status.info("Daemon uses minimal CPU when idle (Rust async/await)");
+                daemon::Daemon::run_foreground().await?;
+            } else {
+                status.info("Starting daemon in background...");
+                daemon::Daemon::start(&pid_file)?;
+                status.success("Daemon started");
+            }
+        }
+
+        DaemonCommands::Stop => {
+            status.info("Stopping daemon...");
+            daemon::Daemon::stop()?;
+            status.success("Daemon stopped");
+        }
+
+        DaemonCommands::Restart => {
+            status.info("Restarting daemon...");
+            daemon::Daemon::stop()?;
+            daemon::Daemon::start("dx.pid")?;
+            status.success("Daemon restarted");
+        }
+
+        DaemonCommands::Status => {
+            let running = daemon::Daemon::is_running();
+            if running {
+                status.success("Daemon is running");
+                // Show stats
+                if let Some(stats) = daemon::Daemon::get_stats() {
+                    status.info(&format!("  Uptime: {}", stats.uptime));
+                    status.info(&format!("  CPU: {:.2}%", stats.cpu_percent));
+                    status.info(&format!("  Memory: {} MB", stats.memory_mb));
+                    status.info(&format!("  Workspaces: {}", stats.workspaces));
+                    status.info(&format!("  Plugins: {}", stats.plugins_loaded));
+                }
+            } else {
+                status.warning("Daemon is not running");
+            }
+        }
+
+        DaemonCommands::Send { command } => {
+            status.info(&format!("Sending command: {}", command));
+            let response = daemon::Daemon::send_command(&command)?;
+            println!("{}", response);
+        }
+    }
+
+    Ok(())
+}
+```
+
+### `crates/cli/src/commands/plugin.rs`
+
+```rust
+use anyhow::Result;
+use clap::{Args, Subcommand, ValueEnum};
+use std::path::PathBuf;
+
+use crate::status::StatusReporter;
+
+#[derive(Args)]
+pub struct PluginArgs {
+    #[command(subcommand)]
+    pub command: PluginCommands,
+}
+
+#[derive(Clone, ValueEnum)]
+pub enum PluginType {
+    /// Messaging integrations (Node.js → WASM)
+    Integration,
+    /// LLM providers (Python → WASM)
+    Provider,
+    /// Performance tools (Rust/Go/C/Zig → WASM)
+    Tool,
+}
+
+#[derive(Subcommand)]
+pub enum PluginCommands {
+    /// Add a new plugin
+    Add {
+        /// Plugin type
+        #[arg(short = 't', long, value_enum)]
+        r#type: PluginType,
+
+        /// Plugin name
+        name: String,
+
+        /// Source path or URL
+        #[arg(short, long)]
+        source: Option<String>,
+    },
+
+    /// List installed plugins
+    List {
+        /// Filter by type
+        #[arg(short = 't', long, value_enum)]
+        r#type: Option<PluginType>,
+    },
+
+    /// Build plugin to WASM
+    Build {
+        /// Plugin path
+        path: PathBuf,
+    },
+
+    /// Remove a plugin
+    Remove {
+        /// Plugin name
+        name: String,
+    },
+
+    /// Show plugin info
+    Info {
+        /// Plugin name
+        name: String,
+    },
+}
+
+pub async fn run(args: PluginArgs, status: &StatusReporter) -> Result<()> {
+    match args.command {
+        PluginCommands::Add { r#type, name, source } => {
+            match r#type {
+                PluginType::Integration => {
+                    status.info(&format!("Adding integration: {}", name));
+                    status.info("→ Language: Node.js → WASM (Javy)");
+                    status.info("→ Use case: WhatsApp, Telegram, Discord, X, Slack");
+                }
+                PluginType::Provider => {
+                    status.info(&format!("Adding provider: {}", name));
+                    status.info("→ Language: Python → WASM (componentize-py)");
+                    status.info("→ Use case: OpenAI, Anthropic, Ollama, Gemini, HuggingFace");
+                }
+                PluginType::Tool => {
+                    status.info(&format!("Adding tool: {}", name));
+                    status.info("→ Languages: Rust, Go, C, C++, Zig → WASM");
+                    status.info("→ Use case: MCP, filesystem, network, http, shell");
+                }
+            }
+
+            // Create plugin scaffold
+            let plugin_dir = match r#type {
+                PluginType::Integration => PathBuf::from("plugins/integrations").join(&name),
+                PluginType::Provider => PathBuf::from("plugins/providers").join(&name),
+                PluginType::Tool => PathBuf::from("plugins/tools").join(&name),
+            };
+
+            std::fs::create_dir_all(&plugin_dir)?;
+
+            match r#type {
+                PluginType::Integration => create_integration_scaffold(&plugin_dir, &name)?,
+                PluginType::Provider => create_provider_scaffold(&plugin_dir, &name)?,
+                PluginType::Tool => create_tool_scaffold(&plugin_dir, &name)?,
+            }
+
+            status.success(&format!("Plugin '{}' created at {:?}", name, plugin_dir));
+        }
+
+        PluginCommands::List { r#type } => {
+            println!();
+            
+            if r#type.is_none() || matches!(r#type, Some(PluginType::Integration)) {
+                println!("📱 INTEGRATIONS (Node.js → WASM)");
+                println!("   Purpose: Messaging app connections");
+                println!("   ├─ whatsapp");
+                println!("   ├─ telegram");
+                println!("   ├─ discord");
+                println!("   ├─ x");
+                println!("   └─ slack");
+                println!();
+            }
+
+            if r#type.is_none() || matches!(r#type, Some(PluginType::Provider)) {
+                println!("🤖 PROVIDERS (Python → WASM)");
+                println!("   Purpose: LLM backend connections");
+                println!("   ├─ openai");
+                println!("   ├─ anthropic");
+                println!("   ├─ ollama (local)");
+                println!("   ├─ gemini");
+                println!("   └─ huggingface");
+                println!();
+            }
+
+            if r#type.is_none() || matches!(r#type, Some(PluginType::Tool)) {
+                println!("🔧 TOOLS (Rust/Go/C/Zig → WASM)");
+                println!("   Purpose: Performance-critical operations");
+                println!("   ├─ mcp (Model Context Protocol)");
+                println!("   ├─ filesystem");
+                println!("   ├─ network");
+                println!("   ├─ http");
+                println!("   └─ shell");
+                println!();
+            }
+        }
+
+        PluginCommands::Build { path } => {
+            status.info(&format!("Building plugin at {:?}", path));
+
+            // Detect plugin type and language
+            let plugin_type = detect_plugin_type(&path)?;
+            let language = detect_language(&path)?;
+
+            status.info(&format!("Detected: {:?} ({:?})", plugin_type, language));
+
+            match (plugin_type, language) {
+                (PluginType::Integration, Language::NodeJs) => {
+                    status.info("Compiling Node.js → WASM via Javy...");
+                    plugins::integrations::compile(&path).await?;
+                }
+                (PluginType::Provider, Language::Python) => {
+                    status.info("Compiling Python → WASM via componentize-py...");
+                    plugins::providers::compile(&path).await?;
+                }
+                (PluginType::Tool, lang) => {
+                    status.info(&format!("Compiling {:?} → WASM...", lang));
+                    plugins::tools::compile(&path, lang).await?;
+                }
+                _ => {
+                    return Err(anyhow::anyhow!("Unsupported plugin type/language combination"));
+                }
+            }
+
+            status.success("Plugin built successfully");
+        }
+
+        PluginCommands::Remove { name } => {
+            status.info(&format!("Removing plugin: {}", name));
+            status.success("Plugin removed");
+        }
+
+        PluginCommands::Info { name } => {
+            status.info(&format!("Plugin: {}", name));
+            // Show plugin details
+        }
+    }
+
+    Ok(())
+}
+
+#[derive(Debug)]
+enum Language {
+    NodeJs,
+    Python,
+    Rust,
+    Go,
+    C,
+    Cpp,
+    Zig,
+}
+
+fn detect_plugin_type(path: &PathBuf) -> Result<PluginType> {
+    let path_str = path.to_string_lossy();
+    if path_str.contains("integrations") {
+        Ok(PluginType::Integration)
+    } else if path_str.contains("providers") {
+        Ok(PluginType::Provider)
+    } else if path_str.contains("tools") {
+        Ok(PluginType::Tool)
+    } else {
+        // Detect by files
+        if path.join("package.json").exists() {
+            Ok(PluginType::Integration)
+        } else if path.join("pyproject.toml").exists() {
+            Ok(PluginType::Provider)
+        } else {
+            Ok(PluginType::Tool)
+        }
+    }
+}
+
+fn detect_language(path: &PathBuf) -> Result<Language> {
+    if path.join("package.json").exists() {
+        Ok(Language::NodeJs)
+    } else if path.join("pyproject.toml").exists() || path.join("setup.py").exists() {
+        Ok(Language::Python)
+    } else if path.join("Cargo.toml").exists() {
+        Ok(Language::Rust)
+    } else if path.join("go.mod").exists() {
+        Ok(Language::Go)
+    } else if path.join("build.zig").exists() {
+        Ok(Language::Zig)
+    } else if path.join("CMakeLists.txt").exists() {
+        Ok(Language::Cpp)
+    } else if path.join("Makefile").exists() {
+        Ok(Language::C)
+    } else {
+        Err(anyhow::anyhow!("Could not detect language"))
+    }
+}
+
+fn create_integration_scaffold(dir: &PathBuf, name: &str) -> Result<()> {
+    std::fs::write(
+        dir.join("package.json"),
+        format!(
+            r#"{{
+  "name": "@dx/integration-{name}",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {{
+    "build": "esbuild src/index.ts --bundle --outfile=dist/bundle.js --format=esm && javy compile dist/bundle.js -o plugin.wasm"
+  }},
+  "devDependencies": {{
+    "esbuild": "^0.20.0",
+    "typescript": "^5.0.0"
+  }}
+}}
+"#
+        ),
+    )?;
+
+    std::fs::create_dir_all(dir.join("src"))?;
+    std::fs::write(
+        dir.join("src/index.ts"),
+        format!(
+            r#"// {name} Integration for DX
+// Compiled to WASM via Javy
+
+export interface Message {{
+  channel: string;
+  content: string;
+  author: string;
+  timestamp: number;
+}}
+
+export interface Integration {{
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  sendMessage(channel: string, content: string): Promise<boolean>;
+  onMessage(callback: (msg: Message) => void): void;
+}}
+
+class {name_pascal}Integration implements Integration {{
+  async connect(): Promise<void> {{
+    // TODO: Implement connection
+  }}
+
+  async disconnect(): Promise<void> {{
+    // TODO: Implement disconnection
+  }}
+
+  async sendMessage(channel: string, content: string): Promise<boolean> {{
+    // TODO: Implement message sending
+    return true;
+  }}
+
+  onMessage(callback: (msg: Message) => void): void {{
+    // TODO: Implement message listener
+  }}
+}}
+
+export default new {name_pascal}Integration();
+"#,
+            name = name,
+            name_pascal = to_pascal_case(name)
+        ),
+    )?;
+
+    Ok(())
+}
+
+fn create_provider_scaffold(dir: &PathBuf, name: &str) -> Result<()> {
+    std::fs::write(
+        dir.join("pyproject.toml"),
+        format!(
+            r#"[project]
+name = "dx-provider-{name}"
+version = "0.1.0"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.dx]
+type = "provider"
+compile = "componentize-py -d wit -w provider componentize src/provider.py -o plugin.wasm"
+"#
+        ),
+    )?;
+
+    std::fs::create_dir_all(dir.join("src"))?;
+    std::fs::write(
+        dir.join("src/provider.py"),
+        format!(
+            r#"\"\"\"{name} Provider for DX - Compiled to WASM via componentize-py\"\"\"
+
+from typing import AsyncIterator, Optional
+
+
+class {name_pascal}Provider:
+    \"\"\"LLM Provider implementation for {name}\"\"\"
+
+    def __init__(self, api_key: Optional[str] = None, model: str = "default"):
+        self.api_key = api_key
+        self.model = model
+
+    async def complete(self, prompt: str, max_tokens: int = 1024) -> str:
+        \"\"\"Complete a prompt and return the response\"\"\"
+        # TODO: Implement completion
+        return ""
+
+    async def stream(self, prompt: str, max_tokens: int = 1024) -> AsyncIterator[str]:
+        \"\"\"Stream completion tokens\"\"\"
+        # TODO: Implement streaming
+        yield ""
+
+    async def embed(self, text: str) -> list[float]:
+        \"\"\"Generate embeddings for text\"\"\"
+        # TODO: Implement embeddings
+        return []
+
+
+# Export provider instance
+provider = {name_pascal}Provider()
+"#,
+            name = name,
+            name_pascal = to_pascal_case(name)
+        ),
+    )?;
+
+    // Create WIT interface
+    std::fs::create_dir_all(dir.join("wit"))?;
+    std::fs::write(
+        dir.join("wit/provider.wit"),
+        r#"package dx:provider;
+
+interface provider {
+    complete: func(prompt: string, max-tokens: u32) -> string;
+    stream: func(prompt: string, max-tokens: u32) -> list<string>;
+    embed: func(text: string) -> list<f32>;
+}
+
+world provider {
+    export provider;
+}
+"#,
+    )?;
+
+    Ok(())
+}
+
+fn create_tool_scaffold(dir: &PathBuf, name: &str) -> Result<()> {
+    // Default to Rust
+    std::fs::write(
+        dir.join("Cargo.toml"),
+        format!(
+            r#"[package]
+name = "dx-tool-{name}"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wit-bindgen = "0.36"
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
+"#
+        ),
+    )?;
+
+    std::fs::create_dir_all(dir.join("src"))?;
+    std::fs::write(
+        dir.join("src/lib.rs"),
+        format!(
+            r#"//! {name} Tool for DX - Compiled to WASM
+
+wit_bindgen::generate!({{
+    world: "dx-tool",
+}});
+
+use exports::dx::tools::{name}::Guest;
+
+struct {name_pascal}Tool;
+
+impl Guest for {name_pascal}Tool {{
+    // TODO: Implement tool functions
+}}
+
+export!({name_pascal}Tool);
+"#,
+            name = name,
+            name_pascal = to_pascal_case(name)
+        ),
+    )?;
+
+    // Create WIT interface
+    std::fs::create_dir_all(dir.join("wit"))?;
+    std::fs::write(
+        dir.join("wit/tool.wit"),
+        format!(
+            r#"package dx:tools;
+
+interface {name} {{
+    // TODO: Define tool functions
+}}
+
+world dx-tool {{
+    export {name};
+}}
+"#
+        ),
+    )?;
+
+    Ok(())
+}
+
+fn to_pascal_case(s: &str) -> String {
+    s.split(|c: char| c == '-' || c == '_')
+        .map(|word| {
+            let mut chars = word.chars();
+            match chars.next() {
+                Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
+                None => String::new(),
+            }
+        })
+        .collect()
+}
+```
+
+### `crates/cli/src/status.rs`
+
+```rust
+//! Status reporter optimized for VS Code GitHub Copilot terminal integration
+//! Uses DX Serializer LLM format for 70%+ token efficiency
+
+use std::io::{self, Write};
+
+#[derive(Clone, Copy, Debug, Default)]
+pub enum OutputFormat {
+    #[default]
+    Pretty,
+    DxLlm,
+    Json,
+}
+
+pub struct StatusReporter {
+    format: OutputFormat,
+}
+
+impl StatusReporter {
+    pub fn new(format: OutputFormat) -> Self {
+        Self { format }
+    }
+
+    pub fn info(&self, message: &str) {
+        match self.format {
+            OutputFormat::Pretty => println!("ℹ️  {}", message),
+            OutputFormat::DxLlm => println!("dx:info msg={}", message.replace(' ', "_")),
+            OutputFormat::Json => println!(r#"{{"type":"info","msg":"{}"}}"#, message),
+        }
+    }
+
+    pub fn success(&self, message: &str) {
+        match self.format {
+            OutputFormat::Pretty => println!("✅ {}", message),
+            OutputFormat::DxLlm => println!("dx:ok msg={}", message.replace(' ', "_")),
+            OutputFormat::Json => println!(r#"{{"type":"ok","msg":"{}"}}"#, message),
+        }
+    }
+
+    pub fn error(&self, message: &str) {
+        match self.format {
+            OutputFormat::Pretty => eprintln!("❌ {}", message),
+            OutputFormat::DxLlm => eprintln!("dx:err msg={}", message.replace(' ', "_")),
+            OutputFormat::Json => eprintln!(r#"{{"type":"err","msg":"{}"}}"#, message),
+        }
+    }
+
+    pub fn warning(&self, message: &str) {
+        match self.format {
+            OutputFormat::Pretty => println!("⚠️  {}", message),
+            OutputFormat::DxLlm => println!("dx:warn msg={}", message.replace(' ', "_")),
+            OutputFormat::Json => println!(r#"{{"type":"warn","msg":"{}"}}"#, message),
+        }
+    }
+
+    pub fn daemon_status(&self, running: bool, stats: Option<&DaemonStats>) {
+        match self.format {
+            OutputFormat::Pretty => {
+                if running {
+                    println!("🟢 Daemon: running");
+                    if let Some(s) = stats {
+                        println!("   Uptime:     {}", s.uptime);
+                        println!("   CPU:        {:.2}%", s.cpu_percent);
+                        println!("   Memory:     {} MB", s.memory_mb);
+                        println!("   Workspaces: {}", s.workspaces);
+                        println!("   Plugins:    {}", s.plugins_loaded);
+                    }
+                } else {
+                    println!("🔴 Daemon: stopped");
+                }
+            }
+            OutputFormat::DxLlm => {
+                if running {
+                    if let Some(s) = stats {
+                        println!(
+                            "dx:daemon running=1 cpu={:.2} mem={} ws={} plugins={}",
+                            s.cpu_percent, s.memory_mb, s.workspaces, s.plugins_loaded
+                        );
+                    } else {
+                        println!("dx:daemon running=1");
+                    }
+                } else {
+                    println!("dx:daemon running=0");
+                }
+            }
+            OutputFormat::Json => {
+                if running {
+                    if let Some(s) = stats {
+                        println!(
+                            r#"{{"daemon":{{"running":true,"cpu":{},"memory":{},"workspaces":{},"plugins":{}}}}}"#,
+                            s.cpu_percent, s.memory_mb, s.workspaces, s.plugins_loaded
+                        );
+                    } else {
+                        println!(r#"{{"daemon":{{"running":true}}}}"#);
+                    }
+                } else {
+                    println!(r#"{{"daemon":{{"running":false}}}}"#);
+                }
+            }
+        }
+    }
+}
+
+pub struct DaemonStats {
+    pub uptime: String,
+    pub cpu_percent: f32,
+    pub memory_mb: u64,
+    pub workspaces: usize,
+    pub plugins_loaded: usize,
+}
+```
+
+---
+
+## Crate: daemon
+
+### `crates/daemon/Cargo.toml`
+
+```toml
+[package]
+name = "dx-daemon"
+version.workspace = true
+edition.workspace = true
+description = "24/7 daemon with minimal CPU usage when idle"
+
+[dependencies]
+core.workspace = true
+workspace.workspace = true
+sandbox.workspace = true
+plugins.workspace = true
+
+tokio.workspace = true
+futures.workspace = true
+tracing.workspace = true
+signal-hook.workspace = true
+signal-hook-tokio.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+# Unix sockets for IPC
+[target.'cfg(unix)'.dependencies]
+tokio = { workspace = true, features = ["net"] }
+
+# Named pipes for Windows IPC
+[target.'cfg(windows)'.dependencies]
+tokio = { workspace = true, features = ["net"] }
+```
+
+### `crates/daemon/src/lib.rs`
+
+```rust
+//! DX Daemon - Runs 24/7 with minimal CPU usage when idle
+//!
+//! Design principles:
+//! - Uses Rust async/await (Tokio) for efficient event-driven execution
+//! - When idle, consumes near-zero CPU (just waiting on epoll/kqueue)
+//! - Wakes up only on:
+//!   - IPC commands (Unix socket / named pipe)
+//!   - Signal handlers (SIGTERM, SIGINT, SIGHUP)
+//!   - Timer events (scheduled tasks)
+//!   - Plugin messages
+
+use std::path::PathBuf;
+use std::sync::Arc;
+
+use futures::StreamExt;
+use signal_hook::consts::{SIGINT, SIGTERM, SIGHUP};
+use signal_hook_tokio::Signals;
+use thiserror::Error;
+use tokio::sync::{mpsc, RwLock, broadcast};
+use tokio::net::UnixListener;
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+use tracing::{info, warn, error};
+
+pub mod ipc;
+pub mod scheduler;
+
+#[derive(Error, Debug)]
+pub enum DaemonError {
+    #[error("IO error: {0}")]
+    Io(#[from] std::io::Error),
+
+    #[error("Already running")]
+    AlreadyRunning,
+
+    #[error("Not running")]
+    NotRunning,
+
+    #[error("IPC error: {0}")]
+    Ipc(String),
+}
+
+pub type Result<T> = std::result::Result<T, DaemonError>;
+
+/// Daemon statistics
+#[derive(Debug, Clone, Default)]
+pub struct DaemonStats {
+    pub start_time: Option<std::time::Instant>,
+    pub cpu_percent: f32,
+    pub memory_mb: u64,
+    pub workspaces: usize,
+    pub plugins_loaded: usize,
+    pub commands_processed: u64,
+}
+
+impl DaemonStats {
+    pub fn uptime(&self) -> String {
+        match self.start_time {
+            Some(start) => {
+                let duration = start.elapsed();
+                let secs = duration.as_secs();
+                let hours = secs / 3600;
+                let mins = (secs % 3600) / 60;
+                let secs = secs % 60;
+                format!("{}h {}m {}s", hours, mins, secs)
+            }
+            None => "0s".to_string(),
+        }
+    }
+}
+
+/// Internal daemon state
+struct DaemonState {
+    stats: DaemonStats,
+    workspace_manager: workspace::WorkspaceManager,
+    plugin_host: plugins::PluginHost,
+    shutdown: broadcast::Sender<()>,
+}
+
+/// The main daemon
+pub struct Daemon {
+    socket_path: PathBuf,
+    pid_file: PathBuf,
+    state: Arc<RwLock<DaemonState>>,
+}
+
+impl Daemon {
+    /// Create a new daemon instance
+    pub fn new() -> Result<Self> {
+        let socket_path = PathBuf::from("/tmp/dx.sock");
+        let pid_file = PathBuf::from("dx.pid");
+
+        let (shutdown_tx, _) = broadcast::channel(1);
+
+        let state = DaemonState {
+            stats: DaemonStats {
+                start_time: Some(std::time::Instant::now()),
+                ..Default::default()
+            },
+            workspace_manager: workspace::WorkspaceManager::new(workspace::ResourceLimits::default()),
+            plugin_host: plugins::PluginHost::new().map_err(|e| DaemonError::Io(std::io::Error::other(e.to_string())))?,
+            shutdown: shutdown_tx,
+        };
+
+        Ok(Self {
+            socket_path,
+            pid_file,
+            state: Arc::new(RwLock::new(state)),
+        })
+    }
+
+    /// Run the daemon in foreground (blocking)
+    pub async fn run_foreground() -> Result<()> {
+        let daemon = Self::new()?;
+        daemon.run().await
+    }
+
+    /// Start daemon in background
+    pub fn start(pid_file: &str) -> Result<()> {
+        // Fork and daemonize (Unix)
+        #[cfg(unix)]
+        {
+            use std::process::Command;
+            
+            let exe = std::env::current_exe()?;
+            let child = Command::new(exe)
+                .args(["daemon", "start", "--foreground"])
+                .spawn()?;
+            
+            std::fs::write(pid_file, child.id().to_string())?;
+        }
+
+        #[cfg(windows)]
+        {
+            // Windows service or background process
+            todo!("Windows daemon support")
+        }
+
+        Ok(())
+    }
+
+    /// Stop the daemon
+    pub fn stop() -> Result<()> {
+        // Send shutdown command via IPC
+        let response = Self::send_command("shutdown")?;
+        if response.contains("ok") {
+            Ok(())
+        } else {
+            Err(DaemonError::Ipc(response))
+        }
+    }
+
+    /// Check if daemon is running
+    pub fn is_running() -> bool {
+        // Check if socket exists and responds
+        Self::send_command("ping").is_ok()
+    }
+
+    /// Get daemon statistics
+    pub fn get_stats() -> Option<DaemonStats> {
+        let response = Self::send_command("stats").ok()?;
+        serde_json::from_str(&response).ok()
+    }
+
+    /// Send command to running daemon
+    pub fn send_command(command: &str) -> Result<String> {
+        use std::io::{Read, Write};
+        use std::os::unix::net::UnixStream;
+
+        let mut stream = UnixStream::connect("/tmp/dx.sock")
+            .map_err(|_| DaemonError::NotRunning)?;
+        
+        stream.write_all(command.as_bytes())?;
+        stream.write_all(b"\n")?;
+        stream.flush()?;
+
+        let mut response = String::new();
+        stream.read_to_string(&mut response)?;
+        
+        Ok(response)
+    }
+
+    /// Main daemon loop
+    async fn run(&self) -> Result<()> {
+        info!("Starting DX daemon...");
+
+        // Remove old socket if exists
+        let _ = std::fs::remove_file(&self.socket_path);
+
+        // Create Unix socket listener
+        let listener = UnixListener::bind(&self.socket_path)?;
+        info!("Listening on {:?}", self.socket_path);
+
+        // Setup signal handlers
+        let mut signals = Signals::new([SIGINT, SIGTERM, SIGHUP])?;
+
+        // Get shutdown receiver
+        let mut shutdown_rx = {
+            let state = self.state.read().await;
+            state.shutdown.subscribe()
+        };
+
+        info!("Daemon running. Waiting for commands (minimal CPU when idle)...");
+
+        loop {
+            tokio::select! {
+                // Handle incoming IPC connections
+                // This is where we wait efficiently - no CPU usage while waiting
+                result = listener.accept() => {
+                    match result {
+                        Ok((stream, _addr)) => {
+                            let state = Arc::clone(&self.state);
+                            tokio::spawn(async move {
+                                if let Err(e) = Self::handle_connection(stream, state).await {
+                                    error!("Connection error: {}", e);
+                                }
+                            });
+                        }
+                        Err(e) => {
+                            error!("Accept error: {}", e);
+                        }
+                    }
+                }
+
+                // Handle OS signals
+                Some(signal) = signals.next() => {
+                    match signal {
+                        SIGINT | SIGTERM => {
+                            info!("Received shutdown signal");
+                            break;
+                        }
+                        SIGHUP => {
+                            info!("Received SIGHUP, reloading configuration...");
+                            // TODO: Reload config
+                        }
+                        _ => {}
+                    }
+                }
+
+                // Handle shutdown broadcast
+                _ = shutdown_rx.recv() => {
+                    info!("Received shutdown command");
+                    break;
+                }
+            }
+        }
+
+        info!("Daemon shutting down...");
+        
+        // Cleanup
+        let _ = std::fs::remove_file(&self.socket_path);
+        let _ = std::fs::remove_file(&self.pid_file);
+
+        Ok(())
+    }
+
+    /// Handle a single IPC connection
+    async fn handle_connection(
+        stream: tokio::net::UnixStream,
+        state: Arc<RwLock<DaemonState>>,
+    ) -> Result<()> {
+        let (reader, mut writer) = stream.into_split();
+        let mut reader = BufReader::new(reader);
+        let mut line = String::new();
+
+        // Read command
+        reader.read_line(&mut line).await?;
+        let command = line.trim();
+
+        // Increment command counter
+        {
+            let mut state = state.write().await;
+            state.stats.commands_processed += 1;
+        }
+
+        // Process command
+        let response = match command {
+            "ping" => "pong".to_string(),
+            
+            "shutdown" => {
+                let state = state.read().await;
+                let _ = state.shutdown.send(());
+                r#"{"status":"ok","msg":"shutting down"}"#.to_string()
+            }
+            
+            "stats" => {
+                let state = state.read().await;
+                serde_json::to_string(&DaemonStatsResponse {
+                    uptime: state.stats.uptime(),
+                    cpu_percent: state.stats.cpu_percent,
+                    memory_mb: state.stats.memory_mb,
+                    workspaces: state.stats.workspaces,
+                    plugins_loaded: state.stats.plugins_loaded,
+                    commands_processed: state.stats.commands_processed,
+                }).unwrap_or_else(|_| "{}".to_string())
+            }
+            
+            "status" => {
+                r#"{"status":"running"}"#.to_string()
+            }
+            
+            cmd if cmd.starts_with("workspace ") => {
+                let args = &cmd[10..];
+                // Handle workspace commands
+                format!(r#"{{"status":"ok","workspace":"{}"}}"#, args)
+            }
+            
+            cmd if cmd.starts_with("plugin ") => {
+                let args = &cmd[7..];
+                // Handle plugin commands
+                format!(r#"{{"status":"ok","plugin":"{}"}}"#, args)
+            }
+            
+            cmd if cmd.starts_with("exec ") => {
+                let cmd_to_exec = &cmd[5..];
+                // Execute in sandbox
+                let mut state = state.write().await;
+                match state.workspace_manager.execute_in_primary(cmd_to_exec).await {
+                    Ok(output) => format!(r#"{{"status":"ok","output":"{}"}}"#, output.replace('"', "\\\"")),
+                    Err(e) => format!(r#"{{"status":"error","msg":"{}"}}"#, e),
+                }
+            }
+            
+            _ => {
+                format!(r#"{{"status":"error","msg":"unknown command: {}"}}"#, command)
+            }
+        };
+
+        // Send response
+        writer.write_all(response.as_bytes()).await?;
+        writer.write_all(b"\n").await?;
+        writer.flush().await?;
+
+        Ok(())
+    }
+}
+
+#[derive(serde::Serialize)]
+struct DaemonStatsResponse {
+    uptime: String,
+    cpu_percent: f32,
+    memory_mb: u64,
+    workspaces: usize,
+    plugins_loaded: usize,
+    commands_processed: u64,
+}
+
+impl Default for Daemon {
+    fn default() -> Self {
+        Self::new().expect("Failed to create daemon")
+    }
+}
+```
+
+### `crates/daemon/src/ipc.rs`
+
+```rust
+//! IPC (Inter-Process Communication) for daemon
+
+use std::path::Path;
+
+#[cfg(unix)]
+pub use unix::*;
+
+#[cfg(windows)]
+pub use windows::*;
+
+#[cfg(unix)]
+mod unix {
+    use super::*;
+    use tokio::net::UnixStream;
+    use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+
+    /// Send a command to the daemon and get response
+    pub async fn send_command(socket_path: &Path, command: &str) -> std::io::Result<String> {
+        let stream = UnixStream::connect(socket_path).await?;
+        let (reader, mut writer) = stream.into_split();
+
+        // Send command
+        writer.write_all(command.as_bytes()).await?;
+        writer.write_all(b"\n").await?;
+        writer.flush().await?;
+
+        // Read response
+        let mut reader = BufReader::new(reader);
+        let mut response = String::new();
+        reader.read_line(&mut response).await?;
+
+        Ok(response)
+    }
+}
+
+#[cfg(windows)]
+mod windows {
+    use super::*;
+
+    pub async fn send_command(_pipe_name: &Path, _command: &str) -> std::io::Result<String> {
+        // TODO: Implement Windows named pipes
+        todo!("Windows IPC support")
+    }
+}
+```
+
+### `crates/daemon/src/scheduler.rs`
+
+```rust
+//! Task scheduler for the daemon
+
+use std::collections::BinaryHeap;
+use std::cmp::Ordering;
+use std::time::{Duration, Instant};
+
+use tokio::sync::mpsc;
+
+/// A scheduled task
+#[derive(Debug)]
+pub struct ScheduledTask {
+    pub id: u64,
+    pub run_at: Instant,
+    pub command: String,
+    pub repeat: Option<Duration>,
+}
+
+impl Eq for ScheduledTask {}
+
+impl PartialEq for ScheduledTask {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Ord for ScheduledTask {
+    fn cmp(&self, other: &Self) -> Ordering {
+        // Reverse ordering for min-heap (earliest first)
+        other.run_at.cmp(&self.run_at)
+    }
+}
+
+impl PartialOrd for ScheduledTask {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+/// Task scheduler
+pub struct Scheduler {
+    tasks: BinaryHeap<ScheduledTask>,
+    next_id: u64,
+    tx: mpsc::Sender<ScheduledTask>,
+}
+
+impl Scheduler {
+    pub fn new() -> (Self, mpsc::Receiver<ScheduledTask>) {
+        let (tx, rx) = mpsc::channel(100);
+        (
+            Self {
+                tasks: BinaryHeap::new(),
+                next_id: 0,
+                tx,
+            },
+            rx,
+        )
+    }
+
+    /// Schedule a task to run at a specific time
+    pub fn schedule_at(&mut self, run_at: Instant, command: String) -> u64 {
+        let id = self.next_id;
+        self.next_id += 1;
+
+        self.tasks.push(ScheduledTask {
+            id,
+            run_at,
+            command,
+            repeat: None,
+        });
+
+        id
+    }
+
+    /// Schedule a task to run after a delay
+    pub fn schedule_after(&mut self, delay: Duration, command: String) -> u64 {
+        self.schedule_at(Instant::now() + delay, command)
+    }
+
+    /// Schedule a repeating task
+    pub fn schedule_repeat(&mut self, interval: Duration, command: String) -> u64 {
+        let id = self.next_id;
+        self.next_id += 1;
+
+        self.tasks.push(ScheduledTask {
+            id,
+            run_at: Instant::now() + interval,
+            command,
+            repeat: Some(interval),
+        });
+
+        id
+    }
+
+    /// Get the next task if it's ready to run
+    pub fn poll(&mut self) -> Option<ScheduledTask> {
+        if let Some(task) = self.tasks.peek() {
+            if task.run_at <= Instant::now() {
+                let mut task = self.tasks.pop().unwrap();
+                
+                // If repeating, reschedule
+                if let Some(interval) = task.repeat {
+                    self.tasks.push(ScheduledTask {
+                        id: self.next_id,
+                        run_at: Instant::now() + interval,
+                        command: task.command.clone(),
+                        repeat: Some(interval),
+                    });
+                    self.next_id += 1;
+                }
+
+                return Some(task);
+            }
+        }
+        None
+    }
+
+    /// Get time until next task (for sleep duration)
+    pub fn time_until_next(&self) -> Option<Duration> {
+        self.tasks.peek().map(|task| {
+            let now = Instant::now();
+            if task.run_at > now {
+                task.run_at - now
+            } else {
+                Duration::ZERO
+            }
+        })
+    }
+}
+
+impl Default for Scheduler {
+    fn default() -> Self {
+        Self::new().0
+    }
+}
+```
+
+---
+
+## Crate: plugins (Updated)
+
+### `crates/plugins/Cargo.toml`
+
+```toml
+[package]
+name = "dx-plugins"
+version.workspace = true
+edition.workspace = true
+description = "Plugin system: Integrations (Node.js), Providers (Python), Tools (Rust/Go/C/Zig)"
+
+[dependencies]
+core.workspace = true
+serializer.workspace = true
+
+wasmtime.workspace = true
+tokio.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+async-trait.workspace = true
+uuid.workspace = true
+serde.workspace = true
+```
+
+### `crates/plugins/src/lib.rs`
+
+```rust
+//! DX Plugin System
+//!
+//! Three plugin categories, each optimized for specific use cases:
+//!
+//! 1. **Integrations** (Node.js → WASM)
+//!    - Messaging apps: WhatsApp, Telegram, Discord, X, Slack
+//!    - Leverages npm ecosystem (largest package repository)
+//!
+//! 2. **Providers** (Python → WASM)
+//!    - LLM backends: OpenAI, Anthropic, Ollama, Gemini, HuggingFace
+//!    - Python has best AI/ML library support
+//!
+//! 3. **Tools** (Rust/Go/C/C++/Zig → WASM)
+//!    - Performance-critical: MCP, filesystem, network, http, shell
+//!    - Native speed with WASM sandboxing
+
+pub mod host;
+pub mod registry;
+pub mod integrations;
+pub mod providers;
+pub mod tools;
+
+use std::path::Path;
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum PluginError {
+    #[error("IO error: {0}")]
+    Io(#[from] std::io::Error),
+
+    #[error("WASM error: {0}")]
+    Wasm(String),
+
+    #[error("Compilation error: {0}")]
+    Compilation(String),
+
+    #[error("Plugin not found: {0}")]
+    NotFound(String),
+
+    #[error("Language not supported: {0}")]
+    UnsupportedLanguage(String),
+}
+
+pub type Result<T> = std::result::Result<T, PluginError>;
+
+/// Plugin category
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Category {
+    /// Messaging integrations (Node.js → WASM)
+    Integration,
+    /// LLM providers (Python → WASM)
+    Provider,
+    /// Performance tools (Rust/Go/C/Zig → WASM)
+    Tool,
+}
+
+impl std::fmt::Display for Category {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Category::Integration => write!(f, "integration"),
+            Category::Provider => write!(f, "provider"),
+            Category::Tool => write!(f, "tool"),
+        }
+    }
+}
+
+/// Source language for plugins
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Language {
+    NodeJs,   // For Integrations
+    Python,   // For Providers
+    Rust,     // For Tools
+    Go,       // For Tools
+    C,        // For Tools
+    Cpp,      // For Tools
+    Zig,      // For Tools
+}
+
+impl Language {
+    /// Detect language from project files
+    pub fn detect(path: &Path) -> Option<Self> {
+        if path.join("package.json").exists() {
+            Some(Self::NodeJs)
+        } else if path.join("pyproject.toml").exists() || path.join("setup.py").exists() {
+            Some(Self::Python)
+        } else if path.join("Cargo.toml").exists() {
+            Some(Self::Rust)
+        } else if path.join("go.mod").exists() {
+            Some(Self::Go)
+        } else if path.join("build.zig").exists() {
+            Some(Self::Zig)
+        } else if path.join("CMakeLists.txt").exists() {
+            Some(Self::Cpp)
+        } else if path.join("Makefile").exists() {
+            Some(Self::C)
+        } else {
+            None
+        }
+    }
+
+    /// Get expected category for this language
+    pub fn expected_category(&self) -> Category {
+        match self {
+            Self::NodeJs => Category::Integration,
+            Self::Python => Category::Provider,
+            Self::Rust | Self::Go | Self::C | Self::Cpp | Self::Zig => Category::Tool,
+        }
+    }
+}
+
+impl std::fmt::Display for Language {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::NodeJs => write!(f, "Node.js"),
+            Self::Python => write!(f, "Python"),
+            Self::Rust => write!(f, "Rust"),
+            Self::Go => write!(f, "Go"),
+            Self::C => write!(f, "C"),
+            Self::Cpp => write!(f, "C++"),
+            Self::Zig => write!(f, "Zig"),
+        }
+    }
+}
+
+/// Plugin metadata
+#[derive(Debug, Clone)]
+pub struct PluginInfo {
+    pub name: String,
+    pub version: String,
+    pub category: Category,
+    pub language: Language,
+    pub description: Option<String>,
+}
+
+// Re-export commonly used items
+pub use host::PluginHost;
+pub use registry::PluginRegistry;
+```
+
+### `crates/plugins/src/integrations.rs`
+
+```rust
+//! Integration plugins (Node.js → WASM)
+//!
+//! For messaging apps: WhatsApp, Telegram, Discord, X, Slack
+//! Uses Javy to compile JavaScript/TypeScript to WASM
+
+use std::path::Path;
+use crate::{PluginError, Result};
+
+/// Compile Node.js integration to WASM
+pub async fn compile(source_dir: &Path) -> Result<Vec<u8>> {
+    let compiler = NodeJsCompiler::new();
+    
+    if !compiler.is_available().await {
+        return Err(PluginError::Compilation(
+            "Javy not installed. Run: cargo install javy-cli".into()
+        ));
+    }
+
+    compiler.compile(source_dir).await
+}
+
+/// Node.js to WASM compiler using Javy
+pub struct NodeJsCompiler {
+    javy_command: String,
+    esbuild_command: String,
+}
+
+impl NodeJsCompiler {
+    pub fn new() -> Self {
+        Self {
+            javy_command: "javy".to_string(),
+            esbuild_command: "npx".to_string(),
+        }
+    }
+
+    /// Check if required tools are available
+    pub async fn is_available(&self) -> bool {
+        let javy_ok = tokio::process::Command::new(&self.javy_command)
+            .arg("--version")
+            .output()
+            .await
+            .map(|o| o.status.success())
+            .unwrap_or(false);
+
+        let npm_ok = tokio::process::Command::new("npm")
+            .arg("--version")
+            .output()
+            .await
+            .map(|o| o.status.success())
+            .unwrap_or(false);
+
+        javy_ok && npm_ok
+    }
+
+    /// Compile Node.js/TypeScript to WASM
+    pub async fn compile(&self, source_dir: &Path) -> Result<Vec<u8>> {
+        // 1. Install dependencies if needed
+        if source_dir.join("package.json").exists() && !source_dir.join("node_modules").exists() {
+            tracing::info!("Installing npm dependencies...");
+            let status = tokio::process::Command::new("npm")
+                .args(["install"])
+                .current_dir(source_dir)
+                .status()
+                .await?;
+
+            if !status.success() {
+                return Err(PluginError::Compilation("npm install failed".into()));
+            }
+        }
+
+        // 2. Bundle with esbuild
+        tracing::info!("Bundling with esbuild...");
+        std::fs::create_dir_all(source_dir.join("dist"))?;
+
+        let entry_point = if source_dir.join("src/index.ts").exists() {
+            "src/index.ts"
+        } else if source_dir.join("src/index.js").exists() {
+            "src/index.js"
+        } else {
+            return Err(PluginError::Compilation("No entry point found (src/index.ts or src/index.js)".into()));
+        };
+
+        let status = tokio::process::Command::new(&self.esbuild_command)
+            .args([
+                "esbuild",
+                entry_point,
+                "--bundle",
+                "--outfile=dist/bundle.js",
+                "--format=esm",
+                "--platform=neutral",
+                "--target=es2020",
+            ])
+            .current_dir(source_dir)
+            .status()
+            .await?;
+
+        if !status.success() {
+            return Err(PluginError::Compilation("esbuild bundling failed".into()));
+        }
+
+        // 3. Compile with Javy
+        tracing::info!("Compiling to WASM with Javy...");
+        let status = tokio::process::Command::new(&self.javy_command)
+            .args(["compile", "dist/bundle.js", "-o", "plugin.wasm"])
+            .current_dir(source_dir)
+            .status()
+            .await?;
+
+        if !status.success() {
+            return Err(PluginError::Compilation("Javy compilation failed".into()));
+        }
+
+        // 4. Read WASM bytes
+        let wasm_path = source_dir.join("plugin.wasm");
+        tokio::fs::read(&wasm_path).await.map_err(Into::into)
+    }
+}
+
+impl Default for NodeJsCompiler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Integration interface trait
+#[async_trait::async_trait]
+pub trait Integration: Send + Sync {
+    /// Connect to the messaging service
+    async fn connect(&self) -> Result<()>;
+
+    /// Disconnect from the service
+    async fn disconnect(&self) -> Result<()>;
+
+    /// Send a message
+    async fn send_message(&self, channel: &str, content: &str) -> Result<()>;
+
+    /// Subscribe to incoming messages
+    async fn subscribe(&self) -> Result<tokio::sync::mpsc::Receiver<Message>>;
+}
+
+/// A message from an integration
+#[derive(Debug, Clone)]
+pub struct Message {
+    pub id: String,
+    pub channel: String,
+    pub content: String,
+    pub author: String,
+    pub timestamp: chrono::DateTime<chrono::Utc>,
+}
+```
+
+### `crates/plugins/src/providers.rs`
+
+```rust
+//! Provider plugins (Python → WASM)
+//!
+//! For LLM backends: OpenAI, Anthropic, Ollama, Gemini, HuggingFace
+//! Uses componentize-py to compile Python to WASM
+
+use std::path::Path;
+use crate::{PluginError, Result};
+
+/// Compile Python provider to WASM
+pub async fn compile(source_dir: &Path) -> Result<Vec<u8>> {
+    let compiler = PythonCompiler::new();
+    
+    if !compiler.is_available().await {
+        return Err(PluginError::Compilation(
+            "componentize-py not installed. Run: pip install componentize-py".into()
+        ));
+    }
+
+    compiler.compile(source_dir).await
+}
+
+/// Python to WASM compiler using componentize-py
+pub struct PythonCompiler {
+    componentize_command: String,
+}
+
+impl PythonCompiler {
+    pub fn new() -> Self {
+        Self {
+            componentize_command: "componentize-py".to_string(),
+        }
+    }
+
+    /// Check if required tools are available
+    pub async fn is_available(&self) -> bool {
+        tokio::process::Command::new(&self.componentize_command)
+            .arg("--version")
+            .output()
+            .await
+            .map(|o| o.status.success())
+            .unwrap_or(false)
+    }
+
+    /// Compile Python to WASM
+    pub async fn compile(&self, source_dir: &Path) -> Result<Vec<u8>> {
+        // Find the main Python file
+        let main_file = if source_dir.join("src/provider.py").exists() {
+            "src/provider.py"
+        } else if source_dir.join("provider.py").exists() {
+            "provider.py"
+        } else if source_dir.join("src/main.py").exists() {
+            "src/main.py"
+        } else {
+            return Err(PluginError::Compilation(
+                "No Python entry point found (src/provider.py, provider.py, or src/main.py)".into()
+            ));
+        };
+
+        // Check for WIT directory
+        let wit_dir = if source_dir.join("wit").exists() {
+            "wit"
+        } else {
+            return Err(PluginError::Compilation(
+                "No WIT directory found. Create wit/provider.wit".into()
+            ));
+        };
+
+        tracing::info!("Compiling Python to WASM with componentize-py...");
+
+        let status = tokio::process::Command::new(&self.componentize_command)
+            .args([
+                "-d", wit_dir,
+                "-w", "provider",
+                "componentize",
+                main_file,
+                "-o", "plugin.wasm",
+            ])
+            .current_dir(source_dir)
+            .status()
+            .await?;
+
+        if !status.success() {
+            return Err(PluginError::Compilation("componentize-py failed".into()));
+        }
+
+        let wasm_path = source_dir.join("plugin.wasm");
+        tokio::fs::read(&wasm_path).await.map_err(Into::into)
+    }
+}
+
+impl Default for PythonCompiler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Provider interface trait
+#[async_trait::async_trait]
+pub trait Provider: Send + Sync {
+    /// Complete a prompt
+    async fn complete(&self, prompt: &str, max_tokens: u32) -> Result<String>;
+
+    /// Stream completion tokens
+    async fn stream(&self, prompt: &str, max_tokens: u32) -> Result<tokio::sync::mpsc::Receiver<String>>;
+
+    /// Generate embeddings
+    async fn embed(&self, text: &str) -> Result<Vec<f32>>;
+}
+
+/// Provider configuration
+#[derive(Debug, Clone)]
+pub struct ProviderConfig {
+    pub api_key: Option<String>,
+    pub model: String,
+    pub base_url: Option<String>,
+    pub max_tokens: u32,
+    pub temperature: f32,
+}
+
+impl Default for ProviderConfig {
+    fn default() -> Self {
+        Self {
+            api_key: None,
+            model: "gpt-4".to_string(),
+            base_url: None,
+            max_tokens: 4096,
+            temperature: 0.7,
+        }
+    }
+}
+```
+
+### `crates/plugins/src/tools.rs`
+
+```rust
+//! Tool plugins (Rust/Go/C/C++/Zig → WASM)
+//!
+//! For performance-critical operations: MCP, filesystem, network, http, shell
+//! Uses native compilers targeting WASM
+
+use std::path::Path;
+use crate::{Language, PluginError, Result};
+
+/// Compile tool to WASM (auto-detect language)
+pub async fn compile(source_dir: &Path, language: Language) -> Result<Vec<u8>> {
+    match language {
+        Language::Rust => RustCompiler::compile(source_dir).await,
+        Language::Go => GoCompiler::compile(source_dir).await,
+        Language::C => CCompiler::compile(source_dir).await,
+        Language::Cpp => CCompiler::compile(source_dir).await,
+        Language::Zig => ZigCompiler::compile(source_dir).await,
+        _ => Err(PluginError::UnsupportedLanguage(format!(
+            "{} is not supported for tools. Use Rust, Go, C, C++, or Zig.",
+            language
+        ))),
+    }
+}
+
+/// Rust to WASM compiler
+pub struct RustCompiler;
+
+impl RustCompiler {
+    pub async fn compile(source_dir: &Path) -> Result<Vec<u8>> {
+        tracing::info!("Compiling Rust to WASM (wasm32-wasip2)...");
+
+        let status = tokio::process::Command::new("cargo")
+            .args([
+                "build",
+                "--release",
+                "--target", "wasm32-wasip2",
+            ])
+            .current_dir(source_dir)
+            .status()
+            .await?;
+
+        if !status.success() {
+            return Err(PluginError::Compilation("cargo build failed".into()));
+        }
+
+        // Find the output WASM file
+        let target_dir = source_dir.join("target/wasm32-wasip2/release");
+        
+        let wasm_file = std::fs::read_dir(&target_dir)?
+            .filter_map(|e| e.ok())
+            .find(|e| {
+                e.path().extension().map(|ext| ext == "wasm").unwrap_or(false)
+            })
+            .ok_or_else(|| PluginError::Compilation("WASM output not found".into()))?;
+
+        tokio::fs::read(wasm_file.path()).await.map_err(Into::into)
+    }
+}
+
+/// Go to WASM compiler (TinyGo)
+pub struct GoCompiler;
+
+impl GoCompiler {
+    pub async fn compile(source_dir: &Path) -> Result<Vec<u8>> {
+        tracing::info!("Compiling Go to WASM (TinyGo)...");
+
+        let status = tokio::process::Command::new("tinygo")
+            .args([
+                "build",
+                "-o", "plugin.wasm",
+                "-target", "wasip2",
+                "-opt", "2",
+                ".",
+            ])
+            .current_dir(source_dir)
+            .status()
+            .await?;
+
+        if !status.success() {
+            return Err(PluginError::Compilation("tinygo build failed".into()));
+        }
+
+        tokio::fs::read(source_dir.join("plugin.wasm")).await.map_err(Into::into)
+    }
+}
+
+/// C/C++ to WASM compiler (Emscripten)
+pub struct CCompiler;
+
+impl CCompiler {
+    pub async fn compile(source_dir: &Path) -> Result<Vec<u8>> {
+        tracing::info!("Compiling C/C++ to WASM (Emscripten)...");
+
+        // Determine source files
+        let source_file = if source_dir.join("src/main.c").exists() {
+            "src/main.c"
+        } else if source_dir.join("src/main.cpp").exists() {
+            "src/main.cpp"
+        } else if source_dir.join("main.c").exists() {
+            "main.c"
+        } else {
+            return Err(PluginError::Compilation("No C/C++ source found".into()));
+        };
+
+        let status = tokio::process::Command::new("emcc")
+            .args([
+                source_file,
+                "-o", "plugin.wasm",
+                "-s", "STANDALONE_WASM=1",
+                "-s", "EXPORTED_FUNCTIONS=['_malloc','_free']",
+                "-O3",
+            ])
+            .current_dir(source_dir)
+            .status()
+            .await?;
+
+        if !status.success() {
+            return Err(PluginError::Compilation("emcc build failed".into()));
+        }
+
+        tokio::fs::read(source_dir.join("plugin.wasm")).await.map_err(Into::into)
+    }
+}
+
+/// Zig to WASM compiler
+pub struct ZigCompiler;
+
+impl ZigCompiler {
+    pub async fn compile(source_dir: &Path) -> Result<Vec<u8>> {
+        tracing::info!("Compiling Zig to WASM...");
+
+        let status = tokio::process::Command::new("zig")
+            .args([
+                "build",
+                "-Dtarget=wasm32-wasi",
+                "-Doptimize=ReleaseFast",
+            ])
+            .current_dir(source_dir)
+            .status()
+            .await?;
+
+        if !status.success() {
+            return Err(PluginError::Compilation("zig build failed".into()));
+        }
+
+        // Find output in zig-out
+        let wasm_path = source_dir.join("zig-out/lib/plugin.wasm");
+        if wasm_path.exists() {
+            tokio::fs::read(&wasm_path).await.map_err(Into::into)
+        } else {
+            // Try alternative path
+            let wasm_path = source_dir.join("zig-out/bin/plugin.wasm");
+            tokio::fs::read(&wasm_path).await.map_err(Into::into)
+        }
+    }
+}
+
+/// Tool interface trait
+#[async_trait::async_trait]
+pub trait Tool: Send + Sync {
+    /// Execute the tool with given input
+    async fn execute(&self, input: &[u8]) -> Result<Vec<u8>>;
+
+    /// Get tool capabilities/schema
+    fn capabilities(&self) -> ToolCapabilities;
+}
+
+/// Tool capabilities description
+#[derive(Debug, Clone)]
+pub struct ToolCapabilities {
+    pub name: String,
+    pub description: String,
+    pub functions: Vec<ToolFunction>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ToolFunction {
+    pub name: String,
+    pub description: String,
+    pub parameters: serde_json::Value,
+}
+```
+
+---
+
+## Example MCP Tool (in plugins/tools/mcp/)
+
+### `plugins/tools/mcp/Cargo.toml`
+
+```toml
+[package]
+name = "dx-tool-mcp"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wit-bindgen = "0.36"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
+```
+
+### `plugins/tools/mcp/src/lib.rs`
+
+```rust
+//! MCP (Model Context Protocol) Tool for DX
+//! Compiled to WASM - runs with native speed in sandbox
+
+wit_bindgen::generate!({
+    world: "dx-tool",
+});
+
+use exports::dx::tools::mcp::Guest;
+
+struct McpTool;
+
+impl Guest for McpTool {
+    /// Handle MCP JSON-RPC request
+    fn handle_request(request: String) -> String {
+        let request: serde_json::Value = match serde_json::from_str(&request) {
+            Ok(v) => v,
+            Err(e) => return error_response(-32700, &format!("Parse error: {}", e)),
+        };
+
+        let method = request.get("method").and_then(|m| m.as_str()).unwrap_or("");
+        let id = request.get("id").cloned().unwrap_or(serde_json::Value::Null);
+
+        let result = match method {
+            "initialize" => handle_initialize(&request),
+            "tools/list" => handle_list_tools(),
+            "tools/call" => handle_call_tool(&request),
+            "resources/list" => handle_list_resources(),
+            "resources/read" => handle_read_resource(&request),
+            "ping" => Ok(serde_json::json!({})),
+            _ => Err((-32601, format!("Method not found: {}", method))),
+        };
+
+        match result {
+            Ok(result) => serde_json::json!({
+                "jsonrpc": "2.0",
+                "id": id,
+                "result": result
+            }).to_string(),
+            Err((code, message)) => error_response_with_id(id, code, &message),
+        }
+    }
+
+    /// Get MCP server info
+    fn server_info() -> String {
+        serde_json::json!({
+            "name": "dx-mcp",
+            "version": "0.1.0",
+            "protocolVersion": "2024-11-05"
+        }).to_string()
+    }
+}
+
+fn handle_initialize(_request: &serde_json::Value) -> Result<serde_json::Value, (i32, String)> {
+    Ok(serde_json::json!({
+        "protocolVersion": "2024-11-05",
+        "capabilities": {
+            "tools": {},
+            "resources": {}
+        },
+        "serverInfo": {
+            "name": "dx-mcp",
+            "version": "0.1.0"
+        }
+    }))
+}
+
+fn handle_list_tools() -> Result<serde_json::Value, (i32, String)> {
+    Ok(serde_json::json!({
+        "tools": [
+            {
+                "name": "execute_command",
+                "description": "Execute a shell command in sandbox",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "command": { "type": "string" }
+                    },
+                    "required": ["command"]
+                }
+            },
+            {
+                "name": "read_file",
+                "description": "Read a file's contents",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "path": { "type": "string" }
+                    },
+                    "required": ["path"]
+                }
+            }
+        ]
+    }))
+}
+
+fn handle_call_tool(request: &serde_json::Value) -> Result<serde_json::Value, (i32, String)> {
+    let params = request.get("params").ok_or((-32602, "Missing params".into()))?;
+    let name = params.get("name").and_then(|n| n.as_str()).ok_or((-32602, "Missing tool name".into()))?;
+    let arguments = params.get("arguments").cloned().unwrap_or(serde_json::json!({}));
+
+    match name {
+        "execute_command" => {
+            let command = arguments.get("command").and_then(|c| c.as_str()).unwrap_or("");
+            // In WASM, we'd call back to the host for actual execution
+            Ok(serde_json::json!({
+                "content": [{
+                    "type": "text",
+                    "text": format!("Would execute: {}", command)
+                }]
+            }))
+        }
+        "read_file" => {
+            let path = arguments.get("path").and_then(|p| p.as_str()).unwrap_or("");
+            Ok(serde_json::json!({
+                "content": [{
+                    "type": "text",
+                    "text": format!("Would read: {}", path)
+                }]
+            }))
+        }
+        _ => Err((-32602, format!("Unknown tool: {}", name)))
+    }
+}
+
+fn handle_list_resources() -> Result<serde_json::Value, (i32, String)> {
+    Ok(serde_json::json!({
+        "resources": []
+    }))
+}
+
+fn handle_read_resource(_request: &serde_json::Value) -> Result<serde_json::Value, (i32, String)> {
+    Err((-32602, "Resource not found".into()))
+}
+
+fn error_response(code: i32, message: &str) -> String {
+    serde_json::json!({
+        "jsonrpc": "2.0",
+        "id": null,
+        "error": {
+            "code": code,
+            "message": message
+        }
+    }).to_string()
+}
+
+fn error_response_with_id(id: serde_json::Value, code: i32, message: &str) -> String {
+    serde_json::json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "error": {
+            "code": code,
+            "message": message
+        }
+    }).to_string()
+}
+
+export!(McpTool);
+```
+
+### `plugins/tools/mcp/wit/tool.wit`
+
+```wit
+package dx:tools;
+
+interface mcp {
+    /// Handle MCP JSON-RPC request
+    handle-request: func(request: string) -> string;
+    
+    /// Get MCP server info
+    server-info: func() -> string;
+}
+
+world dx-tool {
+    export mcp;
+}
+```
+
+---
+
+## Scripts
+
+### `scripts/dev-loop.sh`
+
+```bash
+#!/bin/bash
+# Fast feedback loop for AI development
+# Daemon uses minimal CPU when idle
+
+set -e
+
+export CARGO_INCREMENTAL=1
+export RUSTFLAGS="${RUSTFLAGS:-} -C link-arg=-fuse-ld=mold"
+
+echo "🚀 Starting DX development loop..."
+echo "   Daemon will use minimal CPU when idle (Rust async/await)"
+echo ""
+
+cargo watch \
+    --clear \
+    --watch crates \
+    --watch config.sr \
+    -x 'build -p dx-cli -p dx-daemon' \
+    -s './target/debug/dx status --ai'
+```
+
+### `scripts/build-plugins.sh`
+
+```bash
+#!/bin/bash
+# Build all plugins to WASM
+
+set -e
+
+echo "🔨 Building DX plugins..."
+
+# Build integrations (Node.js → WASM)
+echo ""
+echo "📱 Building Integrations (Node.js → WASM)..."
+for dir in plugins/integrations/*/; do
+    if [ -d "$dir" ]; then
+        name=$(basename "$dir")
+        echo "   → $name"
+        ./target/release/dx plugin build "$dir" 2>/dev/null || echo "     (skipped - no source)"
+    fi
+done
+
+# Build providers (Python → WASM)
+echo ""
+echo "🤖 Building Providers (Python → WASM)..."
+for dir in plugins/providers/*/; do
+    if [ -d "$dir" ]; then
+        name=$(basename "$dir")
+        echo "   → $name"
+        ./target/release/dx plugin build "$dir" 2>/dev/null || echo "     (skipped - no source)"
+    fi
+done
+
+# Build tools (Rust/Go/C/Zig → WASM)
+echo ""
+echo "🔧 Building Tools (Rust/Go/C/Zig → WASM)..."
+for dir in plugins/tools/*/; do
+    if [ -d "$dir" ]; then
+        name=$(basename "$dir")
+        echo "   → $name"
+        ./target/release/dx plugin build "$dir" 2>/dev/null || echo "     (skipped - no source)"
+    fi
+done
+
+echo ""
+echo "✅ All plugins built!"
+```
+
+---
+
+## Deployment
+
+### `deploy/docker/Dockerfile`
+
+```dockerfile
+# Multi-stage build for minimal image
+
+FROM rust:1.83-alpine AS builder
+
+RUN apk add --no-cache musl-dev pkgconfig
+
+WORKDIR /build
+COPY . .
+
+RUN cargo build --release -p dx-cli -p dx-daemon
+
+# Runtime image (<50MB)
+FROM alpine:3.20
+
+RUN apk add --no-cache ca-certificates bubblewrap
+
+RUN adduser -D -u 1000 dx
+
+COPY --from=builder /build/target/release/dx /usr/local/bin/dx
+COPY --from=builder /build/target/release/dx-daemon /usr/local/bin/dx-daemon
+
+USER dx
+WORKDIR /home/dx
+
+# Daemon runs 24/7 with minimal CPU when idle
+ENTRYPOINT ["dx-daemon"]
+CMD ["start", "--foreground"]
+```
+
+---
+
+## Usage
+
+```bash
+# Initialize project
+dx init my-project --with-examples
+cd my-project
+
+# Start daemon (runs 24/7, minimal CPU when idle)
+dx daemon start
+dx daemon status
+
+# Run interactive agent
+dx run
+
+# Manage plugins by category
+dx plugin add --type integration discord   # Node.js → WASM
+dx plugin add --type provider openai       # Python → WASM  
+dx plugin add --type tool mcp              # Rust → WASM
+
+dx plugin list                              # Show all
+dx plugin list --type integration           # Show only integrations
+
+# Build plugins
+dx plugin build plugins/integrations/discord
+dx plugin build plugins/providers/openai
+dx plugin build plugins/tools/mcp
+
+# Workspaces (parallel agents)
+dx workspace spawn --name agent-1
+dx workspace list
+
+# Send command to daemon
+dx daemon send "exec ls -la"
+dx daemon send "status"
+
+# Stop daemon
+dx daemon stop
+```

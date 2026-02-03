@@ -1,9 +1,7 @@
 //! Single selection prompt
 
 use super::interaction::{Event, PromptInteraction, State};
-use super::{
-    S_BAR, S_BAR_END, S_RADIO_ACTIVE, S_RADIO_INACTIVE, S_STEP_ACTIVE, S_STEP_SUBMIT, THEME,
-};
+use super::{SYMBOLS, THEME};
 use console::Term;
 use owo_colors::OwoColorize;
 use std::io;
@@ -177,27 +175,17 @@ impl<T: Clone> PromptInteraction for Select<T> {
         }
 
         let theme = THEME.read().unwrap();
+        let symbols = &*SYMBOLS;
         let mut lines = 0;
 
         match self.state {
             State::Active => {
-                // Title line
-                let symbol = theme.primary.apply_to(S_STEP_ACTIVE);
-                term.write_line(&format!("{} {}", symbol, self.message.bold()))?;
+                // Title line with step indicator
+                let bar = theme.dim.apply_to(symbols.bar);
+                term.write_line(&format!("{}{} {}", bar, theme.primary.apply_to(symbols.step_submit), self.message.bold()))?;
                 lines += 1;
 
-                // Filter line (if any)
-                let bar = theme.dim.apply_to(S_BAR);
-                if !self.filter.is_empty() {
-                    term.write_line(&format!(
-                        "{}  {}",
-                        bar,
-                        theme.dim.apply_to(format!("Filter: {}", self.filter))
-                    ))?;
-                    lines += 1;
-                }
-
-                // Items
+                // Items without box
                 let max_visible = 8;
                 let start = if self.cursor >= max_visible {
                     self.cursor - max_visible + 1
@@ -212,9 +200,9 @@ impl<T: Clone> PromptInteraction for Select<T> {
                     let is_selected = display_idx == self.cursor;
 
                     let radio = if is_selected {
-                        theme.primary.apply_to(S_RADIO_ACTIVE).to_string()
+                        theme.primary.apply_to(symbols.radio_active).to_string()
                     } else {
-                        theme.dim.apply_to(S_RADIO_INACTIVE).to_string()
+                        theme.dim.apply_to(symbols.radio_inactive).to_string()
                     };
 
                     let label = if is_selected {
@@ -229,7 +217,7 @@ impl<T: Clone> PromptInteraction for Select<T> {
                         .map(|h| format!(" {}", theme.dim.apply_to(h)))
                         .unwrap_or_default();
 
-                    term.write_line(&format!("{}  {} {}{}", bar, radio, label, hint))?;
+                    term.write_line(&format!("{}  {}{}{}", bar, radio, label, hint))?;
                     lines += 1;
                 }
 
@@ -240,29 +228,25 @@ impl<T: Clone> PromptInteraction for Select<T> {
                         term.write_line(&format!(
                             "{}  {}",
                             bar,
-                            theme.dim.apply_to(format!("  ... {} more", remaining))
+                            theme.dim.apply_to(format!("... {} more", remaining))
                         ))?;
                         lines += 1;
                     }
                 }
-
-                // Bottom bar
-                let bar_end = theme.dim.apply_to(S_BAR_END);
-                term.write_line(&format!("{}", bar_end))?;
-                lines += 1;
             }
             State::Submit => {
-                let symbol = theme.success.apply_to(S_STEP_SUBMIT);
+                let symbol = theme.success.apply_to(symbols.step_submit);
                 let selected =
                     self.selected_index().map(|i| self.items[i].label.clone()).unwrap_or_default();
                 let display = theme.dim.apply_to(&selected);
-                term.write_line(&format!("{} {}  {}", symbol, self.message.bold(), display))?;
+                term.write_line(&format!("{}{} {}  {}", theme.dim.apply_to(symbols.bar), symbol, self.message.bold(), display))?;
                 lines += 1;
             }
             State::Cancel => {
-                let symbol = theme.error.apply_to(S_STEP_SUBMIT);
+                let symbol = theme.error.apply_to(symbols.step_submit);
                 term.write_line(&format!(
-                    "{} {}  {}",
+                    "{}{} {}  {}",
+                    theme.dim.apply_to(symbols.bar),
                     symbol,
                     self.message.strikethrough(),
                     theme.dim.apply_to("cancelled")
@@ -270,9 +254,10 @@ impl<T: Clone> PromptInteraction for Select<T> {
                 lines += 1;
             }
             State::Error => {
-                let symbol = theme.error.apply_to(S_STEP_SUBMIT);
+                let symbol = theme.error.apply_to(symbols.step_submit);
                 term.write_line(&format!(
-                    "{} {}  {}",
+                    "{}{} {}  {}",
+                    theme.dim.apply_to(symbols.bar),
                     symbol,
                     self.message.bold(),
                     theme.error.apply_to("error")

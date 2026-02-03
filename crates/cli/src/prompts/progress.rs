@@ -1,6 +1,6 @@
 //! Progress bar for tracking completion
 
-use super::{S_BAR, S_BAR_END, S_STEP_ACTIVE, S_STEP_SUBMIT, THEME};
+use super::{SYMBOLS, THEME};
 use console::Term;
 use owo_colors::OwoColorize;
 use std::io;
@@ -38,6 +38,7 @@ impl ProgressBar {
 
     /// Starts the progress bar.
     pub fn start(&mut self) -> io::Result<()> {
+        self.term.hide_cursor()?;
         self.render()
     }
 
@@ -64,10 +65,12 @@ impl ProgressBar {
         self.clear()?;
 
         let theme = THEME.read().unwrap();
-        let symbol = theme.success.apply_to(S_STEP_SUBMIT);
+        let symbols = &*SYMBOLS;
+        let symbol = theme.success.apply_to(symbols.step_submit);
         let msg = message.into();
 
         self.term.write_line(&format!("{} {}", symbol, msg.bold()))?;
+        self.term.show_cursor()?;
         self.last_render_lines = 1;
         Ok(())
     }
@@ -77,10 +80,12 @@ impl ProgressBar {
         self.clear()?;
 
         let theme = THEME.read().unwrap();
-        let symbol = theme.error.apply_to(S_STEP_ACTIVE);
+        let symbols = &*SYMBOLS;
+        let symbol = theme.error.apply_to(symbols.step_active);
         let msg = message.into();
 
         self.term.write_line(&format!("{} {}", symbol, theme.error.apply_to(msg)))?;
+        self.term.show_cursor()?;
         self.last_render_lines = 1;
         Ok(())
     }
@@ -99,15 +104,16 @@ impl ProgressBar {
         self.clear()?;
 
         let theme = THEME.read().unwrap();
+        let symbols = &*SYMBOLS;
         let mut lines = 0;
 
         // Title line
-        let symbol = theme.primary.apply_to(S_STEP_ACTIVE);
+        let symbol = theme.primary.apply_to(symbols.step_active);
         self.term.write_line(&format!("{} {}", symbol, self.message.bold()))?;
         lines += 1;
 
         // Progress bar line
-        let bar = theme.dim.apply_to(S_BAR);
+        let bar = theme.dim.apply_to(symbols.bar);
         let progress = if self.total > 0 {
             (self.current as f64 / self.total as f64).min(1.0)
         } else {
@@ -129,7 +135,7 @@ impl ProgressBar {
         lines += 1;
 
         // Bottom bar
-        let bar_end = theme.dim.apply_to(S_BAR_END);
+        let bar_end = theme.dim.apply_to(symbols.bar_end);
         self.term.write_line(&format!("{}", bar_end))?;
         lines += 1;
 

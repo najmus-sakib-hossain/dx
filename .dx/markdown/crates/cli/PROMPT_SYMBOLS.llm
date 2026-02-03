@@ -1,0 +1,47 @@
+# CLI Prompt Symbol Rendering
+## Overview
+The CLI prompts use Unicode symbols for beautiful, modern rendering across all platforms including Git Bash on Windows.
+## Symbol Set
+All prompts use the following Unicode symbols:
+```
+Step Active:       ◆
+Step Submit:       ◇
+Bar Start:         ┌
+Bar:               │
+Bar End:           └
+Radio Active:      ●
+Radio Inactive:    ○
+Checkbox Active:   ◻
+Checkbox Selected: ◼
+Password Mask:     •
+```
+## Platform Support
+These Unicode symbols render correctly on:
+- ✅ Git Bash (MINGW64) on Windows
+- ✅ Windows Terminal
+- ✅ ConEmu
+- ✅ Unix/Linux/macOS terminals
+- ✅ Modern terminal emulators
+## Cursor Behavior
+The cursor is automatically hidden during prompt interaction for a cleaner experience:
+- Hidden when prompts are active
+- Restored when prompts complete (submit, cancel, or error)
+- Applies to all prompt types: select, multiselect, input, password, confirm
+- Also applies to spinner and progress bar animations
+## Testing
+Run the test example to see the symbols in your terminal:
+```bash
+cargo run --example test_symbols --manifest-path crates/cli/Cargo.toml
+```
+## Implementation Details
+The symbol system is implemented in `crates/cli/src/prompts/mod.rs`:
+- `Symbols` struct: Holds all symbol definitions
+- `SYMBOLS`: Global symbol set (always Unicode)
+- Cursor hiding: Implemented in `PromptInteraction::interact()`
+All prompt components automatically use the Unicode symbol set and hide the cursor during interaction.
+## Benefits
+- **Beautiful rendering**: Consistent Unicode symbols across all platforms
+- **Git Bash support**: Works perfectly in Git Bash on Windows
+- **Clean interface**: Cursor hidden during interaction
+- **Professional appearance**: Modern CLI aesthetic
+- **No configuration**: Just works out of the box

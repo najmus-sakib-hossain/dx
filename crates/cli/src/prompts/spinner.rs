@@ -1,6 +1,6 @@
 //! Animated spinner for async operations
 
-use super::{S_BAR, S_STEP_ACTIVE, S_STEP_SUBMIT, THEME};
+use super::{SYMBOLS, THEME};
 use console::Term;
 use owo_colors::OwoColorize;
 use std::io::{self, Write};
@@ -40,13 +40,17 @@ impl Spinner {
     pub fn start(&mut self) -> io::Result<()> {
         self.running.store(true, Ordering::SeqCst);
 
+        // Hide cursor
+        self.term.hide_cursor()?;
+
         let message = self.message.clone();
         let running = self.running.clone();
         let term = self.term.clone();
 
         self.handle = Some(thread::spawn(move || {
             let theme = THEME.read().unwrap();
-            let bar = theme.dim.apply_to(S_BAR).to_string();
+            let symbols = &*SYMBOLS;
+            let bar = theme.dim.apply_to(symbols.bar).to_string();
             let mut frame_idx = 0;
 
             while running.load(Ordering::SeqCst) {
@@ -78,11 +82,15 @@ impl Spinner {
         }
 
         let theme = THEME.read().unwrap();
-        let symbol = theme.success.apply_to(S_STEP_SUBMIT);
+        let symbols = &*SYMBOLS;
+        let symbol = theme.success.apply_to(symbols.step_submit);
         let msg = message.into();
 
         self.term.clear_line()?;
         self.term.write_line(&format!("{} {}", symbol, msg.bold()))?;
+        
+        // Show cursor again
+        self.term.show_cursor()?;
 
         Ok(())
     }
@@ -96,11 +104,15 @@ impl Spinner {
         }
 
         let theme = THEME.read().unwrap();
-        let symbol = theme.error.apply_to(S_STEP_ACTIVE);
+        let symbols = &*SYMBOLS;
+        let symbol = theme.error.apply_to(symbols.step_active);
         let msg = message.into();
 
         self.term.clear_line()?;
         self.term.write_line(&format!("{} {}", symbol, theme.error.apply_to(msg)))?;
+        
+        // Show cursor again
+        self.term.show_cursor()?;
 
         Ok(())
     }
@@ -114,6 +126,10 @@ impl Spinner {
         }
 
         self.term.clear_line()?;
+        
+        // Show cursor again
+        self.term.show_cursor()?;
+        
         Ok(())
     }
 }

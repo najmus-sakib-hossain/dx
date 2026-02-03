@@ -1,0 +1,134 @@
+# CLI Prompts Developer Guide
+## Quick Start
+The CLI prompts automatically adapt to your terminal environment. No configuration needed!
+## Using Prompts in Your Code
+### Import
+```rust
+use crate::prompts::{intro, outro, select, multiselect, confirm, input, password, spinner, progress};
+```
+### Basic Flow
+```rust
+// Start prompt sequence
+intro("Welcome to DX")?;
+// Single selection
+let provider = select("Choose AI provider")
+    .item("openai", "OpenAI", "GPT-4")
+    .item("anthropic", "Anthropic", "Claude 3")
+    .item("google", "Google", "Gemini Pro")
+    .interact()?;
+// Multiple selection
+let integrations = multiselect("Select integrations")
+    .item("github", "GitHub", "")
+    .item("discord", "Discord", "")
+    .item("slack", "Slack", "")
+    .interact()?;
+// Confirmation
+let confirmed = confirm("Continue with setup?")
+    .initial_value(true)
+    .interact()?;
+// Text input
+let api_key = input("Enter API key")
+    .placeholder("sk-...")
+    .validate(|s| {
+        if s.starts_with("sk-") {
+            Validate::Valid
+        } else {
+            Validate::Invalid("API key must start with 'sk-'".into())
+        }
+    })
+    .interact()?;
+// Password input
+let password = password("Enter password")
+    .validate(|s| {
+        if s.len() >= 8 {
+            Validate::Valid
+        } else {
+            Validate::Invalid("Password must be at least 8 characters".into())
+        }
+    })
+    .interact()?;
+// Spinner for async operations
+let mut spinner = spinner("Loading...");
+spinner.start()?;
+// ... do work ...
+spinner.stop("Done!")?;
+// Progress bar
+let mut progress = progress("Processing files", 100);
+progress.start()?;
+for i in 0..100 {
+    progress.set(i)?;
+    // ... process ...
+}
+progress.finish("Complete!")?;
+// End prompt sequence
+outro("Setup complete!")?;
+```
+## Symbol Rendering
+The prompts use Unicode symbols on all platforms including Git Bash:
+- **All Terminals**: Unicode symbols (`◆`, `◇`, `│`, `●`, `◼`)
+- **Cursor**: Automatically hidden during interaction
+### Testing Symbol Rendering
+```bash
+cargo run --example test_symbols --manifest-path crates/cli/Cargo.toml
+```
+## Prompt Types
+### Select (Single Choice)
+- Arrow keys or j/k to navigate
+- Enter to confirm
+- Escape to cancel
+- Type to filter options
+### MultiSelect (Multiple Choice)
+- Arrow keys or j/k to navigate
+- Space to toggle selection
+- 'a' to toggle all
+- Enter to confirm
+- Type to filter options
+### Confirm (Yes/No)
+- Arrow keys or Tab to toggle
+- y/n to select and confirm
+- Enter to confirm current selection
+### Input (Text Entry)
+- Type to enter text
+- Arrow keys to move cursor
+- Backspace/Delete to edit
+- Tab to use default value
+- Enter to submit
+### Password (Masked Input)
+- Same as Input but characters are masked
+- Uses `*` in Git Bash, `•` in modern terminals
+### Spinner (Loading Animation)
+- Animated spinner with message
+- Call `stop()` or `stop_error()` when done
+### Progress Bar (Task Progress)
+- Shows percentage and progress bar
+- Call `set()` or `inc()` to update
+- Call `finish()` or `finish_error()` when done
+## Styling
+All prompts use a consistent theme with Unicode symbols:
+- **Primary**: Cyan (active selections, highlights)
+- **Success**: Green (completed steps)
+- **Error**: Red (errors, cancellations)
+- **Dim**: Gray (inactive items, hints)
+- **Symbols**: Unicode (◆, ◇, │, ●, ○, ◼, ◻)
+- **Cursor**: Hidden during interaction
+## Best Practices
+1. **Always use intro/outro** for prompt sequences
+2. **Validate user input** with custom validators
+3. **Provide helpful hints** in item descriptions
+4. **Use appropriate prompt types** for the task
+5. **Handle cancellation** gracefully (Escape key)
+6. **Show progress** for long-running operations
+## Examples
+See `crates/cli/examples/` for complete examples:
+- `test_symbols.rs` - Symbol detection and preview
+## Troubleshooting
+### Symbols not rendering correctly?
+Run the test to verify:
+```bash
+cargo run --example test_symbols
+```
+All modern terminals including Git Bash support Unicode symbols. If you see broken characters, your terminal may need to be configured to use UTF-8 encoding.
+## Documentation
+- `PROMPT_SYMBOLS.md` - Detailed symbol documentation
+- `VISUAL_COMPARISON.md` - Before/after visual comparison
+- `PROMPT_RENDERING_FIX.md` - Technical implementation details

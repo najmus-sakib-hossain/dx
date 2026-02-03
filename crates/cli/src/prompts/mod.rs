@@ -85,21 +85,156 @@ pub static THEME: Lazy<RwLock<DxTheme>> = Lazy::new(|| RwLock::new(DxTheme::defa
 // Symbols
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Symbol set for rendering prompts
+pub struct Symbols {
+    pub step_active: &'static str,
+    #[allow(unused)]
+    pub step_cancel: &'static str,
+    #[allow(unused)]
+    pub step_error: &'static str,
+    pub step_submit: &'static str,
+    pub bar_start: &'static str,
+    pub bar: &'static str,
+    pub bar_end: &'static str,
+    pub radio_active: &'static str,
+    pub radio_inactive: &'static str,
+    pub checkbox_active: &'static str,
+    pub checkbox_selected: &'static str,
+    pub checkbox_inactive: &'static str,
+    pub password_mask: char,
+    #[allow(unused)]
+    pub bar_h: &'static str,
+    #[allow(unused)]
+    pub corner_top_right: &'static str,
+    #[allow(unused)]
+    pub connect_left: &'static str,
+    #[allow(unused)]
+    pub corner_bottom_right: &'static str,
+    // New box-drawing symbols for OpenClaw-style UI
+    #[allow(unused)]
+    pub box_top_left: &'static str,
+    #[allow(unused)]
+    pub box_top_right: &'static str,
+    #[allow(unused)]
+    pub box_bottom_left: &'static str,
+    #[allow(unused)]
+    pub box_bottom_right: &'static str,
+    #[allow(unused)]
+    pub box_horizontal: &'static str,
+    #[allow(unused)]
+    pub box_vertical: &'static str,
+    #[allow(unused)]
+    pub box_left_t: &'static str,
+    #[allow(unused)]
+    pub box_right_t: &'static str,
+}
+
+impl Symbols {
+    /// Unicode symbols for modern terminals
+    const fn unicode() -> Self {
+        Self {
+            step_active: "◆",
+            step_cancel: "■",
+            step_error: "▲",
+            step_submit: "◇",
+            bar_start: "┌",
+            bar: "│",
+            bar_end: "└",
+            radio_active: "●",
+            radio_inactive: "○",
+            checkbox_active: "◻",
+            checkbox_selected: "◼",
+            checkbox_inactive: "◻",
+            password_mask: '•',
+            bar_h: "─",
+            corner_top_right: "╮",
+            connect_left: "├",
+            corner_bottom_right: "╯",
+            // Box-drawing for OpenClaw-style UI
+            box_top_left: "┌",
+            box_top_right: "╮",
+            box_bottom_left: "├",
+            box_bottom_right: "╯",
+            box_horizontal: "─",
+            box_vertical: "│",
+            box_left_t: "├",
+            box_right_t: "╯",
+        }
+    }
+
+    /// ASCII-safe symbols for Git Bash and limited terminals
+    const fn ascii() -> Self {
+        Self {
+            step_active: ">",
+            step_cancel: "x",
+            step_error: "!",
+            step_submit: "*",
+            bar_start: "+",
+            bar: "|",
+            bar_end: "+",
+            radio_active: "(*)",
+            radio_inactive: "( )",
+            checkbox_active: "[ ]",
+            checkbox_selected: "[x]",
+            checkbox_inactive: "[ ]",
+            password_mask: '*',
+            bar_h: "-",
+            corner_top_right: "+",
+            connect_left: "+",
+            corner_bottom_right: "+",
+            // Box-drawing for OpenClaw-style UI (ASCII fallback)
+            box_top_left: "+",
+            box_top_right: "+",
+            box_bottom_left: "+",
+            box_bottom_right: "+",
+            box_horizontal: "-",
+            box_vertical: "|",
+            box_left_t: "+",
+            box_right_t: "+",
+        }
+    }
+}
+
+/// Detects if the terminal supports Unicode
+fn supports_unicode() -> bool {
+    // Always use Unicode - modern terminals including Git Bash support it
+    true
+}
+
+pub static SYMBOLS: Lazy<Symbols> = Lazy::new(|| {
+    if supports_unicode() {
+        Symbols::unicode()
+    } else {
+        Symbols::ascii()
+    }
+});
+
+// Legacy constants for backward compatibility
+#[allow(unused)]
 pub const S_STEP_ACTIVE: &str = "◆";
 #[allow(unused)]
 pub const S_STEP_CANCEL: &str = "■";
 #[allow(unused)]
 pub const S_STEP_ERROR: &str = "▲";
+#[allow(unused)]
 pub const S_STEP_SUBMIT: &str = "◇";
 
+#[allow(unused)]
 pub const S_BAR_START: &str = "┌";
+#[allow(unused)]
 pub const S_BAR: &str = "│";
+#[allow(unused)]
 pub const S_BAR_END: &str = "└";
 
+#[allow(unused)]
 pub const S_RADIO_ACTIVE: &str = "●";
+#[allow(unused)]
 pub const S_RADIO_INACTIVE: &str = "○";
+#[allow(unused)]
 pub const S_CHECKBOX_ACTIVE: &str = "◻";
+#[allow(unused)]
 pub const S_CHECKBOX_SELECTED: &str = "◼";
+#[allow(unused)]
 pub const S_CHECKBOX_INACTIVE: &str = "◻";
 
 #[allow(unused)]
@@ -125,9 +260,10 @@ fn term_write(line: impl Display) -> io::Result<()> {
 /// Prints a header for the prompt sequence.
 pub fn intro(title: impl Display) -> io::Result<()> {
     let theme = THEME.read().unwrap();
+    let symbols = &*SYMBOLS;
     term_write(format!(
-        "{}  {}\n\n",
-        theme.dim.apply_to(S_BAR_START),
+        "{}  {}\n",
+        theme.dim.apply_to(symbols.bar_start),
         title,
     ))
 }
@@ -135,16 +271,18 @@ pub fn intro(title: impl Display) -> io::Result<()> {
 /// Prints a footer for the prompt sequence.
 pub fn outro(message: impl Display) -> io::Result<()> {
     let theme = THEME.read().unwrap();
-    term_write(format!("{}  {}\n", theme.dim.apply_to(S_BAR_END), message,))
+    let symbols = &*SYMBOLS;
+    term_write(format!("{}  {}\n", theme.dim.apply_to(symbols.step_submit), message,))
 }
 
 /// Prints a cancelled footer for the prompt sequence.
 #[allow(unused)]
 pub fn outro_cancel(message: impl Display) -> io::Result<()> {
     let theme = THEME.read().unwrap();
+    let symbols = &*SYMBOLS;
     term_write(format!(
         "{}  {}\n",
-        theme.error.apply_to(S_BAR_END),
+        theme.error.apply_to(symbols.bar_end),
         theme.error.apply_to(message.to_string()),
     ))
 }
@@ -188,6 +326,83 @@ pub fn spinner(message: impl Into<String>) -> Spinner {
 #[allow(unused)]
 pub fn progress(message: impl Into<String>, total: u64) -> ProgressBar {
     ProgressBar::new(message, total)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Box Drawing Helpers (OpenClaw-style UI)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Draws a boxed section with title and content
+#[allow(unused)]
+pub fn draw_box(title: &str, content: &[&str], width: usize) -> Vec<String> {
+    let theme = THEME.read().unwrap();
+    let symbols = &*SYMBOLS;
+    let mut lines = Vec::new();
+    
+    // Top border with title
+    let title_line = if title.is_empty() {
+        format!("{}{}{}", 
+            symbols.box_top_left,
+            symbols.box_horizontal.repeat(width - 2),
+            symbols.box_top_right
+        )
+    } else {
+        let title_with_spaces = format!("  {}  ", title);
+        let remaining = width.saturating_sub(title_with_spaces.len() + 1);
+        format!("{}{}{}{}",
+            symbols.box_top_left,
+            theme.dim.apply_to(symbols.box_horizontal.repeat(1)),
+            title_with_spaces,
+            theme.dim.apply_to(symbols.box_horizontal.repeat(remaining))
+        ) + symbols.box_top_right
+    };
+    lines.push(theme.dim.apply_to(title_line).to_string());
+    
+    // Empty line after title
+    lines.push(format!("{}{}{}",
+        theme.dim.apply_to(symbols.box_vertical),
+        " ".repeat(width - 2),
+        theme.dim.apply_to(symbols.box_vertical)
+    ));
+    
+    // Content lines
+    for line in content {
+        let padded = format!("  {}", line);
+        let padding = width.saturating_sub(padded.len() + 2);
+        lines.push(format!("{}{}{}{}",
+            theme.dim.apply_to(symbols.box_vertical),
+            padded,
+            " ".repeat(padding),
+            theme.dim.apply_to(symbols.box_vertical)
+        ));
+    }
+    
+    // Empty line before bottom
+    lines.push(format!("{}{}{}",
+        theme.dim.apply_to(symbols.box_vertical),
+        " ".repeat(width - 2),
+        theme.dim.apply_to(symbols.box_vertical)
+    ));
+    
+    // Bottom border
+    lines.push(format!("{}{}{}",
+        theme.dim.apply_to(symbols.box_bottom_left),
+        theme.dim.apply_to(symbols.box_horizontal.repeat(width - 2)),
+        theme.dim.apply_to(symbols.box_bottom_right)
+    ));
+    
+    lines
+}
+
+/// Draws a horizontal separator line
+#[allow(unused)]
+pub fn draw_separator(width: usize) -> String {
+    let theme = THEME.read().unwrap();
+    let symbols = &*SYMBOLS;
+    format!("{}{}",
+        theme.dim.apply_to(symbols.box_vertical),
+        theme.dim.apply_to(symbols.box_horizontal.repeat(width - 1))
+    )
 }
 
 /// Log messages with different styles

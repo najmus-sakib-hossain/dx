@@ -50,10 +50,13 @@ pub trait PromptInteraction {
     {
         let term = console::Term::stderr();
 
+        // Hide cursor during interaction
+        term.hide_cursor()?;
+
         // Initial render
         self.render(&term)?;
 
-        loop {
+        let result = loop {
             // Read key
             let key = term.read_key()?;
 
@@ -66,17 +69,22 @@ pub trait PromptInteraction {
             // Check state
             match self.state() {
                 State::Submit => {
-                    return Ok(self.value());
+                    break Ok(self.value());
                 }
                 State::Cancel => {
-                    return Err(io::Error::new(io::ErrorKind::Interrupted, "Cancelled"));
+                    break Err(io::Error::new(io::ErrorKind::Interrupted, "Cancelled"));
                 }
                 State::Error => {
-                    return Err(io::Error::other("Error"));
+                    break Err(io::Error::other("Error"));
                 }
                 State::Active => continue,
             }
-        }
+        };
+
+        // Show cursor again
+        term.show_cursor()?;
+
+        result
     }
 }
 

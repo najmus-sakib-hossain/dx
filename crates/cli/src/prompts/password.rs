@@ -2,7 +2,7 @@
 
 use super::cursor::StringCursor;
 use super::interaction::{Event, PromptInteraction, State, Validate};
-use super::{S_BAR, S_BAR_END, S_PASSWORD_MASK, S_STEP_ACTIVE, S_STEP_SUBMIT, THEME};
+use super::{SYMBOLS, THEME};
 use console::Term;
 use owo_colors::OwoColorize;
 use std::io;
@@ -30,9 +30,10 @@ where
 {
     /// Creates a new password prompt.
     pub fn new(message: impl Into<String>) -> Self {
+        let symbols = &*SYMBOLS;
         Self {
             message: message.into(),
-            mask: S_PASSWORD_MASK,
+            mask: symbols.password_mask,
             cursor: StringCursor::new(),
             validate: None,
             state: State::Active,
@@ -137,17 +138,18 @@ where
         }
 
         let theme = THEME.read().unwrap();
+        let symbols = &*SYMBOLS;
         let mut lines = 0;
 
         match self.state {
             State::Active => {
                 // Title line
-                let symbol = theme.primary.apply_to(S_STEP_ACTIVE);
+                let symbol = theme.primary.apply_to(symbols.step_active);
                 term.write_line(&format!("{} {}", symbol, self.message.bold()))?;
                 lines += 1;
 
                 // Input line (masked)
-                let bar = theme.dim.apply_to(S_BAR);
+                let bar = theme.dim.apply_to(symbols.bar);
                 let len = self.cursor.len();
                 let pos = self.cursor.position();
 
@@ -181,12 +183,12 @@ where
                 }
 
                 // Bottom bar
-                let bar_end = theme.dim.apply_to(S_BAR_END);
+                let bar_end = theme.dim.apply_to(symbols.bar_end);
                 term.write_line(&format!("{}", bar_end))?;
                 lines += 1;
             }
             State::Submit => {
-                let symbol = theme.success.apply_to(S_STEP_SUBMIT);
+                let symbol = theme.success.apply_to(symbols.step_submit);
                 let len = self.cursor.len();
                 let masked = self.mask.to_string().repeat(len);
                 term.write_line(&format!(
@@ -198,7 +200,7 @@ where
                 lines += 1;
             }
             State::Cancel => {
-                let symbol = theme.error.apply_to(S_STEP_SUBMIT);
+                let symbol = theme.error.apply_to(symbols.step_submit);
                 term.write_line(&format!(
                     "{} {}  {}",
                     symbol,
@@ -208,7 +210,7 @@ where
                 lines += 1;
             }
             State::Error => {
-                let symbol = theme.error.apply_to(S_STEP_SUBMIT);
+                let symbol = theme.error.apply_to(symbols.step_submit);
                 term.write_line(&format!(
                     "{} {}  {}",
                     symbol,

@@ -1,0 +1,104 @@
+# CLI Prompt Rendering Fix for Git Bash
+## Problem
+The CLI prompts were using Unicode box-drawing characters and symbols (◆, ○, ●, ┌, │, └, etc.) that appeared broken in Git Bash (MINGW64) on Windows due to incorrect detection logic.
+## Solution
+Simplified the implementation to always use Unicode symbols, as Git Bash actually supports them perfectly. Also added cursor hiding for a cleaner user experience.
+## Changes Made
+### 1. Simplified Symbol Detection (`crates/cli/src/prompts/mod.rs`)
+Removed complex detection logic and now always use Unicode:
+```rust
+fn supports_unicode() -> bool {
+    // Always use Unicode - modern terminals including Git Bash support it
+    true
+}
+```
+The `Symbols` struct remains with Unicode symbols:
+```rust
+pub struct Symbols {
+    pub step_active: &'static str,      // ◆
+    pub step_submit: &'static str,      // ◇
+    pub bar_start: &'static str,        // ┌
+    pub bar: &'static str,              // │
+    pub bar_end: &'static str,          // └
+    pub radio_active: &'static str,     // ●
+    pub radio_inactive: &'static str,   // ○
+    pub checkbox_active: &'static str,  // ◻
+    pub checkbox_selected: &'static str,// ◼
+    pub checkbox_inactive: &'static str,// ◻
+    pub password_mask: char,            // •
+    // ... other symbols
+}
+```
+### 2. Added Cursor Hiding (`crates/cli/src/prompts/interaction.rs`)
+Updated the `interact()` method to hide cursor during interaction:
+```rust
+fn interact(&mut self) -> io::Result<Self::Output> {
+    let term = console::Term::stderr();
+    
+    // Hide cursor during interaction
+    term.hide_cursor()?;
+    
+    // ... interaction loop ...
+    
+    // Show cursor again
+    term.show_cursor()?;
+    
+    result
+}
+```
+### 3. Updated Spinner and Progress Bar
+Both now hide cursor during operation:
+- `spinner.rs`: Hides cursor on `start()`, shows on `stop()`/`stop_error()`/`cancel()`
+- `progress.rs`: Hides cursor on `start()`, shows on `finish()`/`finish_error()`
+### 4. Updated Test Example
+Simplified `test_symbols.rs` to show that Unicode is used everywhere:
+```rust
+println!("=== Symbol Set ===");
+println!("Using Unicode symbols on all platforms");
+```
+## Symbol Set
+All platforms now use these Unicode symbols:
+t:11(Symbol,Character,Usage)[Step Active,◆,Active prompt indicator Step Submit,◇,Completed prompt indicator Bar Start,┌,Top border Bar,│,Vertical border Bar End,└,Bottom border Radio Active,●,Selected radio button Radio Inactive,○,Unselected radio button Checkbox Selected,◼,Checked checkbox Checkbox Active,◻,Unchecked checkbox (cursor on) Checkbox Inactive,◻,Unchecked checkbox (cursor off) Password Mask,•,Password character mask]
+## Testing
+Run the test example to verify:
+```bash
+cargo run --example test_symbols --manifest-path crates/cli/Cargo.toml
+```
+Expected output in Git Bash:
+```
+=== Terminal Environment Detection ===
+MSYSTEM: Ok("MINGW64")
+...
+=== Symbol Set ===
+Using Unicode symbols on all platforms
+=== Symbol Preview ===
+Step Active: ◆
+Step Submit: ◇
+Bar Start: ┌
+Bar: │
+Bar End: └
+Radio Active: ●
+Radio Inactive: ○
+Checkbox Active: ◻
+Checkbox Selected: ◼
+Password Mask: •
+```
+## Benefits
+✅ Beautiful Unicode rendering in Git Bash on Windows
+✅ Consistent symbols across all platforms
+✅ Cursor hidden during interaction for cleaner UI
+✅ Simpler codebase - no complex detection logic
+✅ Professional appearance matching modern CLI tools
+✅ All prompt types updated consistently
+## Files Modified
+- `crates/cli/src/prompts/mod.rs` - Simplified to always use Unicode
+- `crates/cli/src/prompts/interaction.rs` - Added cursor hiding
+- `crates/cli/src/prompts/spinner.rs` - Added cursor hiding
+- `crates/cli/src/prompts/progress.rs` - Added cursor hiding
+- `crates/cli/examples/test_symbols.rs` - Updated to reflect Unicode-only approach
+## Files Updated (Documentation)
+- `crates/cli/PROMPT_SYMBOLS.md` - Updated to reflect Unicode-only approach
+- `crates/cli/VISUAL_COMPARISON.md` - Updated visual examples
+- `PROMPT_RENDERING_FIX.md` - This summary document
+## Key Insight
+Git Bash (MINGW64) on Windows has excellent Unicode support. The original issue was assuming it didn't support Unicode characters, when in fact it renders them perfectly. By simplifying to always use Unicode, we get beautiful rendering everywhere without complex detection logic.
