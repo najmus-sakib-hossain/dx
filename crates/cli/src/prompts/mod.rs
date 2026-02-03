@@ -133,10 +133,10 @@ impl Symbols {
     /// Unicode symbols for modern terminals
     const fn unicode() -> Self {
         Self {
-            step_active: "●",
+            step_active: "♦",
             step_cancel: "■",
             step_error: "▲",
-            step_submit: "●",  // Filled circle aligns with │
+            step_submit: "♦",  // Diamond suit symbol
             bar_start: "┌",
             bar: "│",
             bar_end: "└",
