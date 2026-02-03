@@ -4,6 +4,7 @@ Please look at integrations/openclaw folder and make sure in our rust dx project
 1. Integrations
 2. Providers
 3. Tools
+For now on in your steering file please put that I am already may be using "cargo watch -x run" command in some terminal so please use that to find lint and formatting warnings and errors instead of blindly runnning another terminal commands:
 Shohan@dx MINGW64 /f/Dx (main)
 $ openclaw
 🦞 OpenClaw 2026.1.29 (a5b4d22) — Because the right answer is usually a script.

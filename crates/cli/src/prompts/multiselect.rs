@@ -259,9 +259,18 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
 
         match self.state {
             State::Active => {
-                // Title line with step indicator
+                // Title line with horizontal separator
                 let bar = theme.dim.apply_to(symbols.bar);
-                term.write_line(&format!("{}{} {}", bar, theme.primary.apply_to(symbols.step_submit), self.message.bold()))?;
+                let title_with_spaces = format!("  {}  ", self.message);
+                let width: usize = 90;
+                let remaining = width.saturating_sub(title_with_spaces.len() + 3);
+                term.write_line(&format!("{}{}{}{}{}", 
+                    bar,
+                    theme.primary.apply_to(symbols.step_submit),
+                    title_with_spaces.bold(),
+                    theme.dim.apply_to(symbols.box_horizontal.repeat(remaining)),
+                    theme.dim.apply_to(symbols.box_top_right)
+                ))?;
                 lines += 1;
 
                 // Items
@@ -329,6 +338,7 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
                 lines += 1;
             }
             State::Submit => {
+                let bar = theme.dim.apply_to(symbols.bar);
                 let symbol = theme.success.apply_to(symbols.step_submit);
                 let selected: Vec<_> =
                     self.items.iter().filter(|i| i.selected).map(|i| i.label.clone()).collect();
@@ -339,7 +349,7 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
                 };
                 term.write_line(&format!(
                     "{}{} {}  {}",
-                    theme.dim.apply_to(symbols.bar),
+                    bar,
                     symbol,
                     self.message.bold(),
                     theme.dim.apply_to(display)

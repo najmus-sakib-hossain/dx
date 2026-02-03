@@ -85,9 +85,18 @@ impl PromptInteraction for Confirm {
 
         match self.state {
             State::Active => {
-                // Title line with step indicator
+                // Title line with horizontal separator
                 let bar = theme.dim.apply_to(symbols.bar);
-                term.write_line(&format!("{}{} {}", bar, theme.primary.apply_to(symbols.step_submit), self.message.bold()))?;
+                let title_with_spaces = format!("  {}  ", self.message);
+                let width: usize = 90;
+                let remaining = width.saturating_sub(title_with_spaces.len() + 3);
+                term.write_line(&format!("{}{}{}{}{}", 
+                    bar,
+                    theme.primary.apply_to(symbols.step_submit),
+                    title_with_spaces.bold(),
+                    theme.dim.apply_to(symbols.box_horizontal.repeat(remaining)),
+                    theme.dim.apply_to(symbols.box_top_right)
+                ))?;
                 lines += 1;
 
                 // Options line
@@ -105,17 +114,19 @@ impl PromptInteraction for Confirm {
                 lines += 1;
             }
             State::Submit => {
+                let bar = theme.dim.apply_to(symbols.bar);
                 let symbol = theme.success.apply_to(symbols.step_submit);
                 let answer = if self.value { "Yes" } else { "No" };
                 let display = theme.dim.apply_to(answer);
-                term.write_line(&format!("{}{} {}  {}", theme.dim.apply_to(symbols.bar), symbol, self.message.bold(), display))?;
+                term.write_line(&format!("{}{} {}  {}", bar, symbol, self.message.bold(), display))?;
                 lines += 1;
             }
             State::Cancel => {
+                let bar = theme.dim.apply_to(symbols.bar);
                 let symbol = theme.error.apply_to(symbols.step_submit);
                 term.write_line(&format!(
                     "{}{} {}  {}",
-                    theme.dim.apply_to(symbols.bar),
+                    bar,
                     symbol,
                     self.message.strikethrough(),
                     theme.dim.apply_to("cancelled")
@@ -123,10 +134,11 @@ impl PromptInteraction for Confirm {
                 lines += 1;
             }
             State::Error => {
+                let bar = theme.dim.apply_to(symbols.bar);
                 let symbol = theme.error.apply_to(symbols.step_submit);
                 term.write_line(&format!(
                     "{}{} {}  {}",
-                    theme.dim.apply_to(symbols.bar),
+                    bar,
                     symbol,
                     self.message.bold(),
                     theme.error.apply_to("error")

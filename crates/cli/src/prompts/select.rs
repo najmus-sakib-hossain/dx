@@ -180,12 +180,21 @@ impl<T: Clone> PromptInteraction for Select<T> {
 
         match self.state {
             State::Active => {
-                // Title line with step indicator
+                // Title line with horizontal separator
                 let bar = theme.dim.apply_to(symbols.bar);
-                term.write_line(&format!("{}{} {}", bar, theme.primary.apply_to(symbols.step_submit), self.message.bold()))?;
+                let title_with_spaces = format!("  {}  ", self.message);
+                let width: usize = 90;
+                let remaining = width.saturating_sub(title_with_spaces.len() + 3);
+                term.write_line(&format!("{}{}{}{}{}", 
+                    bar,
+                    theme.primary.apply_to(symbols.step_submit),
+                    title_with_spaces.bold(),
+                    theme.dim.apply_to(symbols.box_horizontal.repeat(remaining)),
+                    theme.dim.apply_to(symbols.box_top_right)
+                ))?;
                 lines += 1;
 
-                // Items without box
+                // Items
                 let max_visible = 8;
                 let start = if self.cursor >= max_visible {
                     self.cursor - max_visible + 1
@@ -235,18 +244,20 @@ impl<T: Clone> PromptInteraction for Select<T> {
                 }
             }
             State::Submit => {
+                let bar = theme.dim.apply_to(symbols.bar);
                 let symbol = theme.success.apply_to(symbols.step_submit);
                 let selected =
                     self.selected_index().map(|i| self.items[i].label.clone()).unwrap_or_default();
                 let display = theme.dim.apply_to(&selected);
-                term.write_line(&format!("{}{} {}  {}", theme.dim.apply_to(symbols.bar), symbol, self.message.bold(), display))?;
+                term.write_line(&format!("{}{} {}  {}", bar, symbol, self.message.bold(), display))?;
                 lines += 1;
             }
             State::Cancel => {
+                let bar = theme.dim.apply_to(symbols.bar);
                 let symbol = theme.error.apply_to(symbols.step_submit);
                 term.write_line(&format!(
                     "{}{} {}  {}",
-                    theme.dim.apply_to(symbols.bar),
+                    bar,
                     symbol,
                     self.message.strikethrough(),
                     theme.dim.apply_to("cancelled")
@@ -254,10 +265,11 @@ impl<T: Clone> PromptInteraction for Select<T> {
                 lines += 1;
             }
             State::Error => {
+                let bar = theme.dim.apply_to(symbols.bar);
                 let symbol = theme.error.apply_to(symbols.step_submit);
                 term.write_line(&format!(
                     "{}{} {}  {}",
-                    theme.dim.apply_to(symbols.bar),
+                    bar,
                     symbol,
                     self.message.bold(),
                     theme.error.apply_to("error")

@@ -1,0 +1,37 @@
+# Cargo Watch Policy
+
+## Background Process Awareness
+
+**The user may already be running `cargo watch -x run` or similar watch commands in a separate terminal.**
+
+## Rules
+
+1. **DO NOT run cargo commands blindly** - The user's watch process will automatically detect changes and show errors/warnings
+2. **Check for compilation errors** - Use `getDiagnostics` tool instead of running cargo commands
+3. **Trust the watch process** - If the user has cargo watch running, they will see errors immediately after file changes
+4. **Only run cargo when explicitly needed** - For example:
+   - Running examples: `cargo run --example <name>`
+   - Running tests: `cargo test`
+   - Building release: `cargo build --release`
+
+## What NOT to Do
+
+❌ Don't run `cargo check` after every change
+❌ Don't run `cargo build` to verify compilation
+❌ Don't run `cargo clippy` to check for warnings
+❌ Don't run `cargo fmt --check` to verify formatting
+
+## What to Do Instead
+
+✅ Use `getDiagnostics` tool to check for errors in specific files
+✅ Make changes and let the user's watch process detect issues
+✅ Ask the user if they see any errors in their terminal
+✅ Only run cargo commands when you need specific output (like running examples or tests)
+
+## Rationale
+
+- Running cargo commands while watch is active can cause conflicts
+- The watch process provides immediate feedback
+- Reduces unnecessary command execution
+- Respects the user's development workflow
+- Faster iteration - no need to wait for cargo commands

@@ -261,21 +261,85 @@ fn term_write(line: impl Display) -> io::Result<()> {
 pub fn intro(title: impl Display) -> io::Result<()> {
     let theme = THEME.read().unwrap();
     let symbols = &*SYMBOLS;
+    // No newline after intro - next prompt will continue immediately
     term_write(format!(
-        "{}  {}\n",
+        "{}  {}",
         theme.dim.apply_to(symbols.bar_start),
         title,
     ))
+}
+
+/// Prints a section header with horizontal line
+pub fn section(title: impl Display) -> io::Result<()> {
+    let theme = THEME.read().unwrap();
+    let symbols = &*SYMBOLS;
+    let title_str = title.to_string();
+    let width: usize = 90; // Terminal width
+    let title_with_spaces = format!("  {}  ", title_str);
+    let remaining = width.saturating_sub(title_with_spaces.len() + 2);
+    
+    term_write(format!(
+        "{}{} {}{}{}",
+        theme.dim.apply_to(symbols.bar),
+        theme.primary.apply_to(symbols.step_submit),
+        title_with_spaces,
+        theme.dim.apply_to(symbols.box_horizontal.repeat(remaining)),
+        theme.dim.apply_to(symbols.box_top_right)
+    ))?;
+    term_write("\n")
+}
+
+/// Prints a boxed content section
+pub fn box_section(title: &str, lines: &[&str]) -> io::Result<()> {
+    let theme = THEME.read().unwrap();
+    let symbols = &*SYMBOLS;
+    let width: usize = 90;
+    
+    // Top border with title
+    section(title)?;
+    
+    // Empty line
+    term_write(format!("{}{}",
+        theme.dim.apply_to(symbols.bar),
+        " ".repeat(width)
+    ))?;
+    term_write("\n")?;
+    
+    // Content lines
+    for line in lines {
+        let padded = format!("  {}", line);
+        let padding = width.saturating_sub(padded.len() + 1);
+        term_write(format!("{}{}{}{}",
+            theme.dim.apply_to(symbols.bar),
+            padded,
+            " ".repeat(padding),
+            theme.dim.apply_to(symbols.bar)
+        ))?;
+        term_write("\n")?;
+    }
+    
+    // Empty line
+    term_write(format!("{}{}",
+        theme.dim.apply_to(symbols.bar),
+        " ".repeat(width)
+    ))?;
+    term_write("\n")?;
+    
+    // Bottom border
+    term_write(format!("{}{}{}",
+        theme.dim.apply_to(symbols.box_bottom_left),
+        theme.dim.apply_to(symbols.box_horizontal.repeat(width - 1)),
+        theme.dim.apply_to(symbols.box_bottom_right)
+    ))?;
+    term_write("\n")
 }
 
 /// Prints a footer for the prompt sequence.
 pub fn outro(message: impl Display) -> io::Result<()> {
     let theme = THEME.read().unwrap();
     let symbols = &*SYMBOLS;
-    term_write(format!("{}  {}\n", theme.dim.apply_to(symbols.step_submit), message,))
+    term_write(format!("{}{} {}\n", theme.dim.apply_to(symbols.bar), theme.success.apply_to(symbols.step_submit), message,))
 }
-
-/// Prints a cancelled footer for the prompt sequence.
 #[allow(unused)]
 pub fn outro_cancel(message: impl Display) -> io::Result<()> {
     let theme = THEME.read().unwrap();
