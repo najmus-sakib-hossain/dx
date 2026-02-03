@@ -300,6 +300,7 @@ fn section_with_width(title: impl Display, content_width: usize) -> io::Result<(
 }
 
 /// Prints a section header with horizontal line
+#[allow(unused)]
 pub fn section(title: impl Display) -> io::Result<()> {
     section_with_width(title, 85)
 }

@@ -380,7 +380,7 @@ async fn run_onboarding() -> anyhow::Result<()> {
         .item("gemini-pro", "Gemini Pro", "Fast and cost-effective")
         .item("llama-3", "Llama 3 (Local)", "Privacy-focused, runs locally")
         .item("custom", "Custom model", "Specify your own model");
-    let default_model = default_model_prompt.interact()?;
+    let _default_model = default_model_prompt.interact()?;
 
     // Ask about daemon mode
     let mut start_daemon_prompt = confirm("Would you like to start the DX agent daemon now?")
