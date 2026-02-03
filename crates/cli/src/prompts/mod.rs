@@ -493,7 +493,10 @@ pub mod log {
 
     /// Prints an info message.
     pub fn info(text: impl Display) -> io::Result<()> {
-        eprintln!("  {} {}", "●".blue(), text);
+        let theme = THEME.read().unwrap();
+        let symbols = &*SYMBOLS;
+        eprintln!("{} {}", "●".blue(), text);
+        eprintln!("{}", theme.dim.apply_to(symbols.bar));
         Ok(())
     }
 
@@ -501,7 +504,8 @@ pub mod log {
     pub fn success(text: impl Display) -> io::Result<()> {
         let theme = THEME.read().unwrap();
         let symbols = &*SYMBOLS;
-        eprintln!("{}  {} {}", theme.dim.apply_to(symbols.bar), "✓".green().bold(), text);
+        eprintln!("{} {}", "✓".green().bold(), text);
+        eprintln!("{}", theme.dim.apply_to(symbols.bar));
         Ok(())
     }
 
@@ -509,14 +513,18 @@ pub mod log {
     pub fn warning(text: impl Display) -> io::Result<()> {
         let theme = THEME.read().unwrap();
         let symbols = &*SYMBOLS;
-        eprintln!("{}  {} {}", theme.dim.apply_to(symbols.bar), "⚠".yellow().bold(), text);
+        eprintln!("{} {}", "⚠".yellow().bold(), text);
+        eprintln!("{}", theme.dim.apply_to(symbols.bar));
         Ok(())
     }
 
     /// Prints an error message.
     #[allow(unused)]
     pub fn error(text: impl Display) -> io::Result<()> {
-        eprintln!("  {} {}", "✕".red().bold(), text);
+        let theme = THEME.read().unwrap();
+        let symbols = &*SYMBOLS;
+        eprintln!("{} {}", "✕".red().bold(), text);
+        eprintln!("{}", theme.dim.apply_to(symbols.bar));
         Ok(())
     }
 
