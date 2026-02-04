@@ -117,10 +117,10 @@ class RLMChat:
         """Initialize RLM instance."""
         try:
             self.rlm = RLM(
-                model="groq/llama-3.3-70b-versatile",
+                model="groq/meta-llama/llama-4-scout-17b-16e-instruct",
                 max_iterations=25,
             )
-            print(f"{Colors.GREEN}✓ RLM initialized with Groq (llama-3.3-70b-versatile){Colors.END}")
+            print(f"{Colors.GREEN}✓ RLM initialized with Groq (llama-4-scout-17b-16e-instruct){Colors.END}")
         except Exception as e:
             print(f"{Colors.RED}✗ Failed to initialize RLM: {e}{Colors.END}")
             sys.exit(1)
