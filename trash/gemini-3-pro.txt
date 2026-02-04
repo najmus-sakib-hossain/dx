@@ -137,28 +137,3 @@ kill $DAEMON_PID
 ```
 
 Running this script gives your AI a full "Run -> Log -> Result" cycle in text format, perfect for the GitHub Copilot terminal integration.
-
-
-
-
-╔═══════════════════════════════════════════════════════════════════╗
-║                                                                   ║
-║   ██████╗ ██╗  ██╗     █████╗  ██████╗ ███████╗███╗   ██╗████████╗║
-║   ██╔══██╗╚██╗██╔╝    ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝║
-║   ██║  ██║ ╚███╔╝     ███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║   ║
-║   ██║  ██║ ██╔██╗     ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║   ║
-║   ██████╔╝██╔╝ ██╗    ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║   ║
-║   ╚═════╝ ╚═╝  ╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝   ║
-║                                                                   ║
-║   🤖 AGI-like AI Agent | Connect to ANY app | 70% token savings   ║
-║                                                                   ║
-╚═══════════════════════════════════════════════════════════════════╝
-
-┌  Welcome to DX - Your AGI-like AI Agent
-│  ● Let's set up your AI chat experience with multiple providers, tools, and integrations.
-◇  Select AI providers to configure:  
-│  ◻ OpenAI (GPT-4, GPT-3.5) Most popular, great for general tasks
-│  ◻ Anthropic (Claude) Excellent for analysis and writing
-│  ◻ Google (Gemini) Fast and cost-effective
-│  ◻ Ollama (Local models) Run models locally for privacy
-│  ◻ Custom API endpoint Connect to any OpenAI-compatible API

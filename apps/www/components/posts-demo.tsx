@@ -3,6 +3,12 @@
 import { motion } from "framer-motion";
 import { usePosts, useCreatePost } from "@/lib/hooks/use-posts";
 import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, Plus, X, RefreshCw } from "lucide-react";
 
 export function PostsDemo() {
   const { data: posts, isLoading, error } = usePosts();
@@ -25,64 +31,79 @@ export function PostsDemo() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-      </div>
+      <Card>
+        <CardContent className="flex justify-center items-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </CardContent>
+      </Card>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-600">Error loading posts: {error.message}</p>
-      </div>
+      <Card className="border-destructive">
+        <CardContent className="pt-6">
+          <p className="text-destructive">Error loading posts: {error.message}</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">React Query Demo</h2>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          {showForm ? "Cancel" : "Create Post"}
-        </button>
-      </div>
-
-      {showForm && (
-        <motion.form
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          onSubmit={handleSubmit}
-          className="bg-white p-6 rounded-lg shadow space-y-4"
-        >
-          <input
-            type="text"
-            placeholder="Post title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            className="w-full px-4 py-2 border rounded"
-          />
-          <textarea
-            placeholder="Post body"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            required
-            className="w-full px-4 py-2 border rounded h-24"
-          />
-          <button
-            type="submit"
-            disabled={createPost.isPending}
-            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
-          >
-            {createPost.isPending ? "Creating..." : "Submit"}
-          </button>
-        </motion.form>
-      )}
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <RefreshCw className="h-5 w-5" />
+                React Query Demo
+              </CardTitle>
+              <CardDescription>
+                Data fetching with caching and automatic refetching
+              </CardDescription>
+            </div>
+            <Button onClick={() => setShowForm(!showForm)} variant="outline">
+              {showForm ? <X className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+              {showForm ? "Cancel" : "Create Post"}
+            </Button>
+          </div>
+        </CardHeader>
+        {showForm && (
+          <CardContent>
+            <motion.form
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              onSubmit={handleSubmit}
+              className="space-y-4"
+            >
+              <Input
+                type="text"
+                placeholder="Post title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+              <Textarea
+                placeholder="Post body"
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                required
+                className="h-24"
+              />
+              <Button
+                type="submit"
+                disabled={createPost.isPending}
+                className="w-full"
+              >
+                {createPost.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {createPost.isPending ? "Creating..." : "Submit"}
+              </Button>
+            </motion.form>
+          </CardContent>
+        )}
+      </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {posts?.slice(0, 9).map((post, index) => (
@@ -92,10 +113,15 @@ export function PostsDemo() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition"
           >
-            <h3 className="font-bold text-lg mb-2 line-clamp-2">{post.title}</h3>
-            <p className="text-gray-600 text-sm line-clamp-3">{post.body}</p>
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle className="line-clamp-2 text-lg">{post.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground line-clamp-3">{post.body}</p>
+              </CardContent>
+            </Card>
           </motion.div>
         ))}
       </div>

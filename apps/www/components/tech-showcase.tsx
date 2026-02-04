@@ -3,106 +3,126 @@
 import { motion } from "framer-motion";
 import { useAppStore } from "@/lib/store";
 import { usePosts } from "@/lib/hooks/use-posts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { CheckCircle2, Loader2, Sparkles } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export function TechShowcase() {
-  const { theme, toggleTheme } = useAppStore();
+  const { theme: appTheme, toggleTheme } = useAppStore();
+  const { theme, setTheme } = useTheme();
   const { data: posts, isLoading } = usePosts();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl shadow-lg p-8"
-    >
-      <h3 className="text-2xl font-bold mb-6">Technology Integration</h3>
-      
-      <div className="space-y-4">
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-          <div>
-            <h4 className="font-semibold">Zustand State</h4>
-            <p className="text-sm text-gray-600">Current theme: {theme}</p>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-6 w-6" />
+          <CardTitle>Technology Integration</CardTitle>
+        </div>
+        <CardDescription>
+          All technologies working together seamlessly
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div>
+              <h4 className="font-semibold">Zustand State</h4>
+              <p className="text-sm text-muted-foreground">
+                Current theme: <Badge variant="outline">{mounted ? appTheme : "loading"}</Badge>
+              </p>
+            </div>
+            <Button onClick={toggleTheme} variant="outline">
+              Toggle Store Theme
+            </Button>
           </div>
-          <button
-            onClick={toggleTheme}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-          >
-            Toggle Theme
-          </button>
+
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div>
+              <h4 className="font-semibold">Next Themes</h4>
+              <p className="text-sm text-muted-foreground">
+                Active theme: <Badge variant="outline">{mounted ? theme : "loading"}</Badge>
+              </p>
+            </div>
+            <Button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              variant="outline"
+              disabled={!mounted}
+            >
+              Toggle UI Theme
+            </Button>
+          </div>
+
+          <div className="p-4 border rounded-lg">
+            <h4 className="font-semibold mb-2">React Query Status</h4>
+            <div className="flex items-center gap-2">
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <CheckCircle2 className="h-4 w-4 text-green-500" />
+              )}
+              <p className="text-sm text-muted-foreground">
+                {isLoading ? "Loading posts..." : `${posts?.length || 0} posts cached`}
+              </p>
+            </div>
+          </div>
+
+          <div className="p-4 border rounded-lg">
+            <h4 className="font-semibold mb-3">Framer Motion</h4>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4].map((i) => (
+                <motion.div
+                  key={i}
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 180, 360],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    delay: i * 0.2,
+                  }}
+                  className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg"
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-semibold mb-2">React Query Status</h4>
-          <div className="flex items-center gap-2">
-            <div
-              className={`w-3 h-3 rounded-full ${
-                isLoading ? "bg-yellow-500" : "bg-green-500"
-              }`}
-            />
-            <p className="text-sm text-gray-600">
-              {isLoading ? "Loading posts..." : `${posts?.length || 0} posts cached`}
-            </p>
-          </div>
-        </div>
+        <Separator />
 
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-semibold mb-2">Framer Motion</h4>
-          <div className="flex gap-2">
-            {[1, 2, 3, 4].map((i) => (
-              <motion.div
-                key={i}
-                animate={{
-                  scale: [1, 1.2, 1],
-                  rotate: [0, 180, 360],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  delay: i * 0.2,
-                }}
-                className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded"
-              />
+        <div>
+          <h4 className="font-semibold mb-3">Tech Stack</h4>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              "Next.js 16",
+              "React Query v5",
+              "Framer Motion 12",
+              "Drizzle ORM",
+              "Zustand 5",
+              "Better Auth",
+              "PGlite",
+              "Spline 3D",
+              "shadcn/ui",
+              "Tailwind CSS v4",
+            ].map((tech) => (
+              <div key={tech} className="flex items-center gap-2 text-sm">
+                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                <span>{tech}</span>
+              </div>
             ))}
           </div>
         </div>
-
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-semibold mb-2">Tech Stack</h4>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="flex items-center gap-2">
-              <span className="text-green-600">✓</span>
-              <span>Next.js 16</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-green-600">✓</span>
-              <span>React Query v5</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-green-600">✓</span>
-              <span>Framer Motion 12</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-green-600">✓</span>
-              <span>Drizzle ORM</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-green-600">✓</span>
-              <span>Zustand 5</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-green-600">✓</span>
-              <span>Better Auth</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-green-600">✓</span>
-              <span>PGlite</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-green-600">✓</span>
-              <span>Spline 3D</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
+      </CardContent>
+    </Card>
   );
 }

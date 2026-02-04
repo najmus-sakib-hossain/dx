@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/lib/providers/query-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js Modern Stack",
-  description: "Next.js with React Query, Framer Motion, Drizzle ORM, Zustand, Better Auth, PGlite, and Spline",
+  title: "Next.js Modern Stack 2026",
+  description: "Next.js 16 with React Query, Framer Motion, Drizzle ORM, Zustand, Better Auth, PGlite, Spline, and shadcn/ui",
 };
 
 export default function RootLayout({
@@ -24,11 +25,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <QueryProvider>{children}</QueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <QueryProvider>{children}</QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
