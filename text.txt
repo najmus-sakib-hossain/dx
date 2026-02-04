@@ -1,6 +1,3 @@
-Google don't supports "
-Gemma 3 27B
-" model google ai studio so is there any way to use it and also is the limits of it still the same or its bad or good now for gemma models??
+Good, now please use our groq api key and then please create a python cli chat interface to put prompts and it will use our RLM to answer the question and please learn from all folders in root integrations folder as all of the 3 folders are RLM related so please learn from all of them!!!
 
-
-cargo run --example function_calling_demo
+You are getting that rate limit beacuase to test RLM capablities you are using regular method and sending too much tokens so please only use RLM to parse the large document so you will not get any ratelimit

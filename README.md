@@ -406,39 +406,12 @@ Missing Control UI assets. Build them with `pnpm ui:build` (auto-installs UI dep
 │
 └  Onboarding complete. Dashboard opened with your token; keep that tab to control OpenClaw.
 
-
-
-
-
-
 At integrations openclaw folder you can see providers and channels with using click prompts npm package now plase create a bun project called standable openclaw and in there please create a new openclaw onboard interface using click but in there please just implement all of its providers and channels only in a new bun project at root openclaw-standalone folder!!!
 Directly use openclaw projects files don't create again just update it to remove its openclaw
 No, just remove openclaw branding and put "dx" as branding!!!
 But use openclaw codebase files and don't recreate all of messaging and providers implements just moves nessasry files in our this project!!!
 
 And use bun to do it!!!
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 How about tokens can its save give me real benchmarks via MIT real reserach and hype me up as I creating a ai cli that uses this producitononally and will make it tokens as I will go viral too like openclaw!!!
 
