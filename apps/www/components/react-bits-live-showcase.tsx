@@ -236,7 +236,14 @@ const examples: Example[] = [
     category: "components",
     description: "Circular image gallery",
     component: CircularGallery,
-    props: {}
+    props: {
+      images: [
+        "https://picsum.photos/400/400?random=1",
+        "https://picsum.photos/400/400?random=2",
+        "https://picsum.photos/400/400?random=3",
+        "https://picsum.photos/400/400?random=4",
+      ]
+    }
   },
   {
     id: "stack",
@@ -260,7 +267,14 @@ const examples: Example[] = [
     category: "components",
     description: "Masonry grid layout",
     component: Masonry,
-    props: {}
+    props: {
+      items: [
+        { id: 1, img: "https://picsum.photos/400/300", height: 300 },
+        { id: 2, img: "https://picsum.photos/400/400", height: 400 },
+        { id: 3, img: "https://picsum.photos/400/500", height: 500 },
+        { id: 4, img: "https://picsum.photos/400/350", height: 350 },
+      ]
+    }
   },
   {
     id: "chroma-grid",
@@ -430,15 +444,21 @@ export function ReactBitsLiveShowcase() {
               >
                 <Card className="h-full border-2 hover:border-emerald-500/50 transition-all duration-300 bg-card/50 backdrop-blur-sm group cursor-pointer overflow-hidden">
                   {/* Live Preview */}
-                  <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-background/50 to-background/80">
+                  <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-card/80 to-card/40 border-b-2 border-emerald-500/10">
                     <Suspense fallback={
-                      <div className="flex items-center justify-center h-full">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" />
+                      <div className="flex items-center justify-center h-full bg-gradient-to-br from-background/50 to-background/80">
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                        >
+                          <div className="h-8 w-8 border-2 border-emerald-500 border-t-transparent rounded-full" />
+                        </motion.div>
                       </div>
                     }>
-                      <Component {...example.props} />
+                      <div className="w-full h-full">
+                        <Component {...example.props} />
+                      </div>
                     </Suspense>
-                    <div className="absolute inset-0 bg-gradient-to-t from-card/90 to-transparent pointer-events-none" />
                   </div>
                   
                   <CardHeader className="pb-3">

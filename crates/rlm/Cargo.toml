@@ -10,6 +10,9 @@ keywords = ["llm", "ai", "nlp", "recursive", "language-model"]
 categories = ["text-processing", "api-bindings"]
 readme = "README.md"
 
+[workspace]
+# This crate is standalone
+
 [dependencies]
 # Scripting engine for safe code execution
 rhai = "1.20"
@@ -79,6 +82,14 @@ path = "examples/multi_model_demo.rs"
 [[example]]
 name = "phase3_complete"
 path = "examples/phase3_complete.rs"
+
+[[example]]
+name = "ultimate_demo"
+path = "examples/ultimate_demo.rs"
+
+[[example]]
+name = "simple_test"
+path = "examples/simple_test.rs"
 
 [profile.release]
 opt-level = 3

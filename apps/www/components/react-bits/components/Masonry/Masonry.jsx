@@ -12,6 +12,7 @@ const useMedia = (queries, values, defaultValue) => {
   const [value, setValue] = useState(defaultValue);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     setValue(get());
     const handler = () => setValue(get());
     queries.forEach(q => matchMedia(q).addEventListener('change', handler));

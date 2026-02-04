@@ -1,5 +1,9 @@
 "use client";
 
+"use client";
+
+"use client";
+
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useAppStore } from "@/lib/store";
 import { PGliteDemo } from "@/components/pglite-demo";
