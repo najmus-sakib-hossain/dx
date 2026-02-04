@@ -26,7 +26,7 @@ const nextConfig = {
     ],
   },
   experimental: {
-    turbopackFileSystemCacheForDev: true,
+    turbopackFileSystemCacheForDev: false,
   },
   redirects() {
     return [
