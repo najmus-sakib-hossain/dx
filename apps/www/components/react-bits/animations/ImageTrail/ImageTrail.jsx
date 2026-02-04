@@ -1060,11 +1060,24 @@ export default function ImageTrail({ items = [], variant = 1 }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !items || items.length === 0) return;
 
     const Cls = variantMap[variant] || variantMap[1];
-    new Cls(containerRef.current);
+    try {
+      new Cls(containerRef.current);
+    } catch (error) {
+      console.warn('ImageTrail initialization failed:', error);
+    }
   }, [variant, items]);
+
+  // Don't render if no items
+  if (!items || items.length === 0) {
+    return (
+      <div className="content flex items-center justify-center h-full text-muted-foreground">
+        Move your mouse to see the trail effect
+      </div>
+    );
+  }
 
   return (
     <div className="content" ref={containerRef}>

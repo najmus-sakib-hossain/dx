@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Zap, Box, Code } from "lucide-react";
 import { useState, Suspense, lazy } from "react";
+import { ChakraProvider } from "@/components/chakra-provider";
 
 // Lazy load components - ANIMATIONS
 const ClickSpark = lazy(() => import("@/components/react-bits/animations/ClickSpark/ClickSpark"));
@@ -22,7 +23,6 @@ const ImageTrail = lazy(() => import("@/components/react-bits/animations/ImageTr
 const Galaxy = lazy(() => import("@/components/react-bits/backgrounds/Galaxy/Galaxy"));
 const Lightning = lazy(() => import("@/components/react-bits/backgrounds/Lightning/Lightning"));
 const GridScan = lazy(() => import("@/components/react-bits/backgrounds/GridScan/GridScan").then(m => ({ default: m.GridScan })));
-const Hyperspeed = lazy(() => import("@/components/react-bits/backgrounds/Hyperspeed/Hyperspeed"));
 const GridDistortion = lazy(() => import("@/components/react-bits/backgrounds/GridDistortion/GridDistortion"));
 const LetterGlitch = lazy(() => import("@/components/react-bits/backgrounds/LetterGlitch/LetterGlitch"));
 const LiquidChrome = lazy(() => import("@/components/react-bits/backgrounds/LiquidChrome/LiquidChrome"));
@@ -35,7 +35,6 @@ const Grainient = lazy(() => import("@/components/react-bits/backgrounds/Grainie
 const ScrollStack = lazy(() => import("@/components/react-bits/components/ScrollStack/ScrollStack"));
 const CircularGallery = lazy(() => import("@/components/react-bits/components/CircularGallery/CircularGallery"));
 const Stack = lazy(() => import("@/components/react-bits/components/Stack/Stack"));
-const FluidGlass = lazy(() => import("@/components/react-bits/components/FluidGlass/FluidGlass"));
 const Masonry = lazy(() => import("@/components/react-bits/components/Masonry/Masonry"));
 const ChromaGrid = lazy(() => import("@/components/react-bits/components/ChromaGrid/ChromaGrid"));
 const Folder = lazy(() => import("@/components/react-bits/components/Folder/Folder"));
@@ -82,14 +81,7 @@ const examples: Example[] = [
     component: GridScan,
     props: {}
   },
-  {
-    id: "hyperspeed",
-    title: "Hyperspeed",
-    category: "backgrounds",
-    description: "Warp speed animation",
-    component: Hyperspeed,
-    props: {}
-  },
+
   {
     id: "grid-distortion",
     title: "Grid Distortion",
@@ -218,7 +210,16 @@ const examples: Example[] = [
     category: "animations",
     description: "Image trailing effect",
     component: ImageTrail,
-    props: {}
+    props: {
+      items: [
+        "https://picsum.photos/400/300?random=1",
+        "https://picsum.photos/400/300?random=2",
+        "https://picsum.photos/400/300?random=3",
+        "https://picsum.photos/400/300?random=4",
+        "https://picsum.photos/400/300?random=5",
+      ],
+      variant: 1
+    }
   },
   
   // COMPONENTS
@@ -253,14 +254,7 @@ const examples: Example[] = [
     component: Stack,
     props: {}
   },
-  {
-    id: "fluid-glass",
-    title: "Fluid Glass",
-    category: "components",
-    description: "Glassmorphism effect",
-    component: FluidGlass,
-    props: {}
-  },
+
   {
     id: "masonry",
     title: "Masonry",
@@ -364,7 +358,6 @@ const categoryIcons = {
 
 export function ReactBitsLiveShowcase() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedExample, setSelectedExample] = useState<Example | null>(null);
 
   const filteredExamples = selectedCategory === "all" 
     ? examples 
@@ -455,9 +448,11 @@ export function ReactBitsLiveShowcase() {
                         </motion.div>
                       </div>
                     }>
-                      <div className="w-full h-full">
-                        <Component {...example.props} />
-                      </div>
+                      <ChakraProvider>
+                        <div className="w-full h-full relative">
+                          <Component {...example.props} />
+                        </div>
+                      </ChakraProvider>
                     </Suspense>
                   </div>
                   
@@ -486,15 +481,10 @@ export function ReactBitsLiveShowcase() {
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full group-hover:bg-emerald-500/10 group-hover:text-emerald-500"
-                      onClick={() => setSelectedExample(example)}
-                    >
-                      <Code className="h-4 w-4 mr-2" />
-                      View Full Demo
-                    </Button>
+                    <div className="flex items-center justify-center text-xs text-muted-foreground">
+                      <Code className="h-3 w-3 mr-1" />
+                      Live Interactive Demo
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>

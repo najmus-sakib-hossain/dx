@@ -104,11 +104,12 @@ const Masonry = ({
   };
 
   useEffect(() => {
+    if (!items || items.length === 0) return;
     preloadImages(items.map(i => i.img)).then(() => setImagesReady(true));
   }, [items]);
 
   const grid = useMemo(() => {
-    if (!width) return [];
+    if (!width || !items || items.length === 0) return [];
 
     const colHeights = new Array(columns).fill(0);
     const columnWidth = width / columns;
@@ -128,7 +129,7 @@ const Masonry = ({
   const hasMounted = useRef(false);
 
   useLayoutEffect(() => {
-    if (!imagesReady) return;
+    if (!imagesReady || !grid || grid.length === 0) return;
 
     grid.forEach((item, index) => {
       const selector = `[data-key="${item.id}"]`;
@@ -220,7 +221,7 @@ const Masonry = ({
 
   return (
     <div ref={containerRef} className="list">
-      {grid.map(item => {
+      {grid && grid.length > 0 && grid.map(item => {
         return (
           <div
             key={item.id}
