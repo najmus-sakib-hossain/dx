@@ -117,6 +117,9 @@ enum Commands {
         action: SerializerCommands,
     },
     
+    /// Chat with Google AI Studio models (Gemini, Gemma)
+    Chat(commands::chat::ChatCommand),
+    
     /// Show status of the agent and integrations
     Status,
     
@@ -307,6 +310,7 @@ async fn main() -> anyhow::Result<()> {
         }
         Some(Commands::Schedule { action }) => commands::schedule::run(action).await?,
         Some(Commands::Serializer { action }) => commands::serializer::run(action).await?,
+        Some(Commands::Chat(cmd)) => cmd.execute().await?,
         Some(Commands::Status) => commands::status::run().await?,
         Some(Commands::Init) => commands::init::run().await?,
         None => run_onboarding().await?,

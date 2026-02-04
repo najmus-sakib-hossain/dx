@@ -1,6 +1,7 @@
 //! CLI command modules
 
 pub mod agent;
+pub mod chat;
 pub mod connect;
 pub mod create;
 pub mod disconnect;

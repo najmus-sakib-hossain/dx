@@ -1,0 +1,6 @@
+Google don't supports "
+Gemma 3 27B
+" model google ai studio so is there any way to use it and also is the limits of it still the same or its bad or good now for gemma models??
+
+
+cargo run --example function_calling_demo

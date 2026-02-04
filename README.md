@@ -470,3 +470,5 @@ Please use this:
 |
 ♦
 |
+
+Please list all best tools that current vscode code editor and cursor and ai website can do like web-search, codebase-indexing, lsp, mcp, creating multiple files at once and other - please list all possible best tools!!!
