@@ -7,11 +7,13 @@ import { SplineScene } from "@/components/spline-scene";
 import { PostsDemo } from "@/components/posts-demo";
 import { TechShowcase } from "@/components/tech-showcase";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SiteNav } from "@/components/site-nav";
 import { useSession, signIn, signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -96,7 +98,7 @@ export default function Home() {
       {/* Navigation */}
       <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <Button variant="ghost" size="icon" onClick={toggleSidebar}>
               <Menu className="h-5 w-5" />
             </Button>
@@ -108,6 +110,7 @@ export default function Home() {
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500" />
               <h1 className="text-xl font-bold">Modern Stack</h1>
             </motion.div>
+            <SiteNav />
           </div>
 
           <div className="flex items-center gap-2">
@@ -272,6 +275,73 @@ export default function Home() {
                   </motion.div>
                 );
               })}
+            </div>
+          </motion.section>
+
+          {/* Project Showcases */}
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="space-y-6"
+          >
+            <h3 className="text-2xl font-bold text-center">Project Showcases</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle>shadcn/ui</CardTitle>
+                  <CardDescription>Component library with themes</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href="/shadcn">Explore</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle>TweakCN</CardTitle>
+                  <CardDescription>AI-powered theme generator</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href="/tweakcn">Explore</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle>Themux</CardTitle>
+                  <CardDescription>Theme multiplexer system</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href="/themux">Explore</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle>Midday</CardTitle>
+                  <CardDescription>Business finance management</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href="/midday">Explore</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle>React Bits</CardTitle>
+                  <CardDescription>Component library collection</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href="/react-bits">Explore</Link>
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </motion.section>
         </motion.div>
