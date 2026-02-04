@@ -1,44 +1,32 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Zap, Box, Code } from "lucide-react";
-import { useState, Suspense, lazy } from "react";
-import { ChakraProvider } from "@/components/chakra-provider";
+import { Sparkles, Zap, Box, Code, ChevronDown, ChevronUp } from "lucide-react";
+import { useState, Suspense, lazy, useRef } from "react";
 
 // Lazy load components - ANIMATIONS
 const ClickSpark = lazy(() => import("@/components/react-bits/animations/ClickSpark/ClickSpark"));
-const TargetCursor = lazy(() => import("@/components/react-bits/animations/TargetCursor/TargetCursor"));
 const GradualBlur = lazy(() => import("@/components/react-bits/animations/GradualBlur/GradualBlur"));
 const Magnet = lazy(() => import("@/components/react-bits/animations/Magnet/Magnet"));
-const GhostCursor = lazy(() => import("@/components/react-bits/animations/GhostCursor/GhostCursor"));
 const Crosshair = lazy(() => import("@/components/react-bits/animations/Crosshair/Crosshair"));
 const SplashCursor = lazy(() => import("@/components/react-bits/animations/SplashCursor/SplashCursor"));
-const LaserFlow = lazy(() => import("@/components/react-bits/animations/LaserFlow/LaserFlow"));
-const ImageTrail = lazy(() => import("@/components/react-bits/animations/ImageTrail/ImageTrail"));
 
 // Lazy load components - BACKGROUNDS
-const Galaxy = lazy(() => import("@/components/react-bits/backgrounds/Galaxy/Galaxy"));
-const Lightning = lazy(() => import("@/components/react-bits/backgrounds/Lightning/Lightning"));
 const GridScan = lazy(() => import("@/components/react-bits/backgrounds/GridScan/GridScan").then(m => ({ default: m.GridScan })));
 const GridDistortion = lazy(() => import("@/components/react-bits/backgrounds/GridDistortion/GridDistortion"));
 const LetterGlitch = lazy(() => import("@/components/react-bits/backgrounds/LetterGlitch/LetterGlitch"));
-const LiquidChrome = lazy(() => import("@/components/react-bits/backgrounds/LiquidChrome/LiquidChrome"));
 const Beams = lazy(() => import("@/components/react-bits/backgrounds/Beams/Beams"));
-const Silk = lazy(() => import("@/components/react-bits/backgrounds/Silk/Silk"));
-const LightPillar = lazy(() => import("@/components/react-bits/backgrounds/LightPillar/LightPillar"));
 const Grainient = lazy(() => import("@/components/react-bits/backgrounds/Grainient/Grainient"));
 
 // Lazy load components - COMPONENTS
 const ScrollStack = lazy(() => import("@/components/react-bits/components/ScrollStack/ScrollStack"));
-const CircularGallery = lazy(() => import("@/components/react-bits/components/CircularGallery/CircularGallery"));
 const Stack = lazy(() => import("@/components/react-bits/components/Stack/Stack"));
 const Masonry = lazy(() => import("@/components/react-bits/components/Masonry/Masonry"));
 const ChromaGrid = lazy(() => import("@/components/react-bits/components/ChromaGrid/ChromaGrid"));
 const Folder = lazy(() => import("@/components/react-bits/components/Folder/Folder"));
-const Lanyard = lazy(() => import("@/components/react-bits/components/Lanyard/Lanyard"));
 const PixelCard = lazy(() => import("@/components/react-bits/components/PixelCard/PixelCard"));
 const Carousel = lazy(() => import("@/components/react-bits/components/Carousel/Carousel"));
 const ElasticSlider = lazy(() => import("@/components/react-bits/components/ElasticSlider/ElasticSlider"));
@@ -56,23 +44,7 @@ interface Example {
 }
 
 const examples: Example[] = [
-  // BACKGROUNDS
-  {
-    id: "galaxy",
-    title: "Galaxy",
-    category: "backgrounds",
-    description: "Cosmic galaxy effect with stars",
-    component: Galaxy,
-    props: {}
-  },
-  {
-    id: "lightning",
-    title: "Lightning",
-    category: "backgrounds",
-    description: "Electric lightning animation",
-    component: Lightning,
-    props: {}
-  },
+  // BACKGROUNDS (lightweight only - no WebGL)
   {
     id: "grid-scan",
     title: "Grid Scan",
@@ -81,14 +53,13 @@ const examples: Example[] = [
     component: GridScan,
     props: {}
   },
-
   {
     id: "grid-distortion",
     title: "Grid Distortion",
     category: "backgrounds",
     description: "Distorted grid effect",
     component: GridDistortion,
-    props: {}
+    props: { imageSrc: "https://picsum.photos/800/600" }
   },
   {
     id: "letter-glitch",
@@ -96,14 +67,6 @@ const examples: Example[] = [
     category: "backgrounds",
     description: "Glitchy text background",
     component: LetterGlitch,
-    props: {}
-  },
-  {
-    id: "liquid-chrome",
-    title: "Liquid Chrome",
-    category: "backgrounds",
-    description: "Metallic liquid effect",
-    component: LiquidChrome,
     props: {}
   },
   {
@@ -115,22 +78,6 @@ const examples: Example[] = [
     props: {}
   },
   {
-    id: "silk",
-    title: "Silk",
-    category: "backgrounds",
-    description: "Smooth silk-like animation",
-    component: Silk,
-    props: {}
-  },
-  {
-    id: "light-pillar",
-    title: "Light Pillar",
-    category: "backgrounds",
-    description: "3D light pillar effect with WebGL",
-    component: LightPillar,
-    props: {}
-  },
-  {
     id: "grainient",
     title: "Grainient",
     category: "backgrounds",
@@ -139,22 +86,14 @@ const examples: Example[] = [
     props: {}
   },
   
-  // ANIMATIONS
+  // ANIMATIONS (lightweight only)
   {
     id: "click-spark",
     title: "Click Spark",
     category: "animations",
     description: "Spark on click - Click anywhere!",
     component: ClickSpark,
-    props: { sparkColor: "#3b82f6", sparkCount: 12 }
-  },
-  {
-    id: "target-cursor",
-    title: "Target Cursor",
-    category: "animations",
-    description: "Interactive targeting cursor",
-    component: TargetCursor,
-    props: { targetSelector: ".cursor-target" }
+    props: { sparkColor: "#10b981", sparkCount: 12 }
   },
   {
     id: "gradual-blur",
@@ -173,14 +112,6 @@ const examples: Example[] = [
     props: {}
   },
   {
-    id: "ghost-cursor",
-    title: "Ghost Cursor",
-    category: "animations",
-    description: "Trailing ghost cursor",
-    component: GhostCursor,
-    props: {}
-  },
-  {
     id: "crosshair",
     title: "Crosshair",
     category: "animations",
@@ -196,33 +127,8 @@ const examples: Example[] = [
     component: SplashCursor,
     props: {}
   },
-  {
-    id: "laser-flow",
-    title: "Laser Flow",
-    category: "animations",
-    description: "Flowing laser animation",
-    component: LaserFlow,
-    props: {}
-  },
-  {
-    id: "image-trail",
-    title: "Image Trail",
-    category: "animations",
-    description: "Image trailing effect",
-    component: ImageTrail,
-    props: {
-      items: [
-        "https://picsum.photos/400/300?random=1",
-        "https://picsum.photos/400/300?random=2",
-        "https://picsum.photos/400/300?random=3",
-        "https://picsum.photos/400/300?random=4",
-        "https://picsum.photos/400/300?random=5",
-      ],
-      variant: 1
-    }
-  },
   
-  // COMPONENTS
+  // COMPONENTS (lightweight only - no heavy 3D)
   {
     id: "pixel-card",
     title: "Pixel Card",
@@ -230,21 +136,6 @@ const examples: Example[] = [
     description: "Pixelated card effect",
     component: PixelCard,
     props: {}
-  },
-  {
-    id: "circular-gallery",
-    title: "Circular Gallery",
-    category: "components",
-    description: "Circular image gallery",
-    component: CircularGallery,
-    props: {
-      images: [
-        "https://picsum.photos/400/400?random=1",
-        "https://picsum.photos/400/400?random=2",
-        "https://picsum.photos/400/400?random=3",
-        "https://picsum.photos/400/400?random=4",
-      ]
-    }
   },
   {
     id: "stack",
@@ -284,14 +175,6 @@ const examples: Example[] = [
     category: "components",
     description: "Animated folder component",
     component: Folder,
-    props: {}
-  },
-  {
-    id: "lanyard",
-    title: "Lanyard",
-    category: "components",
-    description: "3D Discord presence card",
-    component: Lanyard,
     props: {}
   },
   {
@@ -358,6 +241,8 @@ const categoryIcons = {
 
 export function ReactBitsLiveShowcase() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const filteredExamples = selectedCategory === "all" 
     ? examples 
@@ -370,141 +255,189 @@ export function ReactBitsLiveShowcase() {
     { id: "components", label: "Components", count: examples.filter(e => e.category === "components").length },
   ];
 
-  return (
-    <Card className="border-2 border-emerald-500/20 bg-card/50 backdrop-blur-sm overflow-hidden">
-      <CardHeader>
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-2">
-            <motion.div
-              animate={{ 
-                rotate: [0, 360],
-                scale: [1, 1.2, 1]
-              }}
-              transition={{ 
-                duration: 3, 
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut"
-              }}
-            >
-              <Sparkles className="h-6 w-6 text-emerald-500" />
-            </motion.div>
-            <CardTitle className="text-2xl">React Bits Live Showcase</CardTitle>
-          </div>
-          <Badge className="bg-gradient-to-r from-emerald-500 to-teal-500">
-            {filteredExamples.length} Live Examples
-          </Badge>
-        </div>
-        <CardDescription className="text-base">
-          Interactive demonstrations of stunning React animations, backgrounds, and components
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent className="space-y-6">
-        {/* Category Filter */}
-        <div className="flex flex-wrap gap-2">
-          {categories.map((cat) => (
-            <Button
-              key={cat.id}
-              variant={selectedCategory === cat.id ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCategory(cat.id)}
-              className={selectedCategory === cat.id ? "bg-gradient-to-r from-emerald-500 to-teal-500" : ""}
-            >
-              {cat.label}
-              <Badge variant="secondary" className="ml-2">
-                {cat.count}
-              </Badge>
-            </Button>
-          ))}
-        </div>
+  const scrollToSection = (index: number) => {
+    const section = document.getElementById(`react-bit-${filteredExamples[index]?.id}`);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setCurrentIndex(index);
+    }
+  };
 
-        {/* Examples Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredExamples.map((example, index) => {
-            const Icon = categoryIcons[example.category];
-            const colorClass = categoryColors[example.category];
-            const Component = example.component;
-            
-            return (
+  const nextSection = () => {
+    if (currentIndex < filteredExamples.length - 1) {
+      scrollToSection(currentIndex + 1);
+    }
+  };
+
+  const prevSection = () => {
+    if (currentIndex > 0) {
+      scrollToSection(currentIndex - 1);
+    }
+  };
+
+  return (
+    <div ref={containerRef} className="relative w-full">
+      {/* Fixed Header */}
+      <div className="sticky top-16 z-40 w-full bg-background/95 backdrop-blur-xl border-b border-emerald-500/20 shadow-lg">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-3">
               <motion.div
-                key={example.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ delay: index * 0.05, duration: 0.4 }}
-                whileHover={{ scale: 1.03, y: -5 }}
-                whileTap={{ scale: 0.98 }}
+                animate={{ 
+                  rotate: [0, 360],
+                  scale: [1, 1.2, 1]
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: "easeInOut"
+                }}
               >
-                <Card className="h-full border-2 hover:border-emerald-500/50 transition-all duration-300 bg-card/50 backdrop-blur-sm group cursor-pointer overflow-hidden">
-                  {/* Live Preview */}
-                  <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-card/80 to-card/40 border-b-2 border-emerald-500/10">
-                    <Suspense fallback={
-                      <div className="flex items-center justify-center h-full bg-gradient-to-br from-background/50 to-background/80">
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                        >
-                          <div className="h-8 w-8 border-2 border-emerald-500 border-t-transparent rounded-full" />
-                        </motion.div>
-                      </div>
-                    }>
-                      <ChakraProvider>
-                        <div className="w-full h-full relative">
-                          <Component {...example.props} />
-                        </div>
-                      </ChakraProvider>
-                    </Suspense>
+                <Sparkles className="h-6 w-6 text-emerald-500" />
+              </motion.div>
+              <div>
+                <h2 className="text-2xl font-bold">React Bits Live Showcase</h2>
+                <p className="text-sm text-muted-foreground">
+                  {currentIndex + 1} / {filteredExamples.length} - {filteredExamples[currentIndex]?.title}
+                </p>
+              </div>
+            </div>
+            
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <Button
+                  key={cat.id}
+                  variant={selectedCategory === cat.id ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setSelectedCategory(cat.id);
+                    setCurrentIndex(0);
+                  }}
+                  className={selectedCategory === cat.id ? "bg-gradient-to-r from-emerald-500 to-teal-500" : ""}
+                >
+                  {cat.label}
+                  <Badge variant="secondary" className="ml-2">
+                    {cat.count}
+                  </Badge>
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Full-Height Sections */}
+      <div className="w-full">
+        {filteredExamples.map((example, index) => {
+          const Icon = categoryIcons[example.category];
+          const colorClass = categoryColors[example.category];
+          const Component = example.component;
+          
+          return (
+            <section
+              key={example.id}
+              id={`react-bit-${example.id}`}
+              className="relative w-full min-h-screen flex items-center justify-center"
+              style={{ scrollSnapAlign: 'start' }}
+            >
+              {/* Background Component */}
+              <div className="absolute inset-0 w-full h-full">
+                <Suspense fallback={
+                  <div className="flex items-center justify-center h-full bg-gradient-to-br from-background/50 to-background/80">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                    >
+                      <div className="h-12 w-12 border-4 border-emerald-500 border-t-transparent rounded-full" />
+                    </motion.div>
+                  </div>
+                }>
+                  <Component {...example.props} />
+                </Suspense>
+              </div>
+
+              {/* Info Overlay */}
+              <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.6 }}
+                  className="bg-background/80 backdrop-blur-xl border-2 border-emerald-500/30 rounded-2xl p-8 shadow-2xl"
+                >
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <motion.div
+                      className={`h-16 w-16 rounded-2xl bg-gradient-to-br ${colorClass} flex items-center justify-center shadow-xl`}
+                      whileHover={{ rotate: 10, scale: 1.1 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <Icon className="h-8 w-8 text-white" />
+                    </motion.div>
                   </div>
                   
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <motion.div
-                            className={`h-10 w-10 rounded-lg bg-gradient-to-br ${colorClass} flex items-center justify-center shadow-lg`}
-                            whileHover={{ rotate: 10, scale: 1.1 }}
-                            transition={{ type: "spring", stiffness: 300 }}
-                          >
-                            <Icon className="h-5 w-5 text-white" />
-                          </motion.div>
-                          <Badge variant="outline" className="text-xs">
-                            {example.category}
-                          </Badge>
-                        </div>
-                        <CardTitle className="text-lg group-hover:text-emerald-500 transition-colors">
-                          {example.title}
-                        </CardTitle>
-                        <CardDescription className="text-sm mt-1">
-                          {example.description}
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center justify-center text-xs text-muted-foreground">
-                      <Code className="h-3 w-3 mr-1" />
-                      Live Interactive Demo
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            );
-          })}
-        </div>
+                  <Badge variant="outline" className="mb-3">
+                    {example.category}
+                  </Badge>
+                  
+                  <h3 className="text-4xl font-bold mb-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
+                    {example.title}
+                  </h3>
+                  
+                  <p className="text-lg text-muted-foreground mb-6">
+                    {example.description}
+                  </p>
 
-        {/* Call to Action */}
+                  <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground">
+                    <Code className="h-4 w-4" />
+                    <span>Live Interactive Demo</span>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Navigation Arrows */}
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 z-20">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={prevSection}
+                  disabled={index === 0}
+                  className="h-12 w-12 rounded-full bg-background/80 backdrop-blur-xl border-emerald-500/30 hover:bg-emerald-500/10 disabled:opacity-30"
+                >
+                  <ChevronUp className="h-6 w-6" />
+                </Button>
+                
+                <div className="px-4 py-2 rounded-full bg-background/80 backdrop-blur-xl border border-emerald-500/30">
+                  <span className="text-sm font-medium">
+                    {index + 1} / {filteredExamples.length}
+                  </span>
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={nextSection}
+                  disabled={index === filteredExamples.length - 1}
+                  className="h-12 w-12 rounded-full bg-background/80 backdrop-blur-xl border-emerald-500/30 hover:bg-emerald-500/10 disabled:opacity-30"
+                >
+                  <ChevronDown className="h-6 w-6" />
+                </Button>
+              </div>
+            </section>
+          );
+        })}
+      </div>
+
+      {/* Scroll Indicator for First Section */}
+      {currentIndex === 0 && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-8 p-6 rounded-lg bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border-2 border-emerald-500/20 text-center"
+          className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30"
+          animate={{ y: [0, 12, 0] }}
+          transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
         >
-          <h3 className="text-xl font-bold mb-2">All components are live and interactive!</h3>
-          <p className="text-muted-foreground mb-4">
-            Click on any card to see the full demo. All source code is available in the react-bits folder.
-          </p>
+          <ChevronDown className="h-8 w-8 text-emerald-500/60" />
         </motion.div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }

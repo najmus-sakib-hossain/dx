@@ -5,3 +5,5 @@
 Why are there dummy template pages instead of actual project pages of the root apps or subdirectories?
 
 Please search the web for RLM references. At Reds RLM folder, we have implemented something like that, but it's just somewhat faster than Python, but we want to make the RLM a game changer, so please give me out-of-the-box ideas to make our Rust RLM implementation the best possible! 
+
+What is wrong - with you?? you are always wasting tokens to test traditional approch - I don't want to see traditional approch - just test our RLM approch - Do a web test about what other models are available in Google AI Studio and use that. 

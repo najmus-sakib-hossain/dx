@@ -10,7 +10,7 @@ import urllib.error
 import time
 
 # Configuration
-GEMINI_API_KEY = "AIzaSyDCUho49_JOlyClTlhSC_UIy_NWB33r03M"
+GEMINI_API_KEY = "AIzaSyDkGMc89MIF6umVwpoAuezYN7m7xsqOiZ0"
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 MODEL = "gemini-2.5-flash"
 
