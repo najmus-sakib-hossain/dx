@@ -17,11 +17,35 @@ pub mod interaction;
 #[allow(unused)]
 pub mod autocomplete;
 #[allow(unused)]
+pub mod calendar;
+#[allow(unused)]
+pub mod code_snippet;
+#[allow(unused)]
+pub mod color_picker_advanced;
+#[allow(unused)]
 pub mod confirm;
+#[allow(unused)]
+pub mod credit_card;
+#[allow(unused)]
+pub mod date_picker;
+#[allow(unused)]
+pub mod email;
+#[allow(unused)]
+pub mod emoji_picker;
+#[allow(unused)]
+pub mod file_browser;
 #[allow(unused)]
 pub mod input;
 #[allow(unused)]
+pub mod json_editor;
+#[allow(unused)]
+pub mod kanban;
+#[allow(unused)]
 pub mod list;
+#[allow(unused)]
+pub mod markdown_editor;
+#[allow(unused)]
+pub mod matrix_select;
 #[allow(unused)]
 pub mod multiselect;
 #[allow(unused)]
@@ -29,9 +53,15 @@ pub mod number;
 #[allow(unused)]
 pub mod password;
 #[allow(unused)]
+pub mod phone_input;
+#[allow(unused)]
 pub mod progress;
 #[allow(unused)]
+pub mod range_slider;
+#[allow(unused)]
 pub mod rating;
+#[allow(unused)]
+pub mod search_filter;
 #[allow(unused)]
 pub mod select;
 #[allow(unused)]
@@ -39,11 +69,21 @@ pub mod slider;
 #[allow(unused)]
 pub mod spinner;
 #[allow(unused)]
+pub mod table_editor;
+#[allow(unused)]
 pub mod tags;
 #[allow(unused)]
 pub mod text;
 #[allow(unused)]
+pub mod time_picker;
+#[allow(unused)]
 pub mod toggle;
+#[allow(unused)]
+pub mod tree_select;
+#[allow(unused)]
+pub mod url;
+#[allow(unused)]
+pub mod wizard;
 
 use console::Term;
 use once_cell::sync::Lazy;
@@ -54,13 +94,37 @@ use std::sync::RwLock;
 #[allow(unused)]
 pub use autocomplete::{autocomplete, Autocomplete, AutocompleteItem};
 #[allow(unused)]
+pub use calendar::{calendar, CalendarView};
+#[allow(unused)]
+pub use code_snippet::{code_snippet, CodeSnippet, CodeSnippetPicker};
+#[allow(unused)]
+pub use color_picker_advanced::{color_picker_advanced, ColorMode, ColorPickerAdvanced};
+#[allow(unused)]
 pub use confirm::Confirm;
+#[allow(unused)]
+pub use credit_card::{credit_card, CreditCardInput};
+#[allow(unused)]
+pub use date_picker::{date_picker, DatePicker};
+#[allow(unused)]
+pub use email::{email, EmailInput};
+#[allow(unused)]
+pub use emoji_picker::{emoji_picker, EmojiPicker};
+#[allow(unused)]
+pub use file_browser::{file_browser, FileBrowser};
 #[allow(unused)]
 pub use input::Input;
 #[allow(unused)]
 pub use interaction::{PromptInteraction, State, Validate};
 #[allow(unused)]
+pub use json_editor::{json_editor, JsonEditor};
+#[allow(unused)]
+pub use kanban::{kanban, KanbanBoard, KanbanTask};
+#[allow(unused)]
 pub use list::{list_editor, ListEditor};
+#[allow(unused)]
+pub use markdown_editor::{markdown_editor, MarkdownEditor};
+#[allow(unused)]
+pub use matrix_select::{matrix_select, MatrixSelect};
 #[allow(unused)]
 pub use multiselect::{MultiSelect, MultiSelectItem};
 #[allow(unused)]
@@ -68,9 +132,15 @@ pub use number::{number, Number};
 #[allow(unused)]
 pub use password::Password;
 #[allow(unused)]
+pub use phone_input::{phone_input, PhoneInput};
+#[allow(unused)]
 pub use progress::ProgressBar;
 #[allow(unused)]
+pub use range_slider::{range_slider, RangeSlider};
+#[allow(unused)]
 pub use rating::{rating, Rating};
+#[allow(unused)]
+pub use search_filter::{search_filter, SearchFilter};
 #[allow(unused)]
 pub use select::{Select, SelectItem};
 #[allow(unused)]
@@ -78,11 +148,21 @@ pub use slider::{slider, Slider};
 #[allow(unused)]
 pub use spinner::Spinner;
 #[allow(unused)]
+pub use table_editor::{table_editor, TableEditor};
+#[allow(unused)]
 pub use tags::{tags, Tags};
 #[allow(unused)]
 pub use text::{text, Text};
 #[allow(unused)]
+pub use time_picker::{time_picker, TimePicker};
+#[allow(unused)]
 pub use toggle::{toggle, Toggle};
+#[allow(unused)]
+pub use tree_select::{tree_select, TreeNode, TreeSelect};
+#[allow(unused)]
+pub use url::{url, UrlInput};
+#[allow(unused)]
+pub use wizard::{wizard, Wizard, WizardStep};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Theme Configuration
