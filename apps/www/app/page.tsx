@@ -7,6 +7,7 @@ import { SplineScene } from "@/components/spline-scene";
 import { PostsDemo } from "@/components/posts-demo";
 import { TechShowcase } from "@/components/tech-showcase";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ReactBitsLiveShowcase } from "@/components/react-bits-live-showcase";
 import { useSession, signIn, signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -432,6 +433,17 @@ export default function Home() {
             transition={{ duration: 0.6 }}
           >
             <PostsDemo />
+          </motion.section>
+
+          {/* React Bits Live Showcase */}
+          <motion.section
+            variants={itemVariants}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+          >
+            <ReactBitsLiveShowcase />
           </motion.section>
         </motion.div>
       </main>
