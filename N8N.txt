@@ -1,0 +1,5 @@
+1. Ui with shadcn-ui
+2. Dx serializer LLM format instead of json
+3. DCP instead of MCP and A2A
+
+Why are there dummy template pages instead of actual project pages of the root apps or subdirectories?
