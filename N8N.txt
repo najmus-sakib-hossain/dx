@@ -3,3 +3,5 @@
 3. DCP instead of MCP and A2A
 
 Why are there dummy template pages instead of actual project pages of the root apps or subdirectories?
+
+Please search the web for RLM references. At Reds RLM folder, we have implemented something like that, but it's just somewhat faster than Python, but we want to make the RLM a game changer, so please give me out-of-the-box ideas to make our Rust RLM implementation the best possible! 
