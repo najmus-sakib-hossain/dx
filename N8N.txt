@@ -7,3 +7,5 @@ Why are there dummy template pages instead of actual project pages of the root a
 Please search the web for RLM references. At Reds RLM folder, we have implemented something like that, but it's just somewhat faster than Python, but we want to make the RLM a game changer, so please give me out-of-the-box ideas to make our Rust RLM implementation the best possible! 
 
 What is wrong - with you?? you are always wasting tokens to test traditional approch - I don't want to see traditional approch - just test our RLM approch - Do a web test about what other models are available in Google AI Studio and use that. 
+
+Good, now the N8n project is good and all, but its UI and UX is bad. Can you use nextjs frameworks UI latest best web technologies to create a good-looking version of N8n website. But the actual implementation of automation tasks would be the same. Everything that was usable before should also be usable in a new website. 
