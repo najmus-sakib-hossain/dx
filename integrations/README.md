@@ -17,3 +17,5 @@ git clone https://github.com/Comfy-Org/ComfyUI comfy-ui && cd comfy-ui && rm -rf
 At the Integrations/OpenClaw folder, you can see that there are Google provider and there is also Google Auth provider giving Google Integrality Models. Please create a new ban project at root called chat and in that chat ban project, just use Click Prompt NPM package with Google Auth as exactly like integration OpenClaw Google implementation so that in the chat folder, we can chat with Google API key and Google Integrality Models directly with a nice UI and as fast as possible.
 
 Please study the root integrations n18 folder and tell me how it has so much 500+ integration with other projects, MCP, and automation apps and websites. I'm a software engineer, so just give me a full overview of that source code. 
+
+Please study the /integrations/n8n folder project and please run it locally!!!
