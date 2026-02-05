@@ -1,19 +1,32 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useAppStore } from "@/lib/store";
+import {
+  ArrowDown,
+  Box,
+  Database,
+  Github,
+  Layers,
+  LogOut,
+  Menu,
+  Palette,
+  RefreshCw,
+  Shield,
+  Sparkles,
+  User,
+  Zap,
+} from "lucide-react";
+import dynamic from "next/dynamic";
+import { useRef } from "react";
 import { PGliteDemo } from "@/components/pglite-demo";
-import { SplineScene } from "@/components/spline-scene";
 import { PostsDemo } from "@/components/posts-demo";
+import { SplineScene } from "@/components/spline-scene";
 import { TechShowcase } from "@/components/tech-showcase";
 import { ThemeToggle } from "@/components/theme-toggle";
-import dynamic from "next/dynamic";
-import { useSession, signIn, signOut } from "@/lib/auth-client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,37 +35,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sparkles,
-  Database,
-  Zap,
-  Box,
-  Shield,
-  Layers,
-  RefreshCw,
-  Palette,
-  Menu,
-  LogOut,
-  User,
-  Github,
-  ArrowDown,
-} from "lucide-react";
-import { useRef } from "react";
+import { signIn, signOut, useSession } from "@/lib/auth-client";
+import { useAppStore } from "@/lib/store";
 
 // Dynamically import ReactBitsLiveShowcase with no SSR
 const ReactBitsLiveShowcase = dynamic(
-  () => import("@/components/react-bits-live-showcase").then(mod => ({ default: mod.ReactBitsLiveShowcase })),
+  () =>
+    import("@/components/react-bits-live-showcase").then((mod) => ({
+      default: mod.ReactBitsLiveShowcase,
+    })),
   { ssr: false }
 );
 
 export default function Home() {
-  const { sidebarOpen, toggleSidebar } = useAppStore();
+  const { toggleSidebar } = useAppStore();
   const { data: session, isPending } = useSession();
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
-    layoutEffect: false,
   });
 
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
@@ -75,7 +76,7 @@ export default function Home() {
       opacity: 1,
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100,
         damping: 15,
       },
@@ -172,7 +173,12 @@ export default function Home() {
       >
         <div className="w-full max-w-7xl mx-auto flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={toggleSidebar} className="hover:bg-emerald-500/10">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              className="hover:bg-emerald-500/10"
+            >
               <Menu className="h-5 w-5" />
             </Button>
             <motion.div
@@ -201,9 +207,15 @@ export default function Home() {
             ) : session ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-emerald-500/10">
+                  <Button
+                    variant="ghost"
+                    className="relative h-10 w-10 rounded-full hover:bg-emerald-500/10"
+                  >
                     <Avatar>
-                      <AvatarImage src={session.user.image} alt={session.user.name} />
+                      <AvatarImage
+                        src={session.user.image || undefined}
+                        alt={session.user.name || "User"}
+                      />
                       <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-500 text-white">
                         {session.user.name?.charAt(0).toUpperCase()}
                       </AvatarFallback>
@@ -288,8 +300,8 @@ export default function Home() {
                 variants={itemVariants}
                 className="text-xl md:text-2xl lg:text-3xl text-muted-foreground max-w-4xl mx-auto leading-relaxed"
               >
-                Experience the cutting edge of web development with Next.js 16, React Query,
-                Framer Motion, Drizzle ORM, Zustand, Better Auth, PGlite, and Spline 3D.
+                Experience the cutting edge of web development with Next.js 16, React Query, Framer
+                Motion, Drizzle ORM, Zustand, Better Auth, PGlite, and Spline 3D.
               </motion.p>
 
               <motion.div variants={itemVariants} className="flex justify-center gap-4 pt-6">
@@ -299,7 +311,11 @@ export default function Home() {
                 >
                   Get Started
                 </Button>
-                <Button size="lg" variant="outline" className="border-emerald-500/30 hover:bg-emerald-500/10 px-8 py-6 text-lg">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-emerald-500/30 hover:bg-emerald-500/10 px-8 py-6 text-lg"
+                >
                   Learn More
                 </Button>
               </motion.div>
@@ -468,10 +484,7 @@ export default function Home() {
       >
         <div className="w-full max-w-7xl mx-auto px-6 py-16">
           <div className="text-center space-y-6">
-            <motion.div
-              className="flex justify-center"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-            >
+            <motion.div className="flex justify-center" whileHover={{ scale: 1.1, rotate: 5 }}>
               <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-xl shadow-emerald-500/25" />
             </motion.div>
             <p className="text-muted-foreground text-lg">

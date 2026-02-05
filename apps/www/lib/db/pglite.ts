@@ -10,7 +10,7 @@ export async function getPGlite() {
 
   if (!pgliteInstance) {
     pgliteInstance = new PGlite();
-    
+
     // Initialize tables
     await pgliteInstance.exec(`
       CREATE TABLE IF NOT EXISTS notes (

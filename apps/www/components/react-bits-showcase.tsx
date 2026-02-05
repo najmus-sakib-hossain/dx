@@ -1,11 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Box, ExternalLink, Sparkles, Zap } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Sparkles, Zap, Box } from "lucide-react";
-import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Example {
   title: string;
@@ -16,45 +16,220 @@ interface Example {
 
 const examples: Example[] = [
   // Backgrounds
-  { title: "Light Pillar", url: "https://reactbits.dev/backgrounds/light-pillar", category: "backgrounds", description: "3D light pillar effect with WebGL" },
-  { title: "Silk", url: "https://reactbits.dev/backgrounds/silk", category: "backgrounds", description: "Smooth silk-like animation" },
-  { title: "Grainient", url: "https://reactbits.dev/backgrounds/grainient", category: "backgrounds", description: "Grainy gradient background" },
-  { title: "Grid Scan", url: "https://reactbits.dev/backgrounds/grid-scan", category: "backgrounds", description: "Animated scanning grid" },
-  { title: "Beams", url: "https://reactbits.dev/backgrounds/beams", category: "backgrounds", description: "Light beam effects" },
-  { title: "Lightning", url: "https://reactbits.dev/backgrounds/lightning", category: "backgrounds", description: "Electric lightning animation" },
-  { title: "Galaxy", url: "https://reactbits.dev/backgrounds/galaxy", category: "backgrounds", description: "Cosmic galaxy effect" },
-  { title: "Threads", url: "https://reactbits.dev/backgrounds/threads", category: "backgrounds", description: "Flowing thread patterns" },
-  { title: "Hyperspeed", url: "https://reactbits.dev/backgrounds/hyperspeed", category: "backgrounds", description: "Warp speed animation" },
-  { title: "Grid Distortion", url: "https://reactbits.dev/backgrounds/grid-distortion", category: "backgrounds", description: "Distorted grid effect" },
-  { title: "Letter Glitch", url: "https://reactbits.dev/backgrounds/letter-glitch", category: "backgrounds", description: "Glitchy text background" },
-  { title: "Liquid Chrome", url: "https://reactbits.dev/backgrounds/liquid-chrome", category: "backgrounds", description: "Metallic liquid effect" },
-  
+  {
+    title: "Light Pillar",
+    url: "https://reactbits.dev/backgrounds/light-pillar",
+    category: "backgrounds",
+    description: "3D light pillar effect with WebGL",
+  },
+  {
+    title: "Silk",
+    url: "https://reactbits.dev/backgrounds/silk",
+    category: "backgrounds",
+    description: "Smooth silk-like animation",
+  },
+  {
+    title: "Grainient",
+    url: "https://reactbits.dev/backgrounds/grainient",
+    category: "backgrounds",
+    description: "Grainy gradient background",
+  },
+  {
+    title: "Grid Scan",
+    url: "https://reactbits.dev/backgrounds/grid-scan",
+    category: "backgrounds",
+    description: "Animated scanning grid",
+  },
+  {
+    title: "Beams",
+    url: "https://reactbits.dev/backgrounds/beams",
+    category: "backgrounds",
+    description: "Light beam effects",
+  },
+  {
+    title: "Lightning",
+    url: "https://reactbits.dev/backgrounds/lightning",
+    category: "backgrounds",
+    description: "Electric lightning animation",
+  },
+  {
+    title: "Galaxy",
+    url: "https://reactbits.dev/backgrounds/galaxy",
+    category: "backgrounds",
+    description: "Cosmic galaxy effect",
+  },
+  {
+    title: "Threads",
+    url: "https://reactbits.dev/backgrounds/threads",
+    category: "backgrounds",
+    description: "Flowing thread patterns",
+  },
+  {
+    title: "Hyperspeed",
+    url: "https://reactbits.dev/backgrounds/hyperspeed",
+    category: "backgrounds",
+    description: "Warp speed animation",
+  },
+  {
+    title: "Grid Distortion",
+    url: "https://reactbits.dev/backgrounds/grid-distortion",
+    category: "backgrounds",
+    description: "Distorted grid effect",
+  },
+  {
+    title: "Letter Glitch",
+    url: "https://reactbits.dev/backgrounds/letter-glitch",
+    category: "backgrounds",
+    description: "Glitchy text background",
+  },
+  {
+    title: "Liquid Chrome",
+    url: "https://reactbits.dev/backgrounds/liquid-chrome",
+    category: "backgrounds",
+    description: "Metallic liquid effect",
+  },
+
   // Animations
-  { title: "Target Cursor", url: "https://reactbits.dev/animations/target-cursor", category: "animations", description: "Interactive targeting cursor" },
-  { title: "Laser Flow", url: "https://reactbits.dev/animations/laser-flow", category: "animations", description: "Flowing laser animation" },
-  { title: "Ghost Cursor", url: "https://reactbits.dev/animations/ghost-cursor", category: "animations", description: "Trailing ghost cursor" },
-  { title: "Gradual Blur", url: "https://reactbits.dev/animations/gradual-blur", category: "animations", description: "Progressive blur effect" },
-  { title: "Click Spark", url: "https://reactbits.dev/animations/click-spark", category: "animations", description: "Spark on click animation" },
-  { title: "Crosshair", url: "https://reactbits.dev/animations/crosshair", category: "animations", description: "Crosshair cursor effect" },
-  { title: "Image Trail", url: "https://reactbits.dev/animations/image-trail", category: "animations", description: "Image trailing effect" },
-  { title: "Splash Cursor", url: "https://reactbits.dev/animations/splash-cursor", category: "animations", description: "Splash effect cursor" },
-  { title: "Magnet", url: "https://reactbits.dev/animations/magnet", category: "animations", description: "Magnetic attraction effect" },
-  
+  {
+    title: "Target Cursor",
+    url: "https://reactbits.dev/animations/target-cursor",
+    category: "animations",
+    description: "Interactive targeting cursor",
+  },
+  {
+    title: "Laser Flow",
+    url: "https://reactbits.dev/animations/laser-flow",
+    category: "animations",
+    description: "Flowing laser animation",
+  },
+  {
+    title: "Ghost Cursor",
+    url: "https://reactbits.dev/animations/ghost-cursor",
+    category: "animations",
+    description: "Trailing ghost cursor",
+  },
+  {
+    title: "Gradual Blur",
+    url: "https://reactbits.dev/animations/gradual-blur",
+    category: "animations",
+    description: "Progressive blur effect",
+  },
+  {
+    title: "Click Spark",
+    url: "https://reactbits.dev/animations/click-spark",
+    category: "animations",
+    description: "Spark on click animation",
+  },
+  {
+    title: "Crosshair",
+    url: "https://reactbits.dev/animations/crosshair",
+    category: "animations",
+    description: "Crosshair cursor effect",
+  },
+  {
+    title: "Image Trail",
+    url: "https://reactbits.dev/animations/image-trail",
+    category: "animations",
+    description: "Image trailing effect",
+  },
+  {
+    title: "Splash Cursor",
+    url: "https://reactbits.dev/animations/splash-cursor",
+    category: "animations",
+    description: "Splash effect cursor",
+  },
+  {
+    title: "Magnet",
+    url: "https://reactbits.dev/animations/magnet",
+    category: "animations",
+    description: "Magnetic attraction effect",
+  },
+
   // Components
-  { title: "Scroll Stack", url: "https://reactbits.dev/components/scroll-stack", category: "components", description: "Stacking scroll animation" },
-  { title: "Circular Gallery", url: "https://reactbits.dev/components/circular-gallery", category: "components", description: "Circular image gallery" },
-  { title: "Stack", url: "https://reactbits.dev/components/stack", category: "components", description: "Card stacking component" },
-  { title: "Fluid Glass", url: "https://reactbits.dev/components/fluid-glass", category: "components", description: "Glassmorphism effect" },
-  { title: "Masonry", url: "https://reactbits.dev/components/masonry", category: "components", description: "Masonry grid layout" },
-  { title: "Chroma Grid", url: "https://reactbits.dev/components/chroma-grid", category: "components", description: "Chromatic grid effect" },
-  { title: "Folder", url: "https://reactbits.dev/components/folder?color=ffffff", category: "components", description: "Animated folder component" },
-  { title: "Lanyard", url: "https://reactbits.dev/components/lanyard", category: "components", description: "Discord presence card" },
-  { title: "Pixel Card", url: "https://reactbits.dev/components/pixel-card", category: "components", description: "Pixelated card effect" },
-  { title: "Carousel", url: "https://reactbits.dev/components/carousel", category: "components", description: "Smooth carousel slider" },
-  { title: "Elastic Slider", url: "https://reactbits.dev/components/elastic-slider", category: "components", description: "Elastic sliding animation" },
-  { title: "Counter", url: "https://reactbits.dev/components/counter?value=1.63", category: "components", description: "Animated number counter" },
-  { title: "Infinite Menu", url: "https://reactbits.dev/components/infinite-menu", category: "components", description: "Infinite scrolling menu" },
-  { title: "Stepper", url: "https://reactbits.dev/components/stepper?step=2", category: "components", description: "Step progress indicator" },
+  {
+    title: "Scroll Stack",
+    url: "https://reactbits.dev/components/scroll-stack",
+    category: "components",
+    description: "Stacking scroll animation",
+  },
+  {
+    title: "Circular Gallery",
+    url: "https://reactbits.dev/components/circular-gallery",
+    category: "components",
+    description: "Circular image gallery",
+  },
+  {
+    title: "Stack",
+    url: "https://reactbits.dev/components/stack",
+    category: "components",
+    description: "Card stacking component",
+  },
+  {
+    title: "Fluid Glass",
+    url: "https://reactbits.dev/components/fluid-glass",
+    category: "components",
+    description: "Glassmorphism effect",
+  },
+  {
+    title: "Masonry",
+    url: "https://reactbits.dev/components/masonry",
+    category: "components",
+    description: "Masonry grid layout",
+  },
+  {
+    title: "Chroma Grid",
+    url: "https://reactbits.dev/components/chroma-grid",
+    category: "components",
+    description: "Chromatic grid effect",
+  },
+  {
+    title: "Folder",
+    url: "https://reactbits.dev/components/folder?color=ffffff",
+    category: "components",
+    description: "Animated folder component",
+  },
+  {
+    title: "Lanyard",
+    url: "https://reactbits.dev/components/lanyard",
+    category: "components",
+    description: "Discord presence card",
+  },
+  {
+    title: "Pixel Card",
+    url: "https://reactbits.dev/components/pixel-card",
+    category: "components",
+    description: "Pixelated card effect",
+  },
+  {
+    title: "Carousel",
+    url: "https://reactbits.dev/components/carousel",
+    category: "components",
+    description: "Smooth carousel slider",
+  },
+  {
+    title: "Elastic Slider",
+    url: "https://reactbits.dev/components/elastic-slider",
+    category: "components",
+    description: "Elastic sliding animation",
+  },
+  {
+    title: "Counter",
+    url: "https://reactbits.dev/components/counter?value=1.63",
+    category: "components",
+    description: "Animated number counter",
+  },
+  {
+    title: "Infinite Menu",
+    url: "https://reactbits.dev/components/infinite-menu",
+    category: "components",
+    description: "Infinite scrolling menu",
+  },
+  {
+    title: "Stepper",
+    url: "https://reactbits.dev/components/stepper?step=2",
+    category: "components",
+    description: "Step progress indicator",
+  },
 ];
 
 const categoryIcons = {
@@ -72,15 +247,28 @@ const categoryColors = {
 export function ReactBitsShowcase() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  const filteredExamples = selectedCategory === "all" 
-    ? examples 
-    : examples.filter(ex => ex.category === selectedCategory);
+  const filteredExamples =
+    selectedCategory === "all"
+      ? examples
+      : examples.filter((ex) => ex.category === selectedCategory);
 
   const categories = [
     { id: "all", label: "All", count: examples.length },
-    { id: "backgrounds", label: "Backgrounds", count: examples.filter(e => e.category === "backgrounds").length },
-    { id: "animations", label: "Animations", count: examples.filter(e => e.category === "animations").length },
-    { id: "components", label: "Components", count: examples.filter(e => e.category === "components").length },
+    {
+      id: "backgrounds",
+      label: "Backgrounds",
+      count: examples.filter((e) => e.category === "backgrounds").length,
+    },
+    {
+      id: "animations",
+      label: "Animations",
+      count: examples.filter((e) => e.category === "animations").length,
+    },
+    {
+      id: "components",
+      label: "Components",
+      count: examples.filter((e) => e.category === "components").length,
+    },
   ];
 
   return (
@@ -89,14 +277,14 @@ export function ReactBitsShowcase() {
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-2">
             <motion.div
-              animate={{ 
+              animate={{
                 rotate: [0, 360],
-                scale: [1, 1.2, 1]
+                scale: [1, 1.2, 1],
               }}
-              transition={{ 
-                duration: 3, 
+              transition={{
+                duration: 3,
                 repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
             >
               <Sparkles className="h-6 w-6 text-emerald-500" />
@@ -111,7 +299,7 @@ export function ReactBitsShowcase() {
           Explore our collection of stunning React animations, backgrounds, and components
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent className="space-y-6">
         {/* Category Filter */}
         <div className="flex flex-wrap gap-2">
@@ -121,7 +309,9 @@ export function ReactBitsShowcase() {
               variant={selectedCategory === cat.id ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedCategory(cat.id)}
-              className={selectedCategory === cat.id ? "bg-gradient-to-r from-emerald-500 to-teal-500" : ""}
+              className={
+                selectedCategory === cat.id ? "bg-gradient-to-r from-emerald-500 to-teal-500" : ""
+              }
             >
               {cat.label}
               <Badge variant="secondary" className="ml-2">
@@ -136,7 +326,7 @@ export function ReactBitsShowcase() {
           {filteredExamples.map((example, index) => {
             const Icon = categoryIcons[example.category];
             const colorClass = categoryColors[example.category];
-            
+
             return (
               <motion.div
                 key={example.url}
@@ -177,7 +367,7 @@ export function ReactBitsShowcase() {
                       variant="ghost"
                       size="sm"
                       className="w-full group-hover:bg-emerald-500/10 group-hover:text-emerald-500"
-                      onClick={() => window.open(example.url, '_blank')}
+                      onClick={() => window.open(example.url, "_blank")}
                     >
                       <ExternalLink className="h-4 w-4 mr-2" />
                       View Demo
@@ -203,7 +393,7 @@ export function ReactBitsShowcase() {
           <Button
             size="lg"
             className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
-            onClick={() => window.open('https://reactbits.dev', '_blank')}
+            onClick={() => window.open("https://reactbits.dev", "_blank")}
           >
             <ExternalLink className="h-4 w-4 mr-2" />
             Visit ReactBits.dev

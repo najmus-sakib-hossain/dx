@@ -1,21 +1,21 @@
-import React, { useState, Children, useRef, useLayoutEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from "motion/react";
+import React, { Children, useLayoutEffect, useRef, useState } from "react";
 
-import './Stepper.css';
+import "./Stepper.css";
 
 export default function Stepper({
   children,
   initialStep = 1,
   onStepChange = () => {},
   onFinalStepCompleted = () => {},
-  stepCircleContainerClassName = '',
-  stepContainerClassName = '',
-  contentClassName = '',
-  footerClassName = '',
+  stepCircleContainerClassName = "",
+  stepContainerClassName = "",
+  contentClassName = "",
+  footerClassName = "",
   backButtonProps = {},
   nextButtonProps = {},
-  backButtonText = 'Back',
-  nextButtonText = 'Continue',
+  backButtonText = "Back",
+  nextButtonText = "Continue",
   disableStepIndicators = false,
   renderStepIndicator,
   ...rest
@@ -27,7 +27,7 @@ export default function Stepper({
   const isCompleted = currentStep > totalSteps;
   const isLastStep = currentStep === totalSteps;
 
-  const updateStep = newStep => {
+  const updateStep = (newStep) => {
     setCurrentStep(newStep);
     if (newStep > totalSteps) {
       onFinalStepCompleted();
@@ -57,7 +57,10 @@ export default function Stepper({
 
   return (
     <div className="outer-container" {...rest}>
-      <div className={`step-circle-container ${stepCircleContainerClassName}`} style={{ border: '1px solid #222' }}>
+      <div
+        className={`step-circle-container ${stepCircleContainerClassName}`}
+        style={{ border: "1px solid #222" }}
+      >
         <div className={`step-indicator-row ${stepContainerClassName}`}>
           {stepsArray.map((_, index) => {
             const stepNumber = index + 1;
@@ -68,17 +71,17 @@ export default function Stepper({
                   renderStepIndicator({
                     step: stepNumber,
                     currentStep,
-                    onStepClick: clicked => {
+                    onStepClick: (clicked) => {
                       setDirection(clicked > currentStep ? 1 : -1);
                       updateStep(clicked);
-                    }
+                    },
                   })
                 ) : (
                   <StepIndicator
                     step={stepNumber}
                     disableStepIndicators={disableStepIndicators}
                     currentStep={currentStep}
-                    onClickStep={clicked => {
+                    onClickStep={(clicked) => {
                       setDirection(clicked > currentStep ? 1 : -1);
                       updateStep(clicked);
                     }}
@@ -101,18 +104,22 @@ export default function Stepper({
 
         {!isCompleted && (
           <div className={`footer-container ${footerClassName}`}>
-            <div className={`footer-nav ${currentStep !== 1 ? 'spread' : 'end'}`}>
+            <div className={`footer-nav ${currentStep !== 1 ? "spread" : "end"}`}>
               {currentStep !== 1 && (
                 <button
                   onClick={handleBack}
-                  className={`back-button ${currentStep === 1 ? 'inactive' : ''}`}
+                  className={`back-button ${currentStep === 1 ? "inactive" : ""}`}
                   {...backButtonProps}
                 >
                   {backButtonText}
                 </button>
               )}
-              <button onClick={isLastStep ? handleComplete : handleNext} className="next-button" {...nextButtonProps}>
-                {isLastStep ? 'Complete' : nextButtonText}
+              <button
+                onClick={isLastStep ? handleComplete : handleNext}
+                className="next-button"
+                {...nextButtonProps}
+              >
+                {isLastStep ? "Complete" : nextButtonText}
               </button>
             </div>
           </div>
@@ -128,13 +135,17 @@ function StepContentWrapper({ isCompleted, currentStep, direction, children, cla
   return (
     <motion.div
       className={className}
-      style={{ position: 'relative', overflow: 'hidden' }}
+      style={{ position: "relative", overflow: "hidden" }}
       animate={{ height: isCompleted ? 0 : parentHeight }}
-      transition={{ type: 'spring', duration: 0.4 }}
+      transition={{ type: "spring", duration: 0.4 }}
     >
       <AnimatePresence initial={false} mode="sync" custom={direction}>
         {!isCompleted && (
-          <SlideTransition key={currentStep} direction={direction} onHeightReady={h => setParentHeight(h)}>
+          <SlideTransition
+            key={currentStep}
+            direction={direction}
+            onHeightReady={(h) => setParentHeight(h)}
+          >
             {children}
           </SlideTransition>
         )}
@@ -159,7 +170,7 @@ function SlideTransition({ children, direction, onHeightReady }) {
       animate="center"
       exit="exit"
       transition={{ duration: 0.4 }}
-      style={{ position: 'absolute', left: 0, right: 0, top: 0 }}
+      style={{ position: "absolute", left: 0, right: 0, top: 0 }}
     >
       {children}
     </motion.div>
@@ -167,18 +178,18 @@ function SlideTransition({ children, direction, onHeightReady }) {
 }
 
 const stepVariants = {
-  enter: dir => ({
-    x: dir >= 0 ? '-100%' : '100%',
-    opacity: 0
+  enter: (dir) => ({
+    x: dir >= 0 ? "-100%" : "100%",
+    opacity: 0,
   }),
   center: {
-    x: '0%',
-    opacity: 1
+    x: "0%",
+    opacity: 1,
   },
-  exit: dir => ({
-    x: dir >= 0 ? '50%' : '-50%',
-    opacity: 0
-  })
+  exit: (dir) => ({
+    x: dir >= 0 ? "50%" : "-50%",
+    opacity: 0,
+  }),
 };
 
 export function Step({ children }) {
@@ -186,7 +197,7 @@ export function Step({ children }) {
 }
 
 function StepIndicator({ step, currentStep, onClickStep, disableStepIndicators }) {
-  const status = currentStep === step ? 'active' : currentStep < step ? 'inactive' : 'complete';
+  const status = currentStep === step ? "active" : currentStep < step ? "inactive" : "complete";
 
   const handleClick = () => {
     if (step !== currentStep && !disableStepIndicators) onClickStep(step);
@@ -196,16 +207,16 @@ function StepIndicator({ step, currentStep, onClickStep, disableStepIndicators }
     <motion.div onClick={handleClick} className="step-indicator" animate={status} initial={false}>
       <motion.div
         variants={{
-          inactive: { scale: 1, backgroundColor: '#222', color: '#a3a3a3' },
-          active: { scale: 1, backgroundColor: '#5227FF', color: '#5227FF' },
-          complete: { scale: 1, backgroundColor: '#5227FF', color: '#3b82f6' }
+          inactive: { scale: 1, backgroundColor: "#222", color: "#a3a3a3" },
+          active: { scale: 1, backgroundColor: "#5227FF", color: "#5227FF" },
+          complete: { scale: 1, backgroundColor: "#5227FF", color: "#3b82f6" },
         }}
         transition={{ duration: 0.3 }}
         className="step-indicator-inner"
       >
-        {status === 'complete' ? (
+        {status === "complete" ? (
           <CheckIcon className="check-icon" />
-        ) : status === 'active' ? (
+        ) : status === "active" ? (
           <div className="active-dot" />
         ) : (
           <span className="step-number">{step}</span>
@@ -217,8 +228,8 @@ function StepIndicator({ step, currentStep, onClickStep, disableStepIndicators }
 
 function StepConnector({ isComplete }) {
   const lineVariants = {
-    incomplete: { width: 0, backgroundColor: 'transparent' },
-    complete: { width: '100%', backgroundColor: '#5227FF' }
+    incomplete: { width: 0, backgroundColor: "transparent" },
+    complete: { width: "100%", backgroundColor: "#5227FF" },
   };
 
   return (
@@ -227,7 +238,7 @@ function StepConnector({ isComplete }) {
         className="step-connector-inner"
         variants={lineVariants}
         initial={false}
-        animate={isComplete ? 'complete' : 'incomplete'}
+        animate={isComplete ? "complete" : "incomplete"}
         transition={{ duration: 0.4 }}
       />
     </div>
@@ -240,7 +251,7 @@ function CheckIcon(props) {
       <motion.path
         initial={{ pathLength: 0 }}
         animate={{ pathLength: 1 }}
-        transition={{ delay: 0.1, type: 'tween', ease: 'easeOut', duration: 0.3 }}
+        transition={{ delay: 0.1, type: "tween", ease: "easeOut", duration: 0.3 }}
         strokeLinecap="round"
         strokeLinejoin="round"
         d="M5 13l4 4L19 7"

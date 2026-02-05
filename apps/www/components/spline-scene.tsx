@@ -1,9 +1,9 @@
 "use client";
 
 import Spline from "@splinetool/react-spline";
-import { Suspense } from "react";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
+import { Suspense } from "react";
 
 export function SplineScene() {
   return (

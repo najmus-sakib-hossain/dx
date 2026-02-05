@@ -1,7 +1,7 @@
-import { useRef, useEffect } from 'react';
-import { Renderer, Program, Mesh, Triangle } from 'ogl';
+import { Mesh, Program, Renderer, Triangle } from "ogl";
+import { useEffect, useRef } from "react";
 
-import './LiquidChrome.css';
+import "./LiquidChrome.css";
 
 export const LiquidChrome = ({
   baseColor = [0.1, 0.1, 0.1],
@@ -83,14 +83,18 @@ export const LiquidChrome = ({
       uniforms: {
         uTime: { value: 0 },
         uResolution: {
-          value: new Float32Array([gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height])
+          value: new Float32Array([
+            gl.canvas.width,
+            gl.canvas.height,
+            gl.canvas.width / gl.canvas.height,
+          ]),
         },
         uBaseColor: { value: new Float32Array(baseColor) },
         uAmplitude: { value: amplitude },
         uFrequencyX: { value: frequencyX },
         uFrequencyY: { value: frequencyY },
-        uMouse: { value: new Float32Array([0, 0]) }
-      }
+        uMouse: { value: new Float32Array([0, 0]) },
+      },
     });
     const mesh = new Mesh(gl, { geometry, program });
 
@@ -102,7 +106,7 @@ export const LiquidChrome = ({
       resUniform[1] = gl.canvas.height;
       resUniform[2] = gl.canvas.width / gl.canvas.height;
     }
-    window.addEventListener('resize', resize);
+    window.addEventListener("resize", resize);
     resize();
 
     function handleMouseMove(event) {
@@ -127,8 +131,8 @@ export const LiquidChrome = ({
     }
 
     if (interactive) {
-      container.addEventListener('mousemove', handleMouseMove);
-      container.addEventListener('touchmove', handleTouchMove);
+      container.addEventListener("mousemove", handleMouseMove);
+      container.addEventListener("touchmove", handleTouchMove);
     }
 
     let animationId;
@@ -143,15 +147,15 @@ export const LiquidChrome = ({
 
     return () => {
       cancelAnimationFrame(animationId);
-      window.removeEventListener('resize', resize);
+      window.removeEventListener("resize", resize);
       if (interactive) {
-        container.removeEventListener('mousemove', handleMouseMove);
-        container.removeEventListener('touchmove', handleTouchMove);
+        container.removeEventListener("mousemove", handleMouseMove);
+        container.removeEventListener("touchmove", handleTouchMove);
       }
       if (gl.canvas.parentElement) {
         gl.canvas.parentElement.removeChild(gl.canvas);
       }
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
   }, [baseColor, speed, amplitude, frequencyX, frequencyY, interactive]);
 

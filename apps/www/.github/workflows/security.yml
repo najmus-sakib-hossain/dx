@@ -1,0 +1,38 @@
+name: Security Audit
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Weekly on Sunday
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+        working-directory: apps/www
+      
+      - name: Run security audit
+        run: bun audit
+        working-directory: apps/www
+        continue-on-error: true
+      
+      - name: Check for known vulnerabilities
+        run: |
+          if bun audit --json | grep -q '"severity":"high"'; then
+            echo "High severity vulnerabilities found!"
+            exit 1
+          fi
+        working-directory: apps/www

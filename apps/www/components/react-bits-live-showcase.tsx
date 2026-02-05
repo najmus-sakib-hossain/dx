@@ -1,37 +1,54 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { Box, ChevronDown, ChevronUp, Code, Sparkles, Zap } from "lucide-react";
+import { lazy, Suspense, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Zap, Box, Code, ChevronDown, ChevronUp } from "lucide-react";
-import { useState, Suspense, lazy, useRef } from "react";
 
 // Lazy load components - ANIMATIONS
 const ClickSpark = lazy(() => import("@/components/react-bits/animations/ClickSpark/ClickSpark"));
-const GradualBlur = lazy(() => import("@/components/react-bits/animations/GradualBlur/GradualBlur"));
+const GradualBlur = lazy(
+  () => import("@/components/react-bits/animations/GradualBlur/GradualBlur")
+);
 const Magnet = lazy(() => import("@/components/react-bits/animations/Magnet/Magnet"));
 const Crosshair = lazy(() => import("@/components/react-bits/animations/Crosshair/Crosshair"));
-const SplashCursor = lazy(() => import("@/components/react-bits/animations/SplashCursor/SplashCursor"));
+const SplashCursor = lazy(
+  () => import("@/components/react-bits/animations/SplashCursor/SplashCursor")
+);
 
 // Lazy load components - BACKGROUNDS
-const GridScan = lazy(() => import("@/components/react-bits/backgrounds/GridScan/GridScan").then(m => ({ default: m.GridScan })));
-const GridDistortion = lazy(() => import("@/components/react-bits/backgrounds/GridDistortion/GridDistortion"));
-const LetterGlitch = lazy(() => import("@/components/react-bits/backgrounds/LetterGlitch/LetterGlitch"));
+const GridScan = lazy(() =>
+  import("@/components/react-bits/backgrounds/GridScan/GridScan").then((m) => ({
+    default: m.GridScan,
+  }))
+);
+const GridDistortion = lazy(
+  () => import("@/components/react-bits/backgrounds/GridDistortion/GridDistortion")
+);
+const LetterGlitch = lazy(
+  () => import("@/components/react-bits/backgrounds/LetterGlitch/LetterGlitch")
+);
 const Beams = lazy(() => import("@/components/react-bits/backgrounds/Beams/Beams"));
 const Grainient = lazy(() => import("@/components/react-bits/backgrounds/Grainient/Grainient"));
 
 // Lazy load components - COMPONENTS
-const ScrollStack = lazy(() => import("@/components/react-bits/components/ScrollStack/ScrollStack"));
+const ScrollStack = lazy(
+  () => import("@/components/react-bits/components/ScrollStack/ScrollStack")
+);
 const Stack = lazy(() => import("@/components/react-bits/components/Stack/Stack"));
 const Masonry = lazy(() => import("@/components/react-bits/components/Masonry/Masonry"));
 const ChromaGrid = lazy(() => import("@/components/react-bits/components/ChromaGrid/ChromaGrid"));
 const Folder = lazy(() => import("@/components/react-bits/components/Folder/Folder"));
 const PixelCard = lazy(() => import("@/components/react-bits/components/PixelCard/PixelCard"));
 const Carousel = lazy(() => import("@/components/react-bits/components/Carousel/Carousel"));
-const ElasticSlider = lazy(() => import("@/components/react-bits/components/ElasticSlider/ElasticSlider"));
+const ElasticSlider = lazy(
+  () => import("@/components/react-bits/components/ElasticSlider/ElasticSlider")
+);
 const Counter = lazy(() => import("@/components/react-bits/components/Counter/Counter"));
-const InfiniteMenu = lazy(() => import("@/components/react-bits/components/InfiniteMenu/InfiniteMenu"));
+const InfiniteMenu = lazy(
+  () => import("@/components/react-bits/components/InfiniteMenu/InfiniteMenu")
+);
 const Stepper = lazy(() => import("@/components/react-bits/components/Stepper/Stepper"));
 
 interface Example {
@@ -39,7 +56,9 @@ interface Example {
   title: string;
   category: "backgrounds" | "animations" | "components";
   description: string;
-  component: React.LazyExoticComponent<any>;
+  // biome-ignore lint/suspicious/noExplicitAny: Third-party react-bits components have varying prop types
+  component: React.LazyExoticComponent<React.ComponentType<any>>;
+  // biome-ignore lint/suspicious/noExplicitAny: Props vary by component type
   props?: any;
 }
 
@@ -51,7 +70,7 @@ const examples: Example[] = [
     category: "backgrounds",
     description: "Animated scanning grid",
     component: GridScan,
-    props: {}
+    props: {},
   },
   {
     id: "grid-distortion",
@@ -59,7 +78,7 @@ const examples: Example[] = [
     category: "backgrounds",
     description: "Distorted grid effect",
     component: GridDistortion,
-    props: { imageSrc: "https://picsum.photos/800/600" }
+    props: { imageSrc: "https://picsum.photos/800/600" },
   },
   {
     id: "letter-glitch",
@@ -67,7 +86,7 @@ const examples: Example[] = [
     category: "backgrounds",
     description: "Glitchy text background",
     component: LetterGlitch,
-    props: {}
+    props: {},
   },
   {
     id: "beams",
@@ -75,7 +94,7 @@ const examples: Example[] = [
     category: "backgrounds",
     description: "Light beam effects",
     component: Beams,
-    props: {}
+    props: {},
   },
   {
     id: "grainient",
@@ -83,9 +102,9 @@ const examples: Example[] = [
     category: "backgrounds",
     description: "Grainy gradient background",
     component: Grainient,
-    props: {}
+    props: {},
   },
-  
+
   // ANIMATIONS (lightweight only)
   {
     id: "click-spark",
@@ -93,7 +112,7 @@ const examples: Example[] = [
     category: "animations",
     description: "Spark on click - Click anywhere!",
     component: ClickSpark,
-    props: { sparkColor: "#10b981", sparkCount: 12 }
+    props: { sparkColor: "#10b981", sparkCount: 12 },
   },
   {
     id: "gradual-blur",
@@ -101,7 +120,7 @@ const examples: Example[] = [
     category: "animations",
     description: "Progressive blur effect",
     component: GradualBlur,
-    props: { position: "bottom", strength: 2 }
+    props: { position: "bottom", strength: 2 },
   },
   {
     id: "magnet",
@@ -109,7 +128,7 @@ const examples: Example[] = [
     category: "animations",
     description: "Magnetic attraction effect",
     component: Magnet,
-    props: {}
+    props: {},
   },
   {
     id: "crosshair",
@@ -117,7 +136,7 @@ const examples: Example[] = [
     category: "animations",
     description: "Crosshair cursor effect",
     component: Crosshair,
-    props: {}
+    props: {},
   },
   {
     id: "splash-cursor",
@@ -125,9 +144,9 @@ const examples: Example[] = [
     category: "animations",
     description: "Splash effect cursor",
     component: SplashCursor,
-    props: {}
+    props: {},
   },
-  
+
   // COMPONENTS (lightweight only - no heavy 3D)
   {
     id: "pixel-card",
@@ -135,7 +154,7 @@ const examples: Example[] = [
     category: "components",
     description: "Pixelated card effect",
     component: PixelCard,
-    props: {}
+    props: {},
   },
   {
     id: "stack",
@@ -143,7 +162,7 @@ const examples: Example[] = [
     category: "components",
     description: "Card stacking component",
     component: Stack,
-    props: {}
+    props: {},
   },
 
   {
@@ -158,8 +177,8 @@ const examples: Example[] = [
         { id: 2, img: "https://picsum.photos/400/400", height: 400 },
         { id: 3, img: "https://picsum.photos/400/500", height: 500 },
         { id: 4, img: "https://picsum.photos/400/350", height: 350 },
-      ]
-    }
+      ],
+    },
   },
   {
     id: "chroma-grid",
@@ -167,7 +186,7 @@ const examples: Example[] = [
     category: "components",
     description: "Chromatic grid effect",
     component: ChromaGrid,
-    props: {}
+    props: {},
   },
   {
     id: "folder",
@@ -175,7 +194,7 @@ const examples: Example[] = [
     category: "components",
     description: "Animated folder component",
     component: Folder,
-    props: {}
+    props: {},
   },
   {
     id: "carousel",
@@ -183,7 +202,7 @@ const examples: Example[] = [
     category: "components",
     description: "Smooth carousel slider",
     component: Carousel,
-    props: {}
+    props: {},
   },
   {
     id: "elastic-slider",
@@ -191,7 +210,7 @@ const examples: Example[] = [
     category: "components",
     description: "Elastic sliding animation",
     component: ElasticSlider,
-    props: {}
+    props: {},
   },
   {
     id: "counter",
@@ -199,7 +218,7 @@ const examples: Example[] = [
     category: "components",
     description: "Animated number counter",
     component: Counter,
-    props: { value: 1.63 }
+    props: { value: 1.63 },
   },
   {
     id: "infinite-menu",
@@ -207,7 +226,7 @@ const examples: Example[] = [
     category: "components",
     description: "Infinite scrolling menu",
     component: InfiniteMenu,
-    props: {}
+    props: {},
   },
   {
     id: "stepper",
@@ -215,7 +234,7 @@ const examples: Example[] = [
     category: "components",
     description: "Step progress indicator",
     component: Stepper,
-    props: { step: 2 }
+    props: { step: 2 },
   },
   {
     id: "scroll-stack",
@@ -223,7 +242,7 @@ const examples: Example[] = [
     category: "components",
     description: "Stacking scroll animation",
     component: ScrollStack,
-    props: {}
+    props: {},
   },
 ];
 
@@ -244,21 +263,34 @@ export function ReactBitsLiveShowcase() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const filteredExamples = selectedCategory === "all" 
-    ? examples 
-    : examples.filter(ex => ex.category === selectedCategory);
+  const filteredExamples =
+    selectedCategory === "all"
+      ? examples
+      : examples.filter((ex) => ex.category === selectedCategory);
 
   const categories = [
     { id: "all", label: "All", count: examples.length },
-    { id: "backgrounds", label: "Backgrounds", count: examples.filter(e => e.category === "backgrounds").length },
-    { id: "animations", label: "Animations", count: examples.filter(e => e.category === "animations").length },
-    { id: "components", label: "Components", count: examples.filter(e => e.category === "components").length },
+    {
+      id: "backgrounds",
+      label: "Backgrounds",
+      count: examples.filter((e) => e.category === "backgrounds").length,
+    },
+    {
+      id: "animations",
+      label: "Animations",
+      count: examples.filter((e) => e.category === "animations").length,
+    },
+    {
+      id: "components",
+      label: "Components",
+      count: examples.filter((e) => e.category === "components").length,
+    },
   ];
 
   const scrollToSection = (index: number) => {
     const section = document.getElementById(`react-bit-${filteredExamples[index]?.id}`);
     if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
       setCurrentIndex(index);
     }
   };
@@ -283,14 +315,14 @@ export function ReactBitsLiveShowcase() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <motion.div
-                animate={{ 
+                animate={{
                   rotate: [0, 360],
-                  scale: [1, 1.2, 1]
+                  scale: [1, 1.2, 1],
                 }}
-                transition={{ 
-                  duration: 3, 
+                transition={{
+                  duration: 3,
                   repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
               >
                 <Sparkles className="h-6 w-6 text-emerald-500" />
@@ -298,11 +330,12 @@ export function ReactBitsLiveShowcase() {
               <div>
                 <h2 className="text-2xl font-bold">React Bits Live Showcase</h2>
                 <p className="text-sm text-muted-foreground">
-                  {currentIndex + 1} / {filteredExamples.length} - {filteredExamples[currentIndex]?.title}
+                  {currentIndex + 1} / {filteredExamples.length} -{" "}
+                  {filteredExamples[currentIndex]?.title}
                 </p>
               </div>
             </div>
-            
+
             {/* Category Filter */}
             <div className="flex flex-wrap gap-2">
               {categories.map((cat) => (
@@ -314,7 +347,11 @@ export function ReactBitsLiveShowcase() {
                     setSelectedCategory(cat.id);
                     setCurrentIndex(0);
                   }}
-                  className={selectedCategory === cat.id ? "bg-gradient-to-r from-emerald-500 to-teal-500" : ""}
+                  className={
+                    selectedCategory === cat.id
+                      ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                      : ""
+                  }
                 >
                   {cat.label}
                   <Badge variant="secondary" className="ml-2">
@@ -333,26 +370,32 @@ export function ReactBitsLiveShowcase() {
           const Icon = categoryIcons[example.category];
           const colorClass = categoryColors[example.category];
           const Component = example.component;
-          
+
           return (
             <section
               key={example.id}
               id={`react-bit-${example.id}`}
               className="relative w-full min-h-screen flex items-center justify-center"
-              style={{ scrollSnapAlign: 'start' }}
+              style={{ scrollSnapAlign: "start" }}
             >
               {/* Background Component */}
               <div className="absolute inset-0 w-full h-full">
-                <Suspense fallback={
-                  <div className="flex items-center justify-center h-full bg-gradient-to-br from-background/50 to-background/80">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                    >
-                      <div className="h-12 w-12 border-4 border-emerald-500 border-t-transparent rounded-full" />
-                    </motion.div>
-                  </div>
-                }>
+                <Suspense
+                  fallback={
+                    <div className="flex items-center justify-center h-full bg-gradient-to-br from-background/50 to-background/80">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Number.POSITIVE_INFINITY,
+                          ease: "linear",
+                        }}
+                      >
+                        <div className="h-12 w-12 border-4 border-emerald-500 border-t-transparent rounded-full" />
+                      </motion.div>
+                    </div>
+                  }
+                >
                   <Component {...example.props} />
                 </Suspense>
               </div>
@@ -375,18 +418,16 @@ export function ReactBitsLiveShowcase() {
                       <Icon className="h-8 w-8 text-white" />
                     </motion.div>
                   </div>
-                  
+
                   <Badge variant="outline" className="mb-3">
                     {example.category}
                   </Badge>
-                  
+
                   <h3 className="text-4xl font-bold mb-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
                     {example.title}
                   </h3>
-                  
-                  <p className="text-lg text-muted-foreground mb-6">
-                    {example.description}
-                  </p>
+
+                  <p className="text-lg text-muted-foreground mb-6">{example.description}</p>
 
                   <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground">
                     <Code className="h-4 w-4" />
@@ -406,13 +447,13 @@ export function ReactBitsLiveShowcase() {
                 >
                   <ChevronUp className="h-6 w-6" />
                 </Button>
-                
+
                 <div className="px-4 py-2 rounded-full bg-background/80 backdrop-blur-xl border border-emerald-500/30">
                   <span className="text-sm font-medium">
                     {index + 1} / {filteredExamples.length}
                   </span>
                 </div>
-                
+
                 <Button
                   variant="outline"
                   size="icon"

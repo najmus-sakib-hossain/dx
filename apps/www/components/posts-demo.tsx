@@ -1,32 +1,46 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { usePosts, useCreatePost } from "@/lib/hooks/use-posts";
+import { AlertCircle, Loader2, Plus, RefreshCw, X } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, X, RefreshCw } from "lucide-react";
+import { VALIDATION_LIMITS } from "@/lib/constants";
+import { useCreatePost, usePosts } from "@/lib/hooks/use-posts";
+import { logger } from "@/lib/logger";
+import { createPostSchema } from "@/lib/validations/post";
 
 export function PostsDemo() {
-  const { data: posts, isLoading, error } = usePosts();
+  const { data: posts, isLoading, error, refetch } = usePosts();
   const createPost = useCreatePost();
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createPost.mutateAsync({
-      title,
-      body,
-      userId: 1,
-    });
-    setTitle("");
-    setBody("");
-    setShowForm(false);
+    setValidationError(null);
+
+    try {
+      const validated = createPostSchema.parse({
+        title,
+        body,
+        userId: 1,
+      });
+
+      await createPost.mutateAsync(validated);
+      setTitle("");
+      setBody("");
+      setShowForm(false);
+    } catch (err) {
+      if (err instanceof Error) {
+        setValidationError(err.message);
+        logger.error("Failed to create post", err);
+      }
+    }
   };
 
   if (isLoading) {
@@ -42,8 +56,17 @@ export function PostsDemo() {
   if (error) {
     return (
       <Card className="border-destructive">
-        <CardContent className="pt-6">
-          <p className="text-destructive">Error loading posts: {error.message}</p>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-5 w-5 text-destructive" />
+            <CardTitle>Error Loading Posts</CardTitle>
+          </div>
+          <CardDescription>{error.message || "Failed to fetch posts from the API"}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={() => refetch()} variant="outline">
+            Retry
+          </Button>
         </CardContent>
       </Card>
     );
@@ -59,9 +82,7 @@ export function PostsDemo() {
                 <RefreshCw className="h-5 w-5" />
                 React Query Demo
               </CardTitle>
-              <CardDescription>
-                Data fetching with caching and automatic refetching
-              </CardDescription>
+              <CardDescription>Data fetching with caching and automatic refetching</CardDescription>
             </div>
             <Button onClick={() => setShowForm(!showForm)} variant="outline">
               {showForm ? <X className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
@@ -78,25 +99,28 @@ export function PostsDemo() {
               onSubmit={handleSubmit}
               className="space-y-4"
             >
+              {validationError && (
+                <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                  <p className="text-sm text-destructive">{validationError}</p>
+                </div>
+              )}
               <Input
                 type="text"
                 placeholder="Post title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                maxLength={VALIDATION_LIMITS.POST_TITLE_MAX}
                 required
               />
               <Textarea
                 placeholder="Post body"
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                required
                 className="h-24"
+                maxLength={VALIDATION_LIMITS.POST_BODY_MAX}
+                required
               />
-              <Button
-                type="submit"
-                disabled={createPost.isPending}
-                className="w-full"
-              >
+              <Button type="submit" disabled={createPost.isPending} className="w-full">
                 {createPost.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {createPost.isPending ? "Creating..." : "Submit"}
               </Button>

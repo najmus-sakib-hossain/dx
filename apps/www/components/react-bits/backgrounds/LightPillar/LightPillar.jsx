@@ -1,21 +1,21 @@
-import { useRef, useEffect, useState } from 'react';
-import * as THREE from 'three';
-import './LightPillar.css';
+import { useEffect, useRef, useState } from "react";
+import * as THREE from "three";
+import "./LightPillar.css";
 
 const LightPillar = ({
-  topColor = '#5227FF',
-  bottomColor = '#FF9FFC',
+  topColor = "#5227FF",
+  bottomColor = "#FF9FFC",
   intensity = 1.0,
   rotationSpeed = 0.3,
   interactive = false,
-  className = '',
+  className = "",
   glowAmount = 0.005,
   pillarWidth = 3.0,
   pillarHeight = 0.4,
   noiseIntensity = 0.5,
-  mixBlendMode = 'screen',
+  mixBlendMode = "screen",
   pillarRotation = 0,
-  quality = 'high'
+  quality = "high",
 }) => {
   const containerRef = useRef(null);
   const rafRef = useRef(null);
@@ -29,8 +29,8 @@ const LightPillar = ({
   const [webGLSupported, setWebGLSupported] = useState(true);
 
   useEffect(() => {
-    const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    const canvas = document.createElement("canvas");
+    const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
     if (!gl) {
       setWebGLSupported(false);
     }
@@ -48,23 +48,38 @@ const LightPillar = ({
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     cameraRef.current = camera;
 
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const isLowEndDevice = isMobile || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+    const isLowEndDevice =
+      isMobile || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
 
     let effectiveQuality = quality;
-    if (isLowEndDevice && quality === 'high') effectiveQuality = 'medium';
-    if (isMobile && quality !== 'low') effectiveQuality = 'low';
+    if (isLowEndDevice && quality === "high") effectiveQuality = "medium";
+    if (isMobile && quality !== "low") effectiveQuality = "low";
 
     const qualitySettings = {
-      low: { iterations: 24, waveIterations: 1, pixelRatio: 0.5, precision: 'mediump', stepMultiplier: 1.5 },
-      medium: { iterations: 40, waveIterations: 2, pixelRatio: 0.65, precision: 'mediump', stepMultiplier: 1.2 },
+      low: {
+        iterations: 24,
+        waveIterations: 1,
+        pixelRatio: 0.5,
+        precision: "mediump",
+        stepMultiplier: 1.5,
+      },
+      medium: {
+        iterations: 40,
+        waveIterations: 2,
+        pixelRatio: 0.65,
+        precision: "mediump",
+        stepMultiplier: 1.2,
+      },
       high: {
         iterations: 80,
         waveIterations: 4,
         pixelRatio: Math.min(window.devicePixelRatio, 2),
-        precision: 'highp',
-        stepMultiplier: 1.0
-      }
+        precision: "highp",
+        stepMultiplier: 1.0,
+      },
     };
 
     const settings = qualitySettings[effectiveQuality] || qualitySettings.medium;
@@ -74,10 +89,10 @@ const LightPillar = ({
       renderer = new THREE.WebGLRenderer({
         antialias: false,
         alpha: true,
-        powerPreference: effectiveQuality === 'high' ? 'high-performance' : 'low-power',
+        powerPreference: effectiveQuality === "high" ? "high-performance" : "low-power",
         precision: settings.precision,
         stencil: false,
-        depth: false
+        depth: false,
       });
     } catch (error) {
       setWebGLSupported(false);
@@ -89,7 +104,7 @@ const LightPillar = ({
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    const parseColor = hex => {
+    const parseColor = (hex) => {
       const color = new THREE.Color(hex);
       return new THREE.Vector3(color.r, color.g, color.b);
     };
@@ -209,11 +224,11 @@ const LightPillar = ({
         uPillarRotCos: { value: Math.cos(pillarRotRad) },
         uPillarRotSin: { value: Math.sin(pillarRotRad) },
         uWaveSin: { value: waveSin },
-        uWaveCos: { value: waveCos }
+        uWaveCos: { value: waveCos },
       },
       transparent: true,
       depthWrite: false,
-      depthTest: false
+      depthTest: false,
     });
     materialRef.current = material;
 
@@ -223,7 +238,7 @@ const LightPillar = ({
     scene.add(mesh);
 
     let mouseMoveTimeout = null;
-    const handleMouseMove = event => {
+    const handleMouseMove = (event) => {
       if (!interactive) return;
 
       if (mouseMoveTimeout) return;
@@ -239,15 +254,16 @@ const LightPillar = ({
     };
 
     if (interactive) {
-      container.addEventListener('mousemove', handleMouseMove, { passive: true });
+      container.addEventListener("mousemove", handleMouseMove, { passive: true });
     }
 
     let lastTime = performance.now();
-    const targetFPS = effectiveQuality === 'low' ? 30 : 60;
+    const targetFPS = effectiveQuality === "low" ? 30 : 60;
     const frameTime = 1000 / targetFPS;
 
-    const animate = currentTime => {
-      if (!materialRef.current || !rendererRef.current || !sceneRef.current || !cameraRef.current) return;
+    const animate = (currentTime) => {
+      if (!materialRef.current || !rendererRef.current || !sceneRef.current || !cameraRef.current)
+        return;
 
       const deltaTime = currentTime - lastTime;
 
@@ -280,12 +296,12 @@ const LightPillar = ({
       }, 150);
     };
 
-    window.addEventListener('resize', handleResize, { passive: true });
+    window.addEventListener("resize", handleResize, { passive: true });
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
       if (interactive) {
-        container.removeEventListener('mousemove', handleMouseMove);
+        container.removeEventListener("mousemove", handleMouseMove);
       }
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
@@ -323,7 +339,7 @@ const LightPillar = ({
     noiseIntensity,
     pillarRotation,
     webGLSupported,
-    quality
+    quality,
   ]);
 
   if (!webGLSupported) {
@@ -334,7 +350,13 @@ const LightPillar = ({
     );
   }
 
-  return <div ref={containerRef} className={`light-pillar-container ${className}`} style={{ mixBlendMode }} />;
+  return (
+    <div
+      ref={containerRef}
+      className={`light-pillar-container ${className}`}
+      style={{ mixBlendMode }}
+    />
+  );
 };
 
 export default LightPillar;

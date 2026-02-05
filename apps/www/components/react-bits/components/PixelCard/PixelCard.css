@@ -20,7 +20,7 @@
 }
 
 .pixel-card::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   margin: auto;

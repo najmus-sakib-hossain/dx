@@ -1,15 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useAppStore } from "@/lib/store";
-import { usePosts } from "@/lib/hooks/use-posts";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { usePosts } from "@/lib/hooks/use-posts";
+import { useAppStore } from "@/lib/store";
 
 export function TechShowcase() {
   const { theme: appTheme, toggleTheme } = useAppStore();
@@ -34,9 +34,7 @@ export function TechShowcase() {
             </motion.div>
             <CardTitle className="text-2xl">Technology Integration</CardTitle>
           </div>
-          <Badge className="bg-gradient-to-r from-purple-500 to-pink-500">
-            Live Demo
-          </Badge>
+          <Badge className="bg-gradient-to-r from-purple-500 to-pink-500">Live Demo</Badge>
         </div>
         <CardDescription className="text-base">
           All technologies working together seamlessly

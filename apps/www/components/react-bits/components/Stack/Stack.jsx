@@ -1,6 +1,6 @@
-import { motion, useMotionValue, useTransform } from 'motion/react';
-import { useState, useEffect } from 'react';
-import './Stack.css';
+import { motion, useMotionValue, useTransform } from "motion/react";
+import { useEffect, useState } from "react";
+import "./Stack.css";
 
 function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false }) {
   const x = useMotionValue(0);
@@ -32,7 +32,7 @@ function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false }
       drag
       dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
       dragElastic={0.6}
-      whileTap={{ cursor: 'grabbing' }}
+      whileTap={{ cursor: "grabbing" }}
       onDragEnd={handleDragEnd}
     >
       {children}
@@ -50,7 +50,7 @@ export default function Stack({
   autoplayDelay = 3000,
   pauseOnHover = false,
   mobileClickOnly = false,
-  mobileBreakpoint = 768
+  mobileBreakpoint = 768,
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -61,8 +61,8 @@ export default function Stack({
     };
 
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, [mobileBreakpoint]);
 
   const shouldDisableDrag = mobileClickOnly && isMobile;
@@ -81,7 +81,7 @@ export default function Stack({
               alt="card-1"
               className="card-image"
             />
-          )
+          ),
         },
         {
           id: 2,
@@ -91,7 +91,7 @@ export default function Stack({
               alt="card-2"
               className="card-image"
             />
-          )
+          ),
         },
         {
           id: 3,
@@ -101,7 +101,7 @@ export default function Stack({
               alt="card-3"
               className="card-image"
             />
-          )
+          ),
         },
         {
           id: 4,
@@ -111,8 +111,8 @@ export default function Stack({
               alt="card-4"
               className="card-image"
             />
-          )
-        }
+          ),
+        },
       ];
     }
   });
@@ -123,10 +123,10 @@ export default function Stack({
     }
   }, [cards]);
 
-  const sendToBack = id => {
-    setStack(prev => {
+  const sendToBack = (id) => {
+    setStack((prev) => {
       const newStack = [...prev];
-      const index = newStack.findIndex(card => card.id === id);
+      const index = newStack.findIndex((card) => card.id === id);
       const [card] = newStack.splice(index, 1);
       newStack.unshift(card);
       return newStack;
@@ -165,13 +165,13 @@ export default function Stack({
               animate={{
                 rotateZ: (stack.length - index - 1) * 4 + randomRotate,
                 scale: 1 + index * 0.06 - stack.length * 0.06,
-                transformOrigin: '90% 90%'
+                transformOrigin: "90% 90%",
               }}
               initial={false}
               transition={{
-                type: 'spring',
+                type: "spring",
                 stiffness: animationConfig.stiffness,
-                damping: animationConfig.damping
+                damping: animationConfig.damping,
               }}
             >
               {card.content}
