@@ -1,39 +1,24 @@
-use gpui::{
-    div, prelude::*, px, rgb, size, App, Application, Bounds, Context, SharedString, Window,
-    WindowBounds, WindowOptions,
-};
+mod components;
+mod theme;
+mod views;
 
-struct HelloWorld {
-    text: SharedString,
-}
-
-impl Render for HelloWorld {
-    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        div()
-            .flex()
-            .bg(rgb(0x000000))
-            .size_full()
-            .justify_center()
-            .items_center()
-            .text_xl()
-            .text_color(rgb(0xffffff))
-            .child(self.text.clone())
-    }
-}
+use gpui::{px, size, App, AppContext, Application, Bounds, WindowBounds, WindowOptions};
+use theme::{Theme, ThemeMode};
+use views::ChatView;
 
 fn main() {
     Application::new().run(|cx: &mut App| {
-        let bounds = Bounds::centered(None, size(px(600.0), px(400.0)), cx);
+        // Use dark theme as default
+        let theme = Theme::new(ThemeMode::Dark);
+        
+        let bounds = Bounds::centered(None, size(px(1280.0), px(800.0)), cx);
         cx.open_window(
             WindowOptions {
                 window_bounds: Some(WindowBounds::Windowed(bounds)),
+                titlebar: None,
                 ..Default::default()
             },
-            |_, cx| {
-                cx.new(|_| HelloWorld {
-                    text: "Hello, world!".into(),
-                })
-            },
+            |_, cx| cx.new(|_| ChatView::new(theme)),
         )
         .unwrap();
     });

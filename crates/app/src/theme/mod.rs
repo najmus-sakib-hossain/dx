@@ -1,0 +1,18 @@
+pub mod colors;
+
+pub use colors::Theme;
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum ThemeMode {
+    Light,
+    Dark,
+}
+
+impl Theme {
+    pub fn new(mode: ThemeMode) -> Self {
+        match mode {
+            ThemeMode::Light => Self::light(),
+            ThemeMode::Dark => Self::dark(),
+        }
+    }
+}
