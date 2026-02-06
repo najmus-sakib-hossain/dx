@@ -2,6 +2,7 @@ use gpui::{rgb, Hsla};
 
 /// Theme colors based on shadcn-ui design system
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct Theme {
     // Base colors
     pub background: Hsla,

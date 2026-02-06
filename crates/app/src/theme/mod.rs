@@ -3,6 +3,7 @@ pub mod colors;
 pub use colors::Theme;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[allow(dead_code)]
 pub enum ThemeMode {
     Light,
     Dark,

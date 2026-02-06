@@ -7,6 +7,7 @@ pub struct Button {
 }
 
 #[derive(Clone, Copy)]
+#[allow(dead_code)]
 pub enum ButtonVariant {
     Primary,
     Secondary,
@@ -21,6 +22,7 @@ impl Button {
         }
     }
 
+    #[allow(dead_code)]
     pub fn primary(mut self) -> Self {
         self.variant = ButtonVariant::Primary;
         self
@@ -31,6 +33,7 @@ impl Button {
         self
     }
 
+    #[allow(dead_code)]
     pub fn ghost(mut self) -> Self {
         self.variant = ButtonVariant::Ghost;
         self
