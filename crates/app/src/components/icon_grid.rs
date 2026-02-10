@@ -85,6 +85,10 @@ impl IconCell {
             theme.card
         };
         
+        // Create input color with 30% opacity for hover
+        let mut hover_bg = theme.input;
+        hover_bg.a = 0.3;
+        
         let icon_name = self.item.name.clone();
         let icon_pack = self.item.pack.clone();
 
@@ -106,8 +110,8 @@ impl IconCell {
             })
             .hover(move |style| {
                 style
-                    .bg(theme.destructive)
-                    .border_color(theme.destructive)
+                    .bg(hover_bg)
+                    .border_color(theme.input)
             })
             .on_mouse_down(MouseButton::Left, move |_event, _window, _cx| {
                 println!("Icon clicked: {} ({})", icon_name, icon_pack);
