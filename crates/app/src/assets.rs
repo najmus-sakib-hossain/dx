@@ -1,6 +1,5 @@
-use gpui::{AssetSource, Result, SharedString, Task};
+use gpui::{AssetSource, Result, SharedString};
 use rust_embed::RustEmbed;
-use std::sync::Arc;
 
 #[derive(RustEmbed)]
 #[folder = "assets"]

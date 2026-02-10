@@ -6,3 +6,5 @@ Please look at the root crates/app folder. There we are giving icon search app U
 Please do a web search about how zed code editor show icons in their code code editor as they also use gpui and learn from it and apply it here too!!! and also currently the icons are not showinga nd also the whole app is too much lagging so just so only 100 icons for now!!!
 
 If you can't do it please create markdown asking another good ai about how zed team uses svg in their code editor and how we are using it that is not actully showing the svg icons and ask for correct way!!!
+
+So, svgl Icons are colorful icons, so they are not matching the light and dark theme properly. We learnt how to show icons properly, right? Please use this system to show all icons from JSON files using our Crates icon and root app/www/public/icons/*.json files svg data

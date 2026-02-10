@@ -5,9 +5,11 @@ pub mod input;
 pub mod search_bar;
 pub mod sidebar;
 
+#[allow(unused_imports)]
 pub use button::Button;
+#[allow(unused_imports)]
 pub use card::Card;
-pub use icon_grid::IconGrid;
+#[allow(unused_imports)]
 pub use input::InputArea;
-pub use search_bar::SearchBar;
+#[allow(unused_imports)]
 pub use sidebar::Sidebar;

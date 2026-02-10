@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use gpui::{div, prelude::*, IntoElement, Pixels};
 
 /// A simple SVG icon renderer that displays SVG content

@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use anyhow::Result;
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -54,13 +56,7 @@ impl SvgCache {
         }
 
         // Render the SVG to PNG (with error handling to prevent crashes)
-        let png_path = match self.render_svg_to_png(svg_id, svg_string, target_size) {
-            Ok(path) => path,
-            Err(e) => {
-                eprintln!("⚠️ Failed to render SVG {}: {}", svg_id, e);
-                return Err(e);
-            }
-        };
+        let png_path = self.render_svg_to_png(svg_id, svg_string, target_size)?;
 
         // Store in cache
         {

@@ -3,17 +3,19 @@ use std::sync::Arc;
 
 use crate::components::icon_grid::{IconGrid, IconGridItem};
 use crate::components::search_bar::SearchBar;
-use crate::icons::data::{IconSource, LoadedIcon};
+use crate::icons::data::{IconSource};
 use crate::icons::IconDataLoader;
 use crate::theme::Theme;
 
 /// How many icons to display per page in the grid (reduced for better performance)
+#[allow(dead_code)]
 const ICONS_PER_PAGE: usize = 50;
 
 /// Maximum total icons to load (to prevent lag)
 const MAX_TOTAL_ICONS: usize = 10;
 
 /// The main icon picker view - equivalent of the www Next.js icon browser
+#[allow(dead_code)]
 pub struct IconPickerView {
     theme: Theme,
     /// All loaded icon data (shared reference)
@@ -56,6 +58,7 @@ impl IconPickerView {
     }
 
     /// Update the filtered icon list based on current search query and pack filter
+    #[allow(dead_code)]
     fn update_filter(&mut self) {
         let query = self.search_query.to_lowercase();
         let icons = self.loader.icons();
@@ -89,6 +92,7 @@ impl IconPickerView {
         self.selected_icon = None;
     }
 
+    #[allow(dead_code)]
     fn render_header(&self) -> impl IntoElement {
         div()
             .flex()
@@ -145,6 +149,7 @@ impl IconPickerView {
             )
     }
 
+    #[allow(dead_code)]
     fn render_search_area(&self) -> impl IntoElement {
         SearchBar::new(
             self.search_query.clone(),
@@ -154,6 +159,7 @@ impl IconPickerView {
         .render(&self.theme)
     }
 
+    #[allow(dead_code)]
     fn render_pack_filters(&self) -> impl IntoElement {
         let theme = self.theme.clone();
         let mut chips = div()
@@ -203,16 +209,12 @@ impl IconPickerView {
     fn render_icon_grid(&self) -> impl IntoElement {
         let icons = self.loader.icons();
         
-        println!("🎨 Rendering {} SVG icons from bundled assets...", icons.len().min(10));
-        
         // Only show first 10 icons - these are now bundled as assets
         let visible_icons: Vec<IconGridItem> = icons
             .iter()
             .take(10)
             .enumerate()
             .map(|(idx, icon)| {
-                println!("  Icon {}: {} -> assets/icons/{}.svg", idx, icon.name, icon.name);
-
                 IconGridItem {
                     index: idx,
                     name: icon.name.clone(),
@@ -228,6 +230,7 @@ impl IconPickerView {
         IconGrid::new(visible_icons).render(&self.theme)
     }
 
+    #[allow(dead_code)]
     fn render_pagination(&self) -> impl IntoElement {
         let total = self.filtered_icons.len();
         let page = self.page_offset / ICONS_PER_PAGE + 1;
@@ -290,6 +293,7 @@ impl IconPickerView {
 
     // Detail panel removed - not needed for simple 10 icon display
 
+    #[allow(dead_code)]
     fn render_sidebar(&self) -> impl IntoElement {
         let theme = self.theme.clone();
         let mut sidebar = div()
@@ -346,6 +350,7 @@ impl IconPickerView {
         sidebar
     }
 
+    #[allow(dead_code)]
     fn render_source_section(&self, label: &str, source: IconSource) -> impl IntoElement {
         let theme = self.theme.clone();
         let packs_for_source: Vec<&str> = self
@@ -385,6 +390,7 @@ impl IconPickerView {
             )
     }
 
+    #[allow(dead_code)]
     fn render_main_content(&self) -> impl IntoElement {
         div()
             .flex()
@@ -444,6 +450,7 @@ impl Render for IconPickerView {
 
 // -- Helper components --
 
+#[allow(dead_code)]
 struct PackChip {
     label: String,
     active: bool,
@@ -497,6 +504,7 @@ impl PackChip {
 }
 
 /// Simple fuzzy match: check if all chars of query appear in order in target
+#[allow(dead_code)]
 fn fuzzy_contains(target: &str, query: &str) -> bool {
     let mut target_chars = target.chars();
     for qc in query.chars() {

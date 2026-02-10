@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use anyhow::Result;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -32,14 +34,10 @@ impl IconDataLoader {
 
     /// Load all icon data from every source
     pub fn load_all(&mut self) -> Result<()> {
-        println!("🔍 Loading ONLY 10 SVG icons for testing...");
-
         // ONLY load from www/svgl (just SVG files, not JSON packs)
         let svgl_dir = self.project_root.join("apps/www/public/svgl");
         if svgl_dir.exists() {
             self.load_svgl_dir(&svgl_dir)?;
-        } else {
-            println!("  ⚠ apps/www/public/svgl not found");
         }
 
         // Comment out other sources to avoid duplicates and reduce load
@@ -59,19 +57,11 @@ impl IconDataLoader {
         // Build pack index
         self.build_pack_index();
 
-        println!(
-            "✅ Loaded {} icons from {} packs",
-            self.icons.len(),
-            self.packs.len()
-        );
         Ok(())
     }
 
     /// Load all Iconify JSON pack files from a directory 
     fn load_iconify_dir(&mut self, dir: &Path, source: IconSource) -> Result<()> {
-        let mut pack_count = 0;
-        let mut icon_count = 0;
-
         for entry in std::fs::read_dir(dir)? {
             let entry = entry?;
             let path = entry.path();
@@ -81,9 +71,8 @@ impl IconDataLoader {
             }
 
             match self.load_iconify_pack(&path, source.clone()) {
-                Ok(count) => {
-                    pack_count += 1;
-                    icon_count += count;
+                Ok(_count) => {
+                    // Pack loaded successfully
                 }
                 Err(e) => {
                     // Skip malformed packs silently
@@ -92,10 +81,6 @@ impl IconDataLoader {
             }
         }
 
-        println!(
-            "  📦 {}: {} packs, {} icons",
-            source, pack_count, icon_count
-        );
         Ok(())
     }
 
@@ -191,7 +176,6 @@ impl IconDataLoader {
             source: IconSource::WwwSvgl,
         });
 
-        println!("  🎨 www/svgl: {} SVG files", count);
         Ok(())
     }
 

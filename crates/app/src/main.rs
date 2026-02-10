@@ -17,13 +17,9 @@ fn main() {
         std::env::current_dir().expect("Could not determine current directory")
     });
 
-    println!("📂 Project root: {}", project_root.display());
-
     // Load all icon data before launching the UI
     let mut loader = IconDataLoader::new(&project_root);
-    if let Err(e) = loader.load_all() {
-        eprintln!("⚠️ Error loading icons: {}", e);
-    }
+    let _ = loader.load_all(); // Ignore errors silently
     let loader = Arc::new(loader);
 
     // Create application with asset source

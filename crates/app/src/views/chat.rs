@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use gpui::{div, prelude::*, px, Context, IntoElement, Window};
 use crate::components::{Button, Card, InputArea, Sidebar};
 use crate::theme::Theme;
