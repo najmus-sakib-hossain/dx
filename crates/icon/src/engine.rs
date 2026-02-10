@@ -1,4 +1,3 @@
-use crate::gpu::GpuSearchEngineSync;
 use crate::index::IconIndex;
 use crate::search::{calculate_score, fuzzy_match, MatchType, SearchResult};
 use crate::types::IconMetadata;
@@ -8,6 +7,9 @@ use dashmap::DashMap;
 use rayon::prelude::*;
 use rkyv::Archived;
 use std::sync::Arc;
+
+#[cfg(feature = "gpu")]
+use crate::gpu::GpuSearchEngineSync;
 
 // Optimal chunk size for cache locality (64KB L1 cache / ~200 bytes per icon = ~320 icons)
 const RAYON_CHUNK_SIZE: usize = 256;
@@ -23,8 +25,10 @@ pub struct IconSearchEngine {
     /// Pre-computed indices (built once at startup)
     precomputed: Arc<PrecomputedIndex>,
     cache: Arc<DashMap<String, Vec<SearchResult>>>,
+    #[cfg(feature = "gpu")]
     #[allow(dead_code)]
     gpu_engine: Option<GpuSearchEngineSync>,
+    #[cfg(feature = "gpu")]
     use_gpu: bool,
 }
 
@@ -55,9 +59,12 @@ impl IconSearchEngine {
         let precomputed = Arc::new(PrecomputedIndex::build(metadata));
 
         // Try to initialize GPU engine
+        #[cfg(feature = "gpu")]
         let gpu_engine = GpuSearchEngineSync::new();
+        #[cfg(feature = "gpu")]
         let use_gpu = gpu_engine.is_available();
 
+        #[cfg(feature = "gpu")]
         if use_gpu {
             println!("✅ GPU acceleration available (optional)");
         }
@@ -65,7 +72,9 @@ impl IconSearchEngine {
         Ok(Self {
             precomputed,
             cache: Arc::new(DashMap::new()),
+            #[cfg(feature = "gpu")]
             gpu_engine: Some(gpu_engine),
+            #[cfg(feature = "gpu")]
             use_gpu,
         })
     }
@@ -254,6 +263,9 @@ impl IconSearchEngine {
 
     /// Check if GPU is being used
     pub fn is_gpu_enabled(&self) -> bool {
-        self.use_gpu
+        #[cfg(feature = "gpu")]
+        { self.use_gpu }
+        #[cfg(not(feature = "gpu"))]
+        { false }
     }
 }
