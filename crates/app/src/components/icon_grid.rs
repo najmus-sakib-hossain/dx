@@ -119,26 +119,14 @@ impl IconCell {
             )
     }
 
-    fn render_icon_preview(&self, _theme: &Theme) -> impl IntoElement {
-        // Now that we have AssetSource registered, svg().path() will work!
-        let asset_path = format!("icons/{}.svg", self.item.name);
+    fn render_icon_preview(&self, theme: &Theme) -> impl IntoElement {
+        // Use the dynamic asset path format: icons/{pack}/{name}.svg
+        let asset_path = SharedString::from(format!("icons/{}/{}.svg", self.item.pack, self.item.name));
         
-        // Note: GPUI's svg() seems to require a color even for colored SVGs
-        // Using white as a "neutral" color, but GPUI may still override the SVG's colors
-        div()
-            .flex()
-            .items_center()
-            .justify_center()
+        svg()
+            .path(asset_path)
+            .text_color(theme.foreground)  // Monochrome icons will inherit this color
             .size(px(64.0))
-            .bg(gpui::rgb(0xf5f5f5))  // Light gray background
-            .rounded(px(4.0))
-            .child(
-                svg()
-                    .path(SharedString::from(asset_path))
-                    .size(px(48.0))
-                    .text_color(gpui::rgb(0x000000))  // Black - GPUI requires this
-                    .flex_shrink_0(),
-            )
             .into_any_element()
     }
 }

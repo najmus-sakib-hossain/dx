@@ -1,5 +1,7 @@
 use gpui::{AssetSource, Result, SharedString};
 use rust_embed::RustEmbed;
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
 #[derive(RustEmbed)]
 #[folder = "assets"]
@@ -7,8 +9,6 @@ pub struct Assets;
 
 impl AssetSource for Assets {
     fn load(&self, path: &str) -> Result<Option<std::borrow::Cow<'static, [u8]>>> {
-        // RustEmbed uses forward slashes.
-        // GPUI paths usually match what you pass to .path()
         if let Some(file) = Assets::get(path) {
             Ok(Some(file.data))
         } else {
@@ -20,6 +20,44 @@ impl AssetSource for Assets {
         Ok(Assets::iter()
             .filter(|p| p.starts_with(path))
             .map(|p| SharedString::from(p.to_string()))
+            .collect())
+    }
+}
+
+// Dynamic SVG AssetSource for JSON-based icons
+pub struct DynamicSvgAssets {
+    svgs: Arc<Mutex<HashMap<String, Vec<u8>>>>,
+}
+
+impl DynamicSvgAssets {
+    pub fn new() -> Self {
+        Self {
+            svgs: Arc::new(Mutex::new(HashMap::new())),
+        }
+    }
+
+    pub fn register_svg(&self, path: String, svg_body: &str, width: f32, height: f32) {
+        let full_svg = format!(
+            r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {} {}" width="{}" height="{}">{}</svg>"#,
+            width, height, width, height, svg_body
+        );
+        let mut svgs = self.svgs.lock().unwrap();
+        svgs.insert(path, full_svg.into_bytes());
+    }
+}
+
+impl AssetSource for DynamicSvgAssets {
+    fn load(&self, path: &str) -> Result<Option<std::borrow::Cow<'static, [u8]>>> {
+        let svgs = self.svgs.lock().unwrap();
+        Ok(svgs.get(path).map(|bytes| bytes.clone().into()))
+    }
+
+    fn list(&self, path: &str) -> Result<Vec<SharedString>> {
+        let svgs = self.svgs.lock().unwrap();
+        Ok(svgs
+            .keys()
+            .filter(|p| p.starts_with(path))
+            .map(|p| SharedString::from(p.clone()))
             .collect())
     }
 }

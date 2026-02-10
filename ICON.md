@@ -8,3 +8,4 @@ Please do a web search about how zed code editor show icons in their code code e
 If you can't do it please create markdown asking another good ai about how zed team uses svg in their code editor and how we are using it that is not actully showing the svg icons and ask for correct way!!!
 
 So, svgl Icons are colorful icons, so they are not matching the light and dark theme properly. We learnt how to show icons properly, right? Please use this system to show all icons from JSON files using our Crates icon and root app/www/public/icons/*.json files svg data
+Awesome, now the icons are showing correctly. Previously, we were showing 300K+ icons with 229 icon packs, but we switched to just showing 10 icons to tackle the GPU UI HVC rendering. Now that the HVC are rendering correctly, please use our previous logic to show an icon searcher in the menu UI and make sure to load less icons so that the app doesn't laggy. 

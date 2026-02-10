@@ -4,7 +4,7 @@ mod icons;
 mod theme;
 mod views;
 
-use assets::Assets;
+use assets::{Assets, DynamicSvgAssets};
 use gpui::{px, size, App, AppContext, Application, Bounds, WindowBounds, WindowOptions};
 use icons::IconDataLoader;
 use std::sync::Arc;
@@ -20,11 +20,20 @@ fn main() {
     // Load all icon data before launching the UI
     let mut loader = IconDataLoader::new(&project_root);
     let _ = loader.load_all(); // Ignore errors silently
+    
+    // Create dynamic SVG asset source and register all loaded icons
+    let dynamic_assets = DynamicSvgAssets::new();
+    for icon in loader.icons() {
+        let path = format!("icons/{}/{}.svg", icon.pack, icon.name);
+        dynamic_assets.register_svg(path, &icon.svg_body, icon.width, icon.height);
+    }
+    
     let loader = Arc::new(loader);
 
-    // Create application with asset source
+    // Create application with asset sources
     Application::new()
         .with_assets(Assets)
+        .with_assets(dynamic_assets)
         .run(move |cx: &mut App| {
             // Use dark theme as default
             let theme = Theme::new(ThemeMode::Dark);

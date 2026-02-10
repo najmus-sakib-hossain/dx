@@ -8,11 +8,10 @@ use crate::icons::IconDataLoader;
 use crate::theme::Theme;
 
 /// How many icons to display per page in the grid (reduced for better performance)
-#[allow(dead_code)]
 const ICONS_PER_PAGE: usize = 50;
 
 /// Maximum total icons to load (to prevent lag)
-const MAX_TOTAL_ICONS: usize = 10;
+const MAX_TOTAL_ICONS: usize = 5000;
 
 /// The main icon picker view - equivalent of the www Next.js icon browser
 #[allow(dead_code)]
@@ -92,7 +91,6 @@ impl IconPickerView {
         self.selected_icon = None;
     }
 
-    #[allow(dead_code)]
     fn render_header(&self) -> impl IntoElement {
         div()
             .flex()
@@ -149,7 +147,6 @@ impl IconPickerView {
             )
     }
 
-    #[allow(dead_code)]
     fn render_search_area(&self) -> impl IntoElement {
         SearchBar::new(
             self.search_query.clone(),
@@ -209,20 +206,23 @@ impl IconPickerView {
     fn render_icon_grid(&self) -> impl IntoElement {
         let icons = self.loader.icons();
         
-        // Only show first 10 icons - these are now bundled as assets
-        let visible_icons: Vec<IconGridItem> = icons
+        // Get the current page of filtered icons
+        let start = self.page_offset;
+        let end = (start + ICONS_PER_PAGE).min(self.filtered_icons.len());
+        
+        let visible_icons: Vec<IconGridItem> = self.filtered_icons[start..end]
             .iter()
-            .take(10)
+            .filter_map(|&idx| icons.get(idx))
             .enumerate()
-            .map(|(idx, icon)| {
+            .map(|(display_idx, icon)| {
                 IconGridItem {
-                    index: idx,
+                    index: display_idx,
                     name: icon.name.clone(),
                     pack: icon.pack.clone(),
                     svg_body: icon.svg_body.clone(),
                     width: icon.width,
                     height: icon.height,
-                    selected: false,
+                    selected: self.selected_icon == Some(display_idx),
                 }
             })
             .collect();
@@ -230,7 +230,6 @@ impl IconPickerView {
         IconGrid::new(visible_icons).render(&self.theme)
     }
 
-    #[allow(dead_code)]
     fn render_pagination(&self) -> impl IntoElement {
         let total = self.filtered_icons.len();
         let page = self.page_offset / ICONS_PER_PAGE + 1;
@@ -390,22 +389,18 @@ impl IconPickerView {
             )
     }
 
-    #[allow(dead_code)]
     fn render_main_content(&self) -> impl IntoElement {
         div()
             .flex()
             .flex_col()
             .flex_1()
             .h_full()
-            .overflow_hidden()
             .bg(self.theme.background)
             .child(self.render_header())
             .child(self.render_search_area())
-            .child(self.render_pack_filters())
             .child(
                 div()
                     .flex_1()
-                    .overflow_hidden()
                     .child(self.render_icon_grid()),
             )
             .child(self.render_pagination())
@@ -416,35 +411,9 @@ impl Render for IconPickerView {
     fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .flex()
-            .flex_col()
             .size_full()
             .bg(self.theme.background)
-            .items_center()
-            .justify_center()
-            .gap_4()
-            // Simple title
-            .child(
-                div()
-                    .text_2xl()
-                    .text_color(self.theme.foreground)
-                    .child(format!("DX Icon Viewer - {} SVG Icons", self.loader.total_icons())),
-            )
-            // Debug info
-            .child(
-                div()
-                    .text_sm()
-                    .text_color(self.theme.muted_foreground)
-                    .child("Rendering SVG icons from bundled assets (like Zed does)"),
-            )
-            // Just the icon grid, nothing else
-            .child(
-                div()
-                    .flex()
-                    .flex_wrap()
-                    .gap_4()
-                    .p_4()
-                    .child(self.render_icon_grid()),
-            )
+            .child(self.render_main_content())
     }
 }
 
