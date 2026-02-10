@@ -29,7 +29,10 @@ impl IconGrid {
             .flex()
             .flex_wrap()
             .gap_2()
-            .p_4();
+            .p_4()
+            .on_mouse_move(|_event, _window, _cx| {
+                // Ensure hover updates in grid area
+            });
 
         if self.items.is_empty() {
             return grid
@@ -37,11 +40,6 @@ impl IconGrid {
                 .items_center()
                 .justify_center()
                 .min_h(px(200.0))
-                .child(
-                    div()
-                        .text_3xl()
-                        .child("🔍"),
-                )
                 .child(
                     div()
                         .text_sm()
@@ -87,9 +85,6 @@ impl IconCell {
             theme.card
         };
         
-        let hover_bg = theme.destructive;  // Danger/destructive color on hover
-        let hover_border = theme.destructive;
-        
         let icon_name = self.item.name.clone();
         let icon_pack = self.item.pack.clone();
 
@@ -105,20 +100,19 @@ impl IconCell {
             .bg(bg)
             .border_1()
             .border_color(border_col)
+            .cursor_pointer()
+            .on_mouse_move(|_event, _window, _cx| {
+                // Trigger hover detection on mouse movement
+            })
             .hover(move |style| {
                 style
-                    .bg(hover_bg)
-                    .border_color(hover_border)
+                    .bg(theme.destructive)
+                    .border_color(theme.destructive)
             })
-            .cursor_pointer()
             .on_mouse_down(MouseButton::Left, move |_event, _window, _cx| {
-                // Icon clicked - in a full implementation, this would:
-                // 1. Copy icon name to clipboard
-                // 2. Show icon details
-                // 3. Update selection state
                 println!("Icon clicked: {} ({})", icon_name, icon_pack);
             })
-            // Icon preview area (larger)
+            // Icon preview area
             .child(
                 div()
                     .flex()

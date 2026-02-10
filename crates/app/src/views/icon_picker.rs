@@ -1,4 +1,4 @@
-use gpui::{div, prelude::*, px, Context, IntoElement, MouseButton, Window};
+use gpui::{div, prelude::*, px, Context, IntoElement, MouseButton, Window, FocusHandle, KeyDownEvent};
 use std::sync::Arc;
 
 use crate::components::icon_grid::{IconGrid, IconGridItem};
@@ -19,6 +19,8 @@ pub struct IconPickerView {
     loader: Arc<IconDataLoader>,
     /// Current search query
     search_query: String,
+    /// Focus handle for search input
+    search_focus: FocusHandle,
     /// Currently selected pack filter (None = all packs)
     selected_pack: Option<String>,
     /// Currently selected icon (for detail panel)
@@ -31,26 +33,32 @@ pub struct IconPickerView {
     total_count: usize,
     /// Current page offset for pagination
     page_offset: usize,
+    /// Cursor blink state for search input
+    cursor_visible: bool,
 }
 
 impl IconPickerView {
-    pub fn new(theme: Theme, loader: Arc<IconDataLoader>) -> Self {
+    pub fn new(theme: Theme, loader: Arc<IconDataLoader>, cx: &mut Context<Self>) -> Self {
         let pack_names = loader.pack_names();
         let total_count = loader.total_icons().min(MAX_TOTAL_ICONS);
 
         // Initially show limited icons for performance
         let filtered_icons: Vec<usize> = (0..total_count).collect();
+        
+        let search_focus = cx.focus_handle();
 
         Self {
             theme,
             loader,
             search_query: String::new(),
+            search_focus,
             selected_pack: None,
             selected_icon: None,
             filtered_icons,
             pack_names,
             total_count,
             page_offset: 0,
+            cursor_visible: true,
         }
     }
 
@@ -134,12 +142,6 @@ impl IconPickerView {
                     .gap_3()
                     .child(
                         div()
-                            .text_xl()
-                            .text_color(self.theme.foreground)
-                            .child("🎨"),
-                    )
-                    .child(
-                        div()
                             .flex()
                             .flex_col()
                             .child(
@@ -174,7 +176,7 @@ impl IconPickerView {
             )
     }
 
-    fn render_search_area(&self, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render_search_area(&self, cx: &mut Context<Self>, window: &mut Window) -> impl IntoElement {
         let theme = self.theme.clone();
         
         div()
@@ -183,8 +185,8 @@ impl IconPickerView {
             .gap_3()
             .border_b_1()
             .border_color(theme.border)
-            // Search input display
-            .child(self.render_search_input(&theme))
+            // Interactive search bar
+            .child(self.render_search_bar_interactive(cx, window, &theme))
             // Pack filter chips with click handlers
             .child(self.render_pack_chips(cx, &theme))
     }
@@ -213,7 +215,7 @@ impl IconPickerView {
                         div()
                             .text_sm()
                             .text_color(theme.muted_foreground)
-                            .child("🔍"),
+                            .child("Search"),
                     )
                     .child(
                         div()
@@ -225,9 +227,9 @@ impl IconPickerView {
                                 theme.foreground
                             })
                             .child(if self.search_query.is_empty() {
-                                "Search icons... (type to search)".to_string()
+                                "Click to search: home, arrow, github, or all icons".to_string()
                             } else {
-                                format!("Searching: {}", self.search_query)
+                                format!("Searching: {} (click to change)", self.search_query)
                             }),
                     )
                     .child(
@@ -238,7 +240,130 @@ impl IconPickerView {
                             .py_1()
                             .rounded(px(4.0))
                             .bg(theme.muted)
-                            .child("⌘K"),
+                            .child("Cmd+K"),
+                    ),
+            )
+    }
+    
+    fn render_search_bar_interactive(&self, cx: &mut Context<Self>, window: &mut Window, theme: &Theme) -> impl IntoElement {
+        let search_focus = self.search_focus.clone();
+        let is_focused = search_focus.is_focused(window);
+        
+        div()
+            .flex()
+            .flex_1()
+            .items_center()
+            .gap_2()
+            .px_6()
+            .py_3()
+            .child(
+                div()
+                    .flex()
+                    .flex_1()
+                    .items_center()
+                    .gap_2()
+                    .px_4()
+                    .py_2()
+                    .rounded(px(8.0))
+                    .bg(theme.card)
+                    .border_1()
+                    .border_color(if is_focused {
+                        theme.ring
+                    } else {
+                        theme.border
+                    })
+                    .cursor_text()
+                    .track_focus(&search_focus)
+                    .on_mouse_down(
+                        MouseButton::Left,
+                        cx.listener(|view, _event, window, cx| {
+                            view.search_focus.focus(window, cx);
+                        }),
+                    )
+                    .on_key_down(cx.listener(|view, event: &KeyDownEvent, _window, cx| {
+                        let keystroke = &event.keystroke;
+                        
+                        // Handle backspace
+                        if keystroke.key == "backspace" {
+                            view.search_query.pop();
+                            view.update_filter();
+                            cx.notify();
+                        }
+                        // Handle regular character input
+                        else if keystroke.key.len() == 1 && !keystroke.modifiers.control && !keystroke.modifiers.alt {
+                            view.search_query.push_str(&keystroke.key);
+                            view.update_filter();
+                            cx.notify();
+                        }
+                        // Handle Escape to clear
+                        else if keystroke.key == "escape" {
+                            view.search_query.clear();
+                            view.update_filter();
+                            cx.notify();
+                        }
+                    }))
+                    .child(
+                        div()
+                            .text_sm()
+                            .text_color(theme.muted_foreground)
+                            .child("Search"),
+                    )
+                    .child(
+                        div()
+                            .flex()
+                            .items_center()
+                            .gap_1()
+                            .child(
+                                div()
+                                    .flex_1()
+                                    .text_sm()
+                                    .text_color(if self.search_query.is_empty() {
+                                        theme.muted_foreground
+                                    } else {
+                                        theme.foreground
+                                    })
+                                    .child(if self.search_query.is_empty() {
+                                        "Type to search icons...".to_string()
+                                    } else {
+                                        self.search_query.clone()
+                                    }),
+                            )
+                            .when(is_focused, |this| {
+                                this.child(
+                                    div()
+                                        .w(px(2.0))
+                                        .h(px(16.0))
+                                        .bg(theme.foreground)
+                                        .child(""),
+                                )
+                            }),
+                    )
+                    .when(!self.search_query.is_empty(), |this| {
+                        this.child(
+                            div()
+                                .text_xs()
+                                .text_color(theme.muted_foreground)
+                                .cursor_pointer()
+                                .on_mouse_down(
+                                    MouseButton::Left,
+                                    cx.listener(|view, _event, _window, cx| {
+                                        view.search_query.clear();
+                                        view.update_filter();
+                                        cx.notify();
+                                    }),
+                                )
+                                .child("Clear"),
+                        )
+                    })
+                    .child(
+                        div()
+                            .text_xs()
+                            .text_color(theme.muted_foreground)
+                            .px_2()
+                            .py_1()
+                            .rounded(px(4.0))
+                            .bg(theme.muted)
+                            .child("Esc"),
                     ),
             )
     }
@@ -249,7 +374,10 @@ impl IconPickerView {
             .flex_wrap()
             .gap_2()
             .px_6()
-            .py_3();
+            .py_3()
+            .on_mouse_move(|_event, _window, _cx| {
+                // Ensure hover updates in chips area
+            });
 
         // "All" chip
         let all_active = self.selected_pack.is_none();
@@ -289,6 +417,12 @@ impl IconPickerView {
         } else {
             theme.secondary_foreground
         };
+        
+        let hover_bg = if active {
+            theme.primary
+        } else {
+            theme.accent
+        };
 
         div()
             .flex()
@@ -299,7 +433,13 @@ impl IconPickerView {
             .rounded(px(12.0))
             .bg(bg)
             .cursor_pointer()
-            .hover(move |style| style.bg(theme.accent))
+            .on_mouse_move(|_event, _window, _cx| {
+                // Trigger hover detection on mouse movement
+            })
+            .hover(move |style| {
+                style
+                    .bg(hover_bg)
+            })
             .on_mouse_down(
                 MouseButton::Left,
                 cx.listener(move |view, _event, _window, cx| {
@@ -405,6 +545,9 @@ impl IconPickerView {
             .py_3()
             .border_t_1()
             .border_color(self.theme.border)
+            .on_mouse_move(|_event, _window, _cx| {
+                // Ensure hover updates in pagination area
+            })
             .child(
                 div()
                     .px_3()
@@ -415,15 +558,26 @@ impl IconPickerView {
                     } else {
                         self.theme.muted
                     })
-                    .when(can_go_prev, |div| div.cursor_pointer())
-                    .on_mouse_down(MouseButton::Left, cx.listener(|view, _event, _window, cx| {
-                        view.prev_page(cx);
-                    }))
+                    .when(can_go_prev, |div| {
+                        div.cursor_pointer()
+                            .on_mouse_move(|_event, _window, _cx| {
+                                // Trigger hover detection
+                            })
+                            .hover(move |style| {
+                                style.bg(self.theme.accent)
+                            })
+                            .on_mouse_down(
+                                MouseButton::Left,
+                                cx.listener(|view, _event, _window, cx| {
+                                    view.prev_page(cx);
+                                }),
+                            )
+                    })
                     .child(
                         div()
                             .text_sm()
                             .text_color(self.theme.foreground)
-                            .child("← Prev"),
+                            .child("Previous"),
                     ),
             )
             .child(
@@ -444,15 +598,26 @@ impl IconPickerView {
                             self.theme.muted
                         },
                     )
-                    .when(can_go_next, |div| div.cursor_pointer())
-                    .on_mouse_down(MouseButton::Left, cx.listener(|view, _event, _window, cx| {
-                        view.next_page(cx);
-                    }))
+                    .when(can_go_next, |div| {
+                        div.cursor_pointer()
+                            .on_mouse_move(|_event, _window, _cx| {
+                                // Trigger hover detection
+                            })
+                            .hover(move |style| {
+                                style.bg(self.theme.accent)
+                            })
+                            .on_mouse_down(
+                                MouseButton::Left,
+                                cx.listener(|view, _event, _window, cx| {
+                                    view.next_page(cx);
+                                }),
+                            )
+                    })
                     .child(
                         div()
                             .text_sm()
                             .text_color(self.theme.foreground)
-                            .child("Next →"),
+                            .child("Next"),
                     ),
             )
     }
@@ -556,7 +721,7 @@ impl IconPickerView {
             )
     }
 
-    fn render_main_content(&self, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render_main_content(&self, cx: &mut Context<Self>, window: &mut Window) -> impl IntoElement {
         div()
             .flex()
             .flex_col()
@@ -564,7 +729,7 @@ impl IconPickerView {
             .h_full()
             .bg(self.theme.background)
             .child(self.render_header())
-            .child(self.render_search_area(cx))
+            .child(self.render_search_area(cx, window))
             .child(
                 div()
                     .flex_1()
@@ -575,12 +740,16 @@ impl IconPickerView {
 }
 
 impl Render for IconPickerView {
-    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .flex()
             .size_full()
             .bg(self.theme.background)
-            .child(self.render_main_content(cx))
+            .on_mouse_move(cx.listener(|_view, _event, _window, cx| {
+                // Force repaint on mouse movement to update hover states
+                cx.notify();
+            }))
+            .child(self.render_main_content(cx, window))
     }
 }
 

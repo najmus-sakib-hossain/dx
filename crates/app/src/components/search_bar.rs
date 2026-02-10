@@ -54,7 +54,7 @@ impl SearchBar {
                 div()
                     .text_sm()
                     .text_color(theme.muted_foreground)
-                    .child("🔍"),
+                    .child("Search"),
             )
             .child(
                 div()
@@ -66,7 +66,7 @@ impl SearchBar {
                         theme.foreground
                     })
                     .child(if self.query.is_empty() {
-                        "Search icons... (type to search)".to_string()
+                        "Type to search icons...".to_string()
                     } else {
                         format!("Searching: {}", self.query)
                     }),
@@ -79,7 +79,7 @@ impl SearchBar {
                     .py_1()
                     .rounded(px(4.0))
                     .bg(theme.muted)
-                    .child("⌘K"),
+                    .child("Cmd+K"),
             )
     }
 

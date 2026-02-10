@@ -50,7 +50,7 @@ fn main() {
                     }),
                     ..Default::default()
                 },
-                move |_, cx| cx.new(|_| IconPickerView::new(theme, loader)),
+                move |_, cx| cx.new(|cx| IconPickerView::new(theme, loader, cx)),
             )
             .unwrap();
         });
