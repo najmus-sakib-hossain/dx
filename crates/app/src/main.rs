@@ -43,7 +43,11 @@ fn main() {
             cx.open_window(
                 WindowOptions {
                     window_bounds: Some(WindowBounds::Windowed(bounds)),
-                    titlebar: None,
+                    titlebar: Some(gpui::TitlebarOptions {
+                        title: Some("DX Icon Picker".into()),
+                        appears_transparent: false,
+                        traffic_light_position: None,
+                    }),
                     ..Default::default()
                 },
                 move |_, cx| cx.new(|_| IconPickerView::new(theme, loader)),

@@ -24,18 +24,18 @@ impl SearchBar {
     }
 
     pub fn render(self, theme: &Theme) -> impl IntoElement {
+        let theme_clone = theme.clone();
+        
         div()
             .flex()
-            .items_center()
+            .flex_col()
             .gap_3()
-            .px_6()
-            .py_3()
             .border_b_1()
             .border_color(theme.border)
             // Search input area
             .child(self.render_search_input(theme))
-            // Pack selector dropdown
-            .child(self.render_pack_selector(theme))
+            // Pack filter chips
+            .child(self.render_pack_filters(&theme_clone))
     }
 
     fn render_search_input(&self, theme: &Theme) -> impl IntoElement {
@@ -66,9 +66,9 @@ impl SearchBar {
                         theme.foreground
                     })
                     .child(if self.query.is_empty() {
-                        "Search icons... (e.g. home, arrow, github)".to_string()
+                        "Search icons... (type to search)".to_string()
                     } else {
-                        self.query.clone()
+                        format!("Searching: {}", self.query)
                     }),
             )
             .child(
@@ -83,36 +83,69 @@ impl SearchBar {
             )
     }
 
-    fn render_pack_selector(&self, theme: &Theme) -> impl IntoElement {
-        let label = self
-            .selected_pack
-            .as_ref()
-            .map(|p| p.as_str())
-            .unwrap_or("All Packs");
+    fn render_pack_filters(self, theme: &Theme) -> impl IntoElement {
+        let mut chips = div()
+            .flex()
+            .flex_wrap()
+            .gap_2()
+            .px_6()
+            .py_3();
+
+        // "All" chip
+        let all_active = self.selected_pack.is_none();
+        
+        chips = chips.child(
+            self.render_pack_chip("All", all_active, theme)
+        );
+
+        // Show top 15 packs
+        for pack_name in self.pack_names.iter().take(15) {
+            let active = self
+                .selected_pack
+                .as_ref()
+                .map(|p| p == pack_name)
+                .unwrap_or(false);
+            
+            chips = chips.child(
+                self.render_pack_chip(pack_name, active, theme)
+            );
+        }
+
+        chips
+    }
+
+    fn render_pack_chip(
+        &self,
+        label: &str,
+        active: bool,
+        theme: &Theme,
+    ) -> impl IntoElement {
+        let bg = if active {
+            theme.primary
+        } else {
+            theme.secondary
+        };
+        let fg = if active {
+            theme.primary_foreground
+        } else {
+            theme.secondary_foreground
+        };
 
         div()
             .flex()
             .items_center()
-            .gap_2()
+            .gap_1()
             .px_3()
-            .py_2()
-            .rounded(px(8.0))
-            .bg(theme.secondary)
-            .border_1()
-            .border_color(theme.border)
+            .py_1()
+            .rounded(px(12.0))
+            .bg(bg)
             .cursor_pointer()
             .hover(move |style| style.bg(theme.accent))
             .child(
                 div()
-                    .text_sm()
-                    .text_color(theme.foreground)
-                    .child(label.to_string()),
-            )
-            .child(
-                div()
                     .text_xs()
-                    .text_color(theme.muted_foreground)
-                    .child("▼"),
+                    .text_color(fg)
+                    .child(label.to_string()),
             )
     }
 }

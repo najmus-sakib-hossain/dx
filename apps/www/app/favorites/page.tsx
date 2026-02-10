@@ -13,7 +13,7 @@ export default function FavoritesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sorted, setSorted] = useState(false);
   const [displayCount, setDisplayCount] = useState(30);
-  const { data: favorites = [], isLoading } = useFavoritesQuery();
+  const { data: favorites = [], isLoading, isError, error } = useFavoritesQuery();
   const clearFavorites = useClearFavorites();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -93,6 +93,27 @@ export default function FavoritesPage() {
     );
   }
 
+  if (isError) {
+    return (
+      <div className="h-[calc(100vh-6rem)] bg-background rounded-md">
+        <ScrollArea className="h-full rounded-md border">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="flex flex-col items-center gap-3 text-center px-4">
+              <div className="text-red-500 text-4xl">⚠️</div>
+              <h2 className="text-xl font-semibold">Failed to load favorites</h2>
+              <p className="text-muted-foreground max-w-md">
+                {error instanceof Error ? error.message : 'An unknown error occurred while accessing the database.'}
+              </p>
+              <Button onClick={() => window.location.reload()} variant="outline" className="mt-2">
+                Retry
+              </Button>
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="h-[calc(100vh-6rem)] bg-background rounded-md">
@@ -120,7 +141,7 @@ export default function FavoritesPage() {
                   disabled={clearFavorites.isPending}
                   className="shrink-0 mr-2 h-10"
                 >
-                 Clear All
+                  Clear All
                 </Button>
               )}
             </div>

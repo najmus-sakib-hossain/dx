@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo, useRef, useState, useEffect } from 'react';
+import { useMemo, useRef, useState, useEffect, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Fuse from 'fuse.js';
 import { svgs as svglIcons } from '@/data/svgs';
@@ -13,10 +14,15 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { loadAllIcons, getAvailablePacks } from '@/lib/dx-icon-adapter';
 import { ICON_PACK_COUNTS } from '@/lib/icon-pack-counts';
 
-export default function Home() {
+function HomeContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { searchTerm, sorted, setSearchTerm, setSorted } = useUIStore();
   const [displayCount, setDisplayCount] = useState(30);
-  const [selectedPack, setSelectedPack] = useState('svgl');
+
+  // Derive selectedPack directly from URL - no state needed
+  const selectedPack = searchParams.get('pack') || 'svgl';
+
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -39,33 +45,16 @@ export default function Home() {
     placeholderData: (previousData) => previousData,
   });
 
-  // Listen for pack selection from sidebar
-  useEffect(() => {
-    const handlePackSelection = (event: CustomEvent<string>) => {
-      setSelectedPack(event.detail);
-    };
-    
-    window.addEventListener('selectIconPack', handlePackSelection as EventListener);
-    
-    // Check URL for pack parameter on mount
-    const urlParams = new URLSearchParams(window.location.search);
-    const packParam = urlParams.get('pack');
-    if (packParam) {
-      setSelectedPack(packParam);
-      // Clean up URL
-      window.history.replaceState({}, '', '/');
-    }
-    
-    return () => {
-      window.removeEventListener('selectIconPack', handlePackSelection as EventListener);
-    };
-  }, []);
+  // Handle pack change via URL update
+  const handlePackChange = (pack: string) => {
+    router.push(`/?pack=${pack}`);
+  };
 
   // Get icons based on selected pack
   const allIcons = useMemo(() => {
     if (selectedPack === 'svgl') return svglIcons;
     if (selectedPack === 'all') return [...svglIcons, ...allIconsData];
-    
+
     return allIconsData.filter((icon) => {
       const category = typeof icon.category === 'string' ? icon.category : icon.category[0];
       return category === selectedPack;
@@ -83,13 +72,13 @@ export default function Home() {
 
   const filteredSvgs = useMemo(() => {
     let result = searchTerm.trim() ? fuse.search(searchTerm).map((r) => r.item) : allIcons;
-    
+
     if (sorted) {
       result = [...result].sort((a, b) => a.title.localeCompare(b.title));
     } else {
       result = [...result].sort((a, b) => b.title.localeCompare(a.title));
     }
-    
+
     return result;
   }, [searchTerm, fuse, allIcons, sorted]);
 
@@ -133,9 +122,9 @@ export default function Home() {
       <div className="h-[calc(100vh-6rem)] bg-background rounded-md">
         <ScrollArea ref={scrollAreaRef} className="h-full rounded-md border">
           <div className="p-2 px-0 pt-0 min-h-[calc(100vh-6rem)] flex flex-col">
-            <SearchInput 
-              value={searchTerm} 
-              onChange={setSearchTerm} 
+            <SearchInput
+              value={searchTerm}
+              onChange={setSearchTerm}
               placeholder="Search icons..."
               totalIcons={allIcons.length}
               filteredCount={filteredSvgs.length}
@@ -144,7 +133,7 @@ export default function Home() {
               onClearSearch={() => setSearchTerm('')}
               showSortButton={filteredSvgs.length > 0}
               selectedPack={selectedPack}
-              onPackChange={setSelectedPack}
+              onPackChange={handlePackChange}
               availablePacks={availablePacks}
             />
             <div className="flex-1 px-2 flex flex-col">
@@ -187,5 +176,20 @@ export default function Home() {
         </ScrollArea>
       </div>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="h-[calc(100vh-6rem)] bg-background rounded-md border flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+          <p className="text-muted-foreground">Initializing...</p>
+        </div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }

@@ -34,7 +34,7 @@ export async function loadAllIcons(): Promise<iSVG[]> {
   if (iconCache) return iconCache;
   
   const iconData = await loadAllIconData();
-  iconCache = iconData.map((icon, index) => iconToSVG(icon, index + 1));
+  iconCache = iconData.map((icon, index) => iconToSVG(icon, index + 10000));
   
   return iconCache;
 }

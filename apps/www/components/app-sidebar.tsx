@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Home, Heart, Package } from 'lucide-react';
 import {
   Sidebar,
@@ -28,6 +28,7 @@ const mainNav = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   // Initialize with all packs immediately from static data to prevent flashing
   const allPackNames = ['svgl', ...Object.keys(ICON_PACK_COUNTS).sort()];
   const [iconPacks] = useState<string[]>(allPackNames);
@@ -81,12 +82,7 @@ export function AppSidebar() {
                       <button
                         className="w-full h-8 p-2 flex items-center justify-between flex-row text-muted-foreground hover:text-primary hover:bg-accent rounded-md transition-colors"
                         onClick={() => {
-                          // Navigate to home page and trigger pack selection
-                          if (pathname !== '/') {
-                            window.location.href = `/?pack=${pack}`;
-                          } else {
-                            window.dispatchEvent(new CustomEvent('selectIconPack', { detail: pack }));
-                          }
+                          router.push(`/?pack=${pack}`);
                         }}
                       >
                         <span className="text-sm w-32 text-left truncate">{displayName}</span>

@@ -1,8 +1,7 @@
-use gpui::{div, prelude::*, px, Context, IntoElement, Window};
+use gpui::{div, prelude::*, px, Context, IntoElement, MouseButton, Window};
 use std::sync::Arc;
 
 use crate::components::icon_grid::{IconGrid, IconGridItem};
-use crate::components::search_bar::SearchBar;
 use crate::icons::data::{IconSource};
 use crate::icons::IconDataLoader;
 use crate::theme::Theme;
@@ -14,7 +13,6 @@ const ICONS_PER_PAGE: usize = 50;
 const MAX_TOTAL_ICONS: usize = 5000;
 
 /// The main icon picker view - equivalent of the www Next.js icon browser
-#[allow(dead_code)]
 pub struct IconPickerView {
     theme: Theme,
     /// All loaded icon data (shared reference)
@@ -57,7 +55,6 @@ impl IconPickerView {
     }
 
     /// Update the filtered icon list based on current search query and pack filter
-    #[allow(dead_code)]
     fn update_filter(&mut self) {
         let query = self.search_query.to_lowercase();
         let icons = self.loader.icons();
@@ -89,6 +86,36 @@ impl IconPickerView {
         // Reset pagination
         self.page_offset = 0;
         self.selected_icon = None;
+    }
+
+    /// Set search query and update filter
+    fn set_search_query(&mut self, query: String, cx: &mut Context<Self>) {
+        self.search_query = query;
+        self.update_filter();
+        cx.notify();
+    }
+
+    /// Set selected pack and update filter
+    fn set_selected_pack(&mut self, pack: Option<String>, cx: &mut Context<Self>) {
+        self.selected_pack = pack;
+        self.update_filter();
+        cx.notify();
+    }
+
+    /// Go to next page
+    fn next_page(&mut self, cx: &mut Context<Self>) {
+        if self.page_offset + ICONS_PER_PAGE < self.filtered_icons.len() {
+            self.page_offset += ICONS_PER_PAGE;
+            cx.notify();
+        }
+    }
+
+    /// Go to previous page
+    fn prev_page(&mut self, cx: &mut Context<Self>) {
+        if self.page_offset >= ICONS_PER_PAGE {
+            self.page_offset -= ICONS_PER_PAGE;
+            cx.notify();
+        }
     }
 
     fn render_header(&self) -> impl IntoElement {
@@ -147,13 +174,144 @@ impl IconPickerView {
             )
     }
 
-    fn render_search_area(&self) -> impl IntoElement {
-        SearchBar::new(
-            self.search_query.clone(),
-            self.selected_pack.clone(),
-            self.pack_names.clone(),
-        )
-        .render(&self.theme)
+    fn render_search_area(&self, cx: &mut Context<Self>) -> impl IntoElement {
+        let theme = self.theme.clone();
+        
+        div()
+            .flex()
+            .flex_col()
+            .gap_3()
+            .border_b_1()
+            .border_color(theme.border)
+            // Search input display
+            .child(self.render_search_input(&theme))
+            // Pack filter chips with click handlers
+            .child(self.render_pack_chips(cx, &theme))
+    }
+    
+    fn render_search_input(&self, theme: &Theme) -> impl IntoElement {
+        div()
+            .flex()
+            .flex_1()
+            .items_center()
+            .gap_2()
+            .px_6()
+            .py_3()
+            .child(
+                div()
+                    .flex()
+                    .flex_1()
+                    .items_center()
+                    .gap_2()
+                    .px_4()
+                    .py_2()
+                    .rounded(px(8.0))
+                    .bg(theme.card)
+                    .border_1()
+                    .border_color(theme.border)
+                    .child(
+                        div()
+                            .text_sm()
+                            .text_color(theme.muted_foreground)
+                            .child("🔍"),
+                    )
+                    .child(
+                        div()
+                            .flex_1()
+                            .text_sm()
+                            .text_color(if self.search_query.is_empty() {
+                                theme.muted_foreground
+                            } else {
+                                theme.foreground
+                            })
+                            .child(if self.search_query.is_empty() {
+                                "Search icons... (type to search)".to_string()
+                            } else {
+                                format!("Searching: {}", self.search_query)
+                            }),
+                    )
+                    .child(
+                        div()
+                            .text_xs()
+                            .text_color(theme.muted_foreground)
+                            .px_2()
+                            .py_1()
+                            .rounded(px(4.0))
+                            .bg(theme.muted)
+                            .child("⌘K"),
+                    ),
+            )
+    }
+    
+    fn render_pack_chips(&self, cx: &mut Context<Self>, theme: &Theme) -> impl IntoElement {
+        let mut chips = div()
+            .flex()
+            .flex_wrap()
+            .gap_2()
+            .px_6()
+            .py_3();
+
+        // "All" chip
+        let all_active = self.selected_pack.is_none();
+        chips = chips.child(self.render_pack_chip("All", all_active, None, cx, theme));
+
+        // Show top 15 packs
+        for pack_name in self.pack_names.iter().take(15) {
+            let active = self
+                .selected_pack
+                .as_ref()
+                .map(|p| p == pack_name)
+                .unwrap_or(false);
+            
+            chips = chips.child(
+                self.render_pack_chip(pack_name, active, Some(pack_name.clone()), cx, theme)
+            );
+        }
+
+        chips
+    }
+    
+    fn render_pack_chip(
+        &self,
+        label: &str,
+        active: bool,
+        pack: Option<String>,
+        cx: &mut Context<Self>,
+        theme: &Theme,
+    ) -> impl IntoElement {
+        let bg = if active {
+            theme.primary
+        } else {
+            theme.secondary
+        };
+        let fg = if active {
+            theme.primary_foreground
+        } else {
+            theme.secondary_foreground
+        };
+
+        div()
+            .flex()
+            .items_center()
+            .gap_1()
+            .px_3()
+            .py_1()
+            .rounded(px(12.0))
+            .bg(bg)
+            .cursor_pointer()
+            .hover(move |style| style.bg(theme.accent))
+            .on_mouse_down(
+                MouseButton::Left,
+                cx.listener(move |view, _event, _window, cx| {
+                    view.set_selected_pack(pack.clone(), cx);
+                }),
+            )
+            .child(
+                div()
+                    .text_xs()
+                    .text_color(fg)
+                    .child(label.to_string()),
+            )
     }
 
     #[allow(dead_code)]
@@ -230,10 +388,13 @@ impl IconPickerView {
         IconGrid::new(visible_icons).render(&self.theme)
     }
 
-    fn render_pagination(&self) -> impl IntoElement {
+    fn render_pagination(&self, cx: &mut Context<Self>) -> impl IntoElement {
         let total = self.filtered_icons.len();
         let page = self.page_offset / ICONS_PER_PAGE + 1;
         let total_pages = (total + ICONS_PER_PAGE - 1) / ICONS_PER_PAGE;
+        
+        let can_go_prev = self.page_offset > 0;
+        let can_go_next = self.page_offset + ICONS_PER_PAGE < total;
 
         div()
             .flex()
@@ -249,12 +410,15 @@ impl IconPickerView {
                     .px_3()
                     .py_1()
                     .rounded(px(6.0))
-                    .bg(if self.page_offset > 0 {
+                    .bg(if can_go_prev {
                         self.theme.secondary
                     } else {
                         self.theme.muted
                     })
-                    .cursor_pointer()
+                    .when(can_go_prev, |div| div.cursor_pointer())
+                    .on_mouse_down(MouseButton::Left, cx.listener(|view, _event, _window, cx| {
+                        view.prev_page(cx);
+                    }))
                     .child(
                         div()
                             .text_sm()
@@ -274,13 +438,16 @@ impl IconPickerView {
                     .py_1()
                     .rounded(px(6.0))
                     .bg(
-                        if self.page_offset + ICONS_PER_PAGE < total {
+                        if can_go_next {
                             self.theme.secondary
                         } else {
                             self.theme.muted
                         },
                     )
-                    .cursor_pointer()
+                    .when(can_go_next, |div| div.cursor_pointer())
+                    .on_mouse_down(MouseButton::Left, cx.listener(|view, _event, _window, cx| {
+                        view.next_page(cx);
+                    }))
                     .child(
                         div()
                             .text_sm()
@@ -389,7 +556,7 @@ impl IconPickerView {
             )
     }
 
-    fn render_main_content(&self) -> impl IntoElement {
+    fn render_main_content(&self, cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .flex()
             .flex_col()
@@ -397,23 +564,23 @@ impl IconPickerView {
             .h_full()
             .bg(self.theme.background)
             .child(self.render_header())
-            .child(self.render_search_area())
+            .child(self.render_search_area(cx))
             .child(
                 div()
                     .flex_1()
                     .child(self.render_icon_grid()),
             )
-            .child(self.render_pagination())
+            .child(self.render_pagination(cx))
     }
 }
 
 impl Render for IconPickerView {
-    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .flex()
             .size_full()
             .bg(self.theme.background)
-            .child(self.render_main_content())
+            .child(self.render_main_content(cx))
     }
 }
 

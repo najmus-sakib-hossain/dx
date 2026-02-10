@@ -1,4 +1,4 @@
-use gpui::{div, svg, prelude::*, px, IntoElement, SharedString};
+use gpui::{div, svg, prelude::*, px, IntoElement, MouseButton, SharedString};
 use crate::theme::Theme;
 
 /// A single icon to render in the grid
@@ -86,6 +86,12 @@ impl IconCell {
         } else {
             theme.card
         };
+        
+        let hover_bg = theme.destructive;  // Danger/destructive color on hover
+        let hover_border = theme.destructive;
+        
+        let icon_name = self.item.name.clone();
+        let icon_pack = self.item.pack.clone();
 
         div()
             .flex()
@@ -99,6 +105,19 @@ impl IconCell {
             .bg(bg)
             .border_1()
             .border_color(border_col)
+            .hover(move |style| {
+                style
+                    .bg(hover_bg)
+                    .border_color(hover_border)
+            })
+            .cursor_pointer()
+            .on_mouse_down(MouseButton::Left, move |_event, _window, _cx| {
+                // Icon clicked - in a full implementation, this would:
+                // 1. Copy icon name to clipboard
+                // 2. Show icon details
+                // 3. Update selection state
+                println!("Icon clicked: {} ({})", icon_name, icon_pack);
+            })
             // Icon preview area (larger)
             .child(
                 div()

@@ -4,6 +4,8 @@ pub mod icon_grid;
 pub mod input;
 pub mod search_bar;
 pub mod sidebar;
+pub mod titlebar;
+pub mod ui;
 
 #[allow(unused_imports)]
 pub use button::Button;
@@ -13,3 +15,5 @@ pub use card::Card;
 pub use input::InputArea;
 #[allow(unused_imports)]
 pub use sidebar::Sidebar;
+#[allow(unused_imports)]
+pub use titlebar::TitleBar;
