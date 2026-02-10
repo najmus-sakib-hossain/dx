@@ -1,3 +1,8 @@
 Please look at the "F:\Dx\apps\www" path folder where you can find "F:\Dx\apps\www\public\icons" json files and and "F:\Dx\apps\www\public\svgl" folder there is svg icons for svgl icon sets now in our crates/apps gpui rust desktop app we have to show that icons as in the www folder nextjs project so Please do a web search about the latest Zed's GPUI on 10th February 2026 and create an icon picker with a list of all the icons. As the root app/www next day's website we have did. At the trace icon folder, there you can find enough based icon searcher and lister, so please use that to do all of the searching and listing of the icons of our apps and use all data like the next day's public folder, hbcl folder, and icons folder icons. 
-
 Please clarify all the things and ask me questions to clarify all the things!!!
+
+Please look at the root crates/app folder. There we are giving icon search app UI using JET's GPUI Rust crate. But currently we are not actually showing the real SVGs. So please do a web search and learn how to show real SVGs in Rust GPUI and show them correctly. Also, the app is lagging so mass. Please do a web search to load the icon in a way that it doesn't lag. 
+
+Please do a web search about how zed code editor show icons in their code code editor as they also use gpui and learn from it and apply it here too!!! and also currently the icons are not showinga nd also the whole app is too much lagging so just so only 100 icons for now!!!
+
+If you can't do it please create markdown asking another good ai about how zed team uses svg in their code editor and how we are using it that is not actully showing the svg icons and ask for correct way!!!

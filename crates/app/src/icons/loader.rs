@@ -32,17 +32,9 @@ impl IconDataLoader {
 
     /// Load all icon data from every source
     pub fn load_all(&mut self) -> Result<()> {
-        println!("🔍 Loading icons from all sources...");
+        println!("🔍 Loading ONLY 10 SVG icons for testing...");
 
-        // 1. Iconify JSON packs from apps/www/public/icons
-        let www_icons_dir = self.project_root.join("apps/www/public/icons");
-        if www_icons_dir.exists() {
-            self.load_iconify_dir(&www_icons_dir, IconSource::WwwIcons)?;
-        } else {
-            println!("  ⚠ apps/www/public/icons not found");
-        }
-
-        // 2. SVG files from apps/www/public/svgl
+        // ONLY load from www/svgl (just SVG files, not JSON packs)
         let svgl_dir = self.project_root.join("apps/www/public/svgl");
         if svgl_dir.exists() {
             self.load_svgl_dir(&svgl_dir)?;
@@ -50,13 +42,19 @@ impl IconDataLoader {
             println!("  ⚠ apps/www/public/svgl not found");
         }
 
-        // 3. Iconify JSON packs from crates/icon/data
-        let crate_data_dir = self.project_root.join("crates/icon/data");
-        if crate_data_dir.exists() {
-            self.load_iconify_dir(&crate_data_dir, IconSource::CrateData)?;
-        } else {
-            println!("  ⚠ crates/icon/data not found");
-        }
+        // Comment out other sources to avoid duplicates and reduce load
+        // let www_icons_dir = self.project_root.join("apps/www/public/icons");
+        // if www_icons_dir.exists() {
+        //     self.load_iconify_dir(&www_icons_dir, IconSource::WwwIcons)?;
+        // }
+
+        // let crate_data_dir = self.project_root.join("crates/icon/data");
+        // if crate_data_dir.exists() {
+        //     self.load_iconify_dir(&crate_data_dir, IconSource::CrateData)?;
+        // }
+
+        // Limit to only 10 icons
+        self.icons.truncate(10);
 
         // Build pack index
         self.build_pack_index();

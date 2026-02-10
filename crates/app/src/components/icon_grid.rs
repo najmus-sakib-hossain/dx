@@ -1,8 +1,15 @@
-use gpui::{div, prelude::*, px, IntoElement};
+use gpui::{div, svg, prelude::*, px, white, black, hsla, IntoElement, SharedString};
 use crate::theme::Theme;
 
+/// Get a color for an icon based on its name (simple hash-based coloring)
+fn get_icon_color(name: &str) -> gpui::Hsla {
+    let hash = name.bytes().fold(0u32, |acc, b| acc.wrapping_mul(31).wrapping_add(b as u32));
+    let hue = (hash % 360) as f32;
+    hsla(hue / 360.0, 0.7, 0.5, 1.0)
+}
+
 /// A single icon to render in the grid
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct IconGridItem {
     pub index: usize,
     pub name: String,
@@ -91,54 +98,54 @@ impl IconCell {
             .flex_col()
             .items_center()
             .justify_center()
-            .gap_1()
-            .w(px(80.0))
-            .h(px(88.0))
+            .gap_2()
+            .w(px(120.0))
+            .h(px(140.0))
             .rounded(px(8.0))
             .bg(bg)
             .border_1()
             .border_color(border_col)
-            .cursor_pointer()
-            .hover(move |style| style.bg(theme.accent).border_color(theme.ring))
-            // Icon preview area
+            // Icon preview area (larger)
             .child(
                 div()
                     .flex()
                     .items_center()
                     .justify_center()
-                    .size(px(36.0))
+                    .size(px(80.0))
                     .child(self.render_icon_preview(theme)),
             )
-            // Icon name (truncated)
+            // Icon name
             .child(
                 div()
-                    .text_xs()
-                    .text_color(theme.muted_foreground)
+                    .text_sm()
+                    .text_color(theme.foreground)
                     .overflow_x_hidden()
-                    .max_w(px(72.0))
-                    .child(truncate_name(&self.item.name, 10)),
+                    .max_w(px(110.0))
+                    .child(truncate_name(&self.item.name, 15)),
             )
     }
 
     fn render_icon_preview(&self, theme: &Theme) -> impl IntoElement {
-        // GPUI's svg() element loads from asset paths, not inline SVG strings.
-        // For now, render a text representation. In a full implementation,
-        // we'd write temporary SVG files or use a custom Element to paint paths.
-        //
-        // We display the first few meaningful characters of the icon name as a
-        // visual placeholder, styled to look like an icon cell.
-
-        let display_char = get_icon_emoji(&self.item.pack, &self.item.name);
-
+        // Now that we have AssetSource registered, svg().path() will work!
+        let asset_path = format!("icons/{}.svg", self.item.name);
+        
+        println!("  Rendering SVG: {} from asset path: {}", self.item.name, asset_path);
+        
         div()
             .flex()
             .items_center()
             .justify_center()
-            .size(px(32.0))
+            .size(px(64.0))
+            .bg(white())  // White background to see the icons clearly
             .rounded(px(4.0))
-            .text_color(theme.foreground)
-            .text_base()
-            .child(display_char)
+            .child(
+                svg()
+                    .path(SharedString::from(asset_path))
+                    .size(px(48.0))
+                    .text_color(gpui::black())  // CRITICAL: Color the SVG (most use currentColor)
+                    .flex_shrink_0(),
+            )
+            .into_any_element()
     }
 }
 

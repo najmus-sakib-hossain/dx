@@ -1,8 +1,10 @@
+mod assets;
 mod components;
 mod icons;
 mod theme;
 mod views;
 
+use assets::Assets;
 use gpui::{px, size, App, AppContext, Application, Bounds, WindowBounds, WindowOptions};
 use icons::IconDataLoader;
 use std::sync::Arc;
@@ -24,22 +26,25 @@ fn main() {
     }
     let loader = Arc::new(loader);
 
-    Application::new().run(move |cx: &mut App| {
-        // Use dark theme as default
-        let theme = Theme::new(ThemeMode::Dark);
-        let loader = loader.clone();
+    // Create application with asset source
+    Application::new()
+        .with_assets(Assets)
+        .run(move |cx: &mut App| {
+            // Use dark theme as default
+            let theme = Theme::new(ThemeMode::Dark);
+            let loader = loader.clone();
 
-        let bounds = Bounds::centered(None, size(px(1440.0), px(900.0)), cx);
-        cx.open_window(
-            WindowOptions {
-                window_bounds: Some(WindowBounds::Windowed(bounds)),
-                titlebar: None,
-                ..Default::default()
-            },
-            move |_, cx| cx.new(|_| IconPickerView::new(theme, loader)),
-        )
-        .unwrap();
-    });
+            let bounds = Bounds::centered(None, size(px(1440.0), px(900.0)), cx);
+            cx.open_window(
+                WindowOptions {
+                    window_bounds: Some(WindowBounds::Windowed(bounds)),
+                    titlebar: None,
+                    ..Default::default()
+                },
+                move |_, cx| cx.new(|_| IconPickerView::new(theme, loader)),
+            )
+            .unwrap();
+        });
 }
 
 /// Walk up from the current exe or cwd to find the DX monorepo root

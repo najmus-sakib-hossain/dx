@@ -7,8 +7,11 @@ use crate::icons::data::{IconSource, LoadedIcon};
 use crate::icons::IconDataLoader;
 use crate::theme::Theme;
 
-/// How many icons to display per page in the grid
-const ICONS_PER_PAGE: usize = 200;
+/// How many icons to display per page in the grid (reduced for better performance)
+const ICONS_PER_PAGE: usize = 50;
+
+/// Maximum total icons to load (to prevent lag)
+const MAX_TOTAL_ICONS: usize = 10;
 
 /// The main icon picker view - equivalent of the www Next.js icon browser
 pub struct IconPickerView {
@@ -34,9 +37,9 @@ pub struct IconPickerView {
 impl IconPickerView {
     pub fn new(theme: Theme, loader: Arc<IconDataLoader>) -> Self {
         let pack_names = loader.pack_names();
-        let total_count = loader.total_icons();
+        let total_count = loader.total_icons().min(MAX_TOTAL_ICONS);
 
-        // Initially show all icons
+        // Initially show limited icons for performance
         let filtered_icons: Vec<usize> = (0..total_count).collect();
 
         Self {
@@ -199,13 +202,17 @@ impl IconPickerView {
 
     fn render_icon_grid(&self) -> impl IntoElement {
         let icons = self.loader.icons();
-        let end = (self.page_offset + ICONS_PER_PAGE).min(self.filtered_icons.len());
-        let visible_range = &self.filtered_icons[self.page_offset..end];
-
-        let items: Vec<IconGridItem> = visible_range
+        
+        println!("🎨 Rendering {} SVG icons from bundled assets...", icons.len().min(10));
+        
+        // Only show first 10 icons - these are now bundled as assets
+        let visible_icons: Vec<IconGridItem> = icons
             .iter()
-            .map(|&idx| {
-                let icon = &icons[idx];
+            .take(10)
+            .enumerate()
+            .map(|(idx, icon)| {
+                println!("  Icon {}: {} -> assets/icons/{}.svg", idx, icon.name, icon.name);
+
                 IconGridItem {
                     index: idx,
                     name: icon.name.clone(),
@@ -213,12 +220,12 @@ impl IconPickerView {
                     svg_body: icon.svg_body.clone(),
                     width: icon.width,
                     height: icon.height,
-                    selected: self.selected_icon == Some(idx),
+                    selected: false,
                 }
             })
             .collect();
 
-        IconGrid::new(items).render(&self.theme)
+        IconGrid::new(visible_icons).render(&self.theme)
     }
 
     fn render_pagination(&self) -> impl IntoElement {
@@ -281,182 +288,7 @@ impl IconPickerView {
             )
     }
 
-    fn render_detail_panel(&self) -> impl IntoElement {
-        if let Some(idx) = self.selected_icon {
-            let icons = self.loader.icons();
-            if let Some(icon) = icons.get(idx) {
-                return div()
-                    .flex()
-                    .flex_col()
-                    .w(px(280.0))
-                    .h_full()
-                    .bg(self.theme.card)
-                    .border_l_1()
-                    .border_color(self.theme.border)
-                    .child(self.render_detail_content(icon))
-                    .into_any_element();
-            }
-        }
-
-        // Empty detail panel placeholder
-        div()
-            .flex()
-            .flex_col()
-            .w(px(280.0))
-            .h_full()
-            .bg(self.theme.card)
-            .border_l_1()
-            .border_color(self.theme.border)
-            .items_center()
-            .justify_center()
-            .child(
-                div()
-                    .text_sm()
-                    .text_color(self.theme.muted_foreground)
-                    .child("Select an icon to view details"),
-            )
-            .into_any_element()
-    }
-
-    fn render_detail_content(&self, icon: &LoadedIcon) -> impl IntoElement {
-        div()
-            .flex()
-            .flex_col()
-            .gap_4()
-            .p_6()
-            // Large preview
-            .child(
-                div()
-                    .flex()
-                    .items_center()
-                    .justify_center()
-                    .size(px(120.0))
-                    .mx_auto()
-                    .rounded(px(12.0))
-                    .bg(self.theme.background)
-                    .border_1()
-                    .border_color(self.theme.border)
-                    .child(
-                        div()
-                            .text_3xl()
-                            .text_color(self.theme.foreground)
-                            .child("📎"), // Placeholder for SVG preview
-                    ),
-            )
-            // Icon name
-            .child(
-                div()
-                    .flex()
-                    .flex_col()
-                    .gap_1()
-                    .child(
-                        div()
-                            .text_xs()
-                            .text_color(self.theme.muted_foreground)
-                            .child("Name"),
-                    )
-                    .child(
-                        div()
-                            .text_sm()
-                            .text_color(self.theme.foreground)
-                            .child(icon.name.clone()),
-                    ),
-            )
-            // Pack
-            .child(
-                div()
-                    .flex()
-                    .flex_col()
-                    .gap_1()
-                    .child(
-                        div()
-                            .text_xs()
-                            .text_color(self.theme.muted_foreground)
-                            .child("Pack"),
-                    )
-                    .child(
-                        div()
-                            .text_sm()
-                            .text_color(self.theme.foreground)
-                            .child(icon.pack.clone()),
-                    ),
-            )
-            // Source
-            .child(
-                div()
-                    .flex()
-                    .flex_col()
-                    .gap_1()
-                    .child(
-                        div()
-                            .text_xs()
-                            .text_color(self.theme.muted_foreground)
-                            .child("Source"),
-                    )
-                    .child(
-                        div()
-                            .text_sm()
-                            .text_color(self.theme.foreground)
-                            .child(icon.source.to_string()),
-                    ),
-            )
-            // Dimensions
-            .child(
-                div()
-                    .flex()
-                    .flex_col()
-                    .gap_1()
-                    .child(
-                        div()
-                            .text_xs()
-                            .text_color(self.theme.muted_foreground)
-                            .child("Dimensions"),
-                    )
-                    .child(
-                        div()
-                            .text_sm()
-                            .text_color(self.theme.foreground)
-                            .child(format!("{}×{}", icon.width, icon.height)),
-                    ),
-            )
-            // Copy SVG button
-            .child(
-                div()
-                    .mt_4()
-                    .px_4()
-                    .py_2()
-                    .rounded(px(6.0))
-                    .bg(self.theme.primary)
-                    .cursor_pointer()
-                    .flex()
-                    .items_center()
-                    .justify_center()
-                    .child(
-                        div()
-                            .text_sm()
-                            .text_color(self.theme.primary_foreground)
-                            .child("Copy SVG"),
-                    ),
-            )
-            // Copy ID button
-            .child(
-                div()
-                    .px_4()
-                    .py_2()
-                    .rounded(px(6.0))
-                    .bg(self.theme.secondary)
-                    .cursor_pointer()
-                    .flex()
-                    .items_center()
-                    .justify_center()
-                    .child(
-                        div()
-                            .text_sm()
-                            .text_color(self.theme.secondary_foreground)
-                            .child(format!("Copy: {}", icon.id)),
-                    ),
-            )
-    }
+    // Detail panel removed - not needed for simple 10 icon display
 
     fn render_sidebar(&self) -> impl IntoElement {
         let theme = self.theme.clone();
@@ -578,11 +410,35 @@ impl Render for IconPickerView {
     fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .flex()
+            .flex_col()
             .size_full()
             .bg(self.theme.background)
-            .child(self.render_sidebar())
-            .child(self.render_main_content())
-            .child(self.render_detail_panel())
+            .items_center()
+            .justify_center()
+            .gap_4()
+            // Simple title
+            .child(
+                div()
+                    .text_2xl()
+                    .text_color(self.theme.foreground)
+                    .child(format!("DX Icon Viewer - {} SVG Icons", self.loader.total_icons())),
+            )
+            // Debug info
+            .child(
+                div()
+                    .text_sm()
+                    .text_color(self.theme.muted_foreground)
+                    .child("Rendering SVG icons from bundled assets (like Zed does)"),
+            )
+            // Just the icon grid, nothing else
+            .child(
+                div()
+                    .flex()
+                    .flex_wrap()
+                    .gap_4()
+                    .p_4()
+                    .child(self.render_icon_grid()),
+            )
     }
 }
 
