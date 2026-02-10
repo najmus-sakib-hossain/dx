@@ -1,3 +1,6 @@
+At apps/www folder please do these:
+
+```markdown
 # ============================================================================
 #  DX — OFFICIAL WEBSITE · SYSTEM INSTRUCTIONS
 #  Enhanced Development Experience · https://dx.dev
@@ -785,3 +788,4 @@ When in doubt, choose:
 # ============================================================================
 #  END OF SYSTEM INSTRUCTIONS
 # ============================================================================
+```
