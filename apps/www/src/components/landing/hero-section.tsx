@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Spotlight } from "@/components/effects";
+import { SilkBackground } from "@/components/backgrounds/silk-background";
+import { GradualBlur } from "@/components/animations/gradual-blur";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowRight, Terminal, Sparkles } from "lucide-react";
@@ -15,6 +17,9 @@ import Link from "next/link";
 export function HeroSection() {
   return (
     <section className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden px-4 py-32 text-center">
+      {/* Silk flowing background */}
+      <SilkBackground className="absolute inset-0 -z-20 opacity-30" />
+
       {/* Animated gradient mesh background */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/80" />
@@ -53,20 +58,22 @@ export function HeroSection() {
       </motion.div>
 
       {/* Headline */}
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="max-w-5xl text-5xl font-bold tracking-tight sm:text-7xl lg:text-8xl"
-      >
-        <span className="bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-transparent">
-          Enhanced
-        </span>
-        <br />
-        <span className="bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
-          Development Experience
-        </span>
-      </motion.h1>
+      <GradualBlur delay={0.15} duration={0.8}>
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="max-w-5xl text-5xl font-bold tracking-tight sm:text-7xl lg:text-8xl"
+        >
+          <span className="bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-transparent">
+            Enhanced
+          </span>
+          <br />
+          <span className="bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
+            Development Experience
+          </span>
+        </motion.h1>
+      </GradualBlur>
 
       {/* Subheadline */}
       <motion.p

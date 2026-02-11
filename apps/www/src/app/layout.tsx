@@ -1,3 +1,4 @@
+import { ChatPanel } from "@/components/chat/chat-panel";
 import { DockBar } from "@/components/dock/dock-bar";
 import { ActiveThemeProvider } from "@/components/providers/active-theme";
 import { ThemeProvider } from "@/components/providers/theme-provider";
@@ -61,6 +62,7 @@ export default function RootLayout({
         >
           <ActiveThemeProvider>
             {children}
+            <ChatPanel />
             <DockBar />
           </ActiveThemeProvider>
         </ThemeProvider>

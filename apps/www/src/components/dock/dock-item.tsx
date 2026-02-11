@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 import {
   type MotionValue,
   motion,
-  useMotionValue,
   useSpring,
   useTransform,
 } from "framer-motion";
@@ -23,9 +22,14 @@ export interface DockItemProps {
   title: string;
   icon: LucideIcon;
   href: string;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
-export function DockItem({ mouseX, title, icon: Icon, href }: DockItemProps) {
+/**
+ * DockItem — Individual item in the macOS-style dock bar.
+ * Scales based on mouse proximity for the magnification effect.
+ */
+export function DockItem({ mouseX, title, icon: Icon, href, onClick }: DockItemProps) {
   const ref = React.useRef<HTMLDivElement>(null);
 
   const distance = useTransform(mouseX, (val) => {
@@ -40,22 +44,39 @@ export function DockItem({ mouseX, title, icon: Icon, href }: DockItemProps) {
     damping: 12,
   });
 
+  const content = (
+    <motion.div
+      ref={ref}
+      style={{ width }}
+      className={cn(
+        "aspect-square w-10 rounded-full flex items-center justify-center",
+        "bg-neutral-200/60 dark:bg-neutral-800/80",
+        "border border-white/10 dark:border-white/[0.06]",
+        "backdrop-blur-md shadow-lg",
+        "hover:bg-neutral-300/80 dark:hover:bg-neutral-700/80",
+        "transition-colors cursor-pointer"
+      )}
+    >
+      <Icon className="size-[45%] text-neutral-700 dark:text-neutral-200" />
+    </motion.div>
+  );
+
   return (
-    <TooltipProvider>
+    <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Link href={href}>
-            <motion.div
-              ref={ref}
-              style={{ width }}
-              className="aspect-square w-10 rounded-full bg-neutral-400/20 dark:bg-neutral-800/80 flex items-center justify-center border border-white/10 backdrop-blur-md shadow-lg hover:bg-neutral-300 dark:hover:bg-neutral-700/80 transition-colors"
-            >
-              <Icon className="size-5 text-neutral-800 dark:text-neutral-200" />
-            </motion.div>
-          </Link>
+          {onClick ? (
+            <button type="button" onClick={onClick} aria-label={title}>
+              {content}
+            </button>
+          ) : (
+            <Link href={href} aria-label={title}>
+              {content}
+            </Link>
+          )}
         </TooltipTrigger>
-        <TooltipContent>
-          <p>{title}</p>
+        <TooltipContent side="top" sideOffset={8}>
+          <p className="text-xs font-medium">{title}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

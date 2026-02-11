@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { PixelCard } from "@/components/animations/pixel-card";
 import { motion } from "framer-motion";
 import {
     Code2,
@@ -129,9 +130,10 @@ export function FeaturesSection() {
                 >
                     {FEATURES.map((feature) => (
                         <motion.div key={feature.title} variants={itemVariants as any}>
+                          <PixelCard className="h-full">
                             <Link
                                 href={feature.href}
-                                className="group relative flex flex-col rounded-xl border border-border bg-card/50 p-6 transition-all duration-300 hover:border-primary/30 hover:bg-card hover:shadow-lg hover:shadow-primary/5"
+                                className="group relative flex h-full flex-col rounded-xl border border-border bg-card/50 p-6 transition-all duration-300 hover:border-primary/30 hover:bg-card hover:shadow-lg hover:shadow-primary/5"
                             >
                                 <feature.icon
                                     className={cn("mb-4 size-8", feature.color)}
@@ -147,6 +149,7 @@ export function FeaturesSection() {
                                     Learn more →
                                 </div>
                             </Link>
+                          </PixelCard>
                         </motion.div>
                     ))}
                 </motion.div>

@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 const serverEnvSchema = z.object({
-  DATABASE_URL: z.string().url().optional(), // Optional for now until DB is set up
-  CLERK_SECRET_KEY: z.string().min(1).optional(),
-  CLERK_WEBHOOK_SECRET: z.string().min(1).optional(),
+  DATABASE_URL: z.string().url().optional(),
+  BETTER_AUTH_SECRET: z.string().min(1).optional(),
+  BETTER_AUTH_WEBHOOK_SECRET: z.string().min(1).optional(),
   SOCKET_SECRET: z.string().min(1).optional(),
   SENTRY_DSN: z.string().url().optional(),
   SENTRY_AUTH_TOKEN: z.string().min(1).optional(),
@@ -13,11 +13,6 @@ const serverEnvSchema = z.object({
 const clientEnvSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
   NEXT_PUBLIC_APP_NAME: z.string().min(1).default("DX"),
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1).optional(),
-  NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().default("/sign-in"),
-  NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().default("/sign-up"),
-  NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().default("/dashboard"),
-  NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().default("/dashboard"),
   NEXT_PUBLIC_SOCKET_URL: z.string().url().optional(),
   NEXT_PUBLIC_POSTHOG_KEY: z.string().min(1).optional(),
   NEXT_PUBLIC_POSTHOG_HOST: z.string().url().optional(),
@@ -27,22 +22,14 @@ const clientEnvSchema = z.object({
 
 const processEnv = {
   DATABASE_URL: process.env.DATABASE_URL,
-  CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
-  CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,
+  BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
+  BETTER_AUTH_WEBHOOK_SECRET: process.env.BETTER_AUTH_WEBHOOK_SECRET,
   SOCKET_SECRET: process.env.SOCKET_SECRET,
   SENTRY_DSN: process.env.SENTRY_DSN,
   SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
   ALGOLIA_ADMIN_KEY: process.env.ALGOLIA_ADMIN_KEY,
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-  NEXT_PUBLIC_CLERK_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
-  NEXT_PUBLIC_CLERK_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
-  NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL:
-    process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL,
-  NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL:
-    process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
   NEXT_PUBLIC_SOCKET_URL: process.env.NEXT_PUBLIC_SOCKET_URL,
   NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
   NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
