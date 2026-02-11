@@ -21,7 +21,10 @@ fn test_serializer_outputs_space_separated_schema() {
         "Schema should be space-separated, got: {}",
         output
     );
-    assert!(!output.contains("(id,name,email)"), "Schema should not be comma-separated");
+    assert!(
+        !output.contains("(id,name,email)"),
+        "Schema should not be comma-separated"
+    );
 }
 
 #[test]

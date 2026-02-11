@@ -41,8 +41,11 @@ fn simple_object() -> impl Strategy<Value = HashMap<String, DxLlmValue>> {
 
 /// Generate a DxSection with simple data
 fn simple_section() -> impl Strategy<Value = DxSection> {
-    (prop::collection::vec("[a-z][a-z0-9_]{0,10}", 2..5), 1usize..10).prop_flat_map(
-        |(schema, num_rows)| {
+    (
+        prop::collection::vec("[a-z][a-z0-9_]{0,10}", 2..5),
+        1usize..10,
+    )
+        .prop_flat_map(|(schema, num_rows)| {
             let num_cols = schema.len();
             prop::collection::vec(
                 prop::collection::vec(simple_llm_value(), num_cols..=num_cols),
@@ -55,8 +58,7 @@ fn simple_section() -> impl Strategy<Value = DxSection> {
                 }
                 section
             })
-        },
-    )
+        })
 }
 
 /// Generate a simple DxDocument
@@ -65,7 +67,10 @@ fn simple_document() -> impl Strategy<Value = DxDocument> {
         prop::collection::hash_map("[a-z][a-z0-9_]{0,10}", simple_llm_value(), 0..5),
         prop::collection::hash_map("[a-z][a-z0-9_]{0,10}", "[a-zA-Z0-9_]{1,20}", 0..3),
         prop::collection::vec(
-            (prop::sample::select(vec!['a', 'b', 'c', 'd', 'e']), simple_section()),
+            (
+                prop::sample::select(vec!['a', 'b', 'c', 'd', 'e']),
+                simple_section(),
+            ),
             0..3,
         ),
     )
@@ -597,8 +602,10 @@ mod unit_tests {
     #[test]
     fn test_simple_roundtrip() {
         let mut doc = DxDocument::new();
-        doc.context.insert("name".to_string(), DxLlmValue::Str("test".to_string()));
-        doc.context.insert("count".to_string(), DxLlmValue::Num(42.0));
+        doc.context
+            .insert("name".to_string(), DxLlmValue::Str("test".to_string()));
+        doc.context
+            .insert("count".to_string(), DxLlmValue::Num(42.0));
 
         let serializer = LlmSerializer::new();
         let serialized = serializer.serialize(&doc);
@@ -615,7 +622,8 @@ mod unit_tests {
             DxLlmValue::Str("b".to_string()),
             DxLlmValue::Str("c".to_string()),
         ];
-        doc.context.insert("items".to_string(), DxLlmValue::Arr(arr));
+        doc.context
+            .insert("items".to_string(), DxLlmValue::Arr(arr));
 
         let serializer = LlmSerializer::new();
         let serialized = serializer.serialize(&doc);
@@ -630,7 +638,8 @@ mod unit_tests {
         let mut obj = HashMap::new();
         obj.insert("host".to_string(), DxLlmValue::Str("localhost".to_string()));
         obj.insert("port".to_string(), DxLlmValue::Num(5432.0));
-        doc.context.insert("config".to_string(), DxLlmValue::Obj(obj));
+        doc.context
+            .insert("config".to_string(), DxLlmValue::Obj(obj));
 
         let serializer = LlmSerializer::new();
         let serialized = serializer.serialize(&doc);
@@ -644,10 +653,16 @@ mod unit_tests {
         let mut doc = DxDocument::new();
         let mut section = DxSection::new(vec!["id".to_string(), "name".to_string()]);
         section
-            .add_row(vec![DxLlmValue::Num(1.0), DxLlmValue::Str("Alice".to_string())])
+            .add_row(vec![
+                DxLlmValue::Num(1.0),
+                DxLlmValue::Str("Alice".to_string()),
+            ])
             .unwrap();
         section
-            .add_row(vec![DxLlmValue::Num(2.0), DxLlmValue::Str("Bob".to_string())])
+            .add_row(vec![
+                DxLlmValue::Num(2.0),
+                DxLlmValue::Str("Bob".to_string()),
+            ])
             .unwrap();
         doc.sections.insert('u', section);
 
@@ -655,7 +670,10 @@ mod unit_tests {
         let serialized = serializer.serialize(&doc);
         eprintln!("Serialized: {}", serialized);
         let parsed = LlmParser::parse(&serialized).unwrap();
-        eprintln!("Parsed sections: {:?}", parsed.sections.keys().collect::<Vec<_>>());
+        eprintln!(
+            "Parsed sections: {:?}",
+            parsed.sections.keys().collect::<Vec<_>>()
+        );
 
         assert!(documents_equivalent(&doc, &parsed));
     }

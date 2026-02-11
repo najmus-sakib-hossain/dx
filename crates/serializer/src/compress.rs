@@ -88,8 +88,11 @@ pub fn format_machine(human_dx: &str) -> Result<Vec<u8>, String> {
             output.extend_from_slice(b">");
 
             // Compress array values (remove spaces around |)
-            let compressed_values =
-                values.split('|').map(str::trim).collect::<Vec<_>>().join("|");
+            let compressed_values = values
+                .split('|')
+                .map(str::trim)
+                .collect::<Vec<_>>()
+                .join("|");
             output.extend_from_slice(compressed_values.as_bytes());
             output.extend_from_slice(b"\n");
         }
@@ -104,8 +107,10 @@ pub fn format_machine(human_dx: &str) -> Result<Vec<u8>, String> {
                 .all(|p| p.chars().next().is_some_and(char::is_uppercase))
             {
                 // Table schema - compress column names
-                let compressed_cols: Vec<String> =
-                    parts.iter().map(|col| compress_table_column(col, mappings)).collect();
+                let compressed_cols: Vec<String> = parts
+                    .iter()
+                    .map(|col| compress_table_column(col, mappings))
+                    .collect();
 
                 // Need to find the table key from context (previous line usually)
                 // For now, output compressed columns
@@ -159,7 +164,9 @@ fn compress_table_column(col: &str, mappings: &Mappings) -> String {
 /// Compress with writer output
 pub fn compress_to_writer<W: Write>(human_dx: &str, writer: &mut W) -> Result<(), String> {
     let compressed = format_machine(human_dx)?;
-    writer.write_all(&compressed).map_err(|e| format!("Failed to write: {e}"))
+    writer
+        .write_all(&compressed)
+        .map_err(|e| format!("Failed to write: {e}"))
 }
 
 #[cfg(test)]

@@ -7,7 +7,7 @@
 ///
 /// Default mappings: n=name, v=version, t=title, d=description, a=author,
 ///                   c=context, l=languages, f=forge, s=style, m=media, i=i18n, u=ui
-use serializer::{Mappings, format_machine};
+use serializer::{format_machine, Mappings};
 
 #[test]
 fn test_popular_keys_abbreviated() {
@@ -19,7 +19,10 @@ fn test_popular_keys_abbreviated() {
     // Should abbreviate all popular keys
     assert!(result.contains("n:dx-www"), "name should abbreviate to n");
     assert!(result.contains("v:1.0.0"), "version should abbreviate to v");
-    assert!(result.contains("d:Runtime"), "description should abbreviate to d");
+    assert!(
+        result.contains("d:Runtime"),
+        "description should abbreviate to d"
+    );
 }
 
 #[test]
@@ -30,8 +33,14 @@ fn test_custom_keys_preserved() {
     let result = String::from_utf8(compressed).unwrap();
 
     // Should preserve custom keys exactly
-    assert!(result.contains("myCustomField:value123"), "Custom key should be preserved");
-    assert!(result.contains("userPreferences:dark"), "Custom key should be preserved");
+    assert!(
+        result.contains("myCustomField:value123"),
+        "Custom key should be preserved"
+    );
+    assert!(
+        result.contains("userPreferences:dark"),
+        "Custom key should be preserved"
+    );
 }
 
 #[test]
@@ -45,12 +54,24 @@ fn test_mixed_popular_and_custom() {
     println!("Output: {result}");
 
     // Popular keys abbreviated
-    assert!(result.contains("n:dx-www"), "Popular 'name' should abbreviate");
-    assert!(result.contains("v:1.0"), "Popular 'version' should abbreviate");
+    assert!(
+        result.contains("n:dx-www"),
+        "Popular 'name' should abbreviate"
+    );
+    assert!(
+        result.contains("v:1.0"),
+        "Popular 'version' should abbreviate"
+    );
 
     // Custom keys preserved
-    assert!(result.contains("myAppFeature:enabled"), "Custom key preserved");
-    assert!(result.contains("customTimeout:5000"), "Custom key preserved");
+    assert!(
+        result.contains("myAppFeature:enabled"),
+        "Custom key preserved"
+    );
+    assert!(
+        result.contains("customTimeout:5000"),
+        "Custom key preserved"
+    );
 }
 
 #[test]
@@ -73,8 +94,14 @@ fn test_nested_custom_keys() {
     let result = String::from_utf8(compressed).unwrap();
 
     // Should preserve both parts
-    assert!(result.contains("myModule.myFeature:enabled"), "Custom nested key preserved");
-    assert!(result.contains("myModule.timeout:5000"), "Custom nested key preserved");
+    assert!(
+        result.contains("myModule.myFeature:enabled"),
+        "Custom nested key preserved"
+    );
+    assert!(
+        result.contains("myModule.timeout:5000"),
+        "Custom nested key preserved"
+    );
 }
 
 #[test]
@@ -88,7 +115,10 @@ fn test_nested_mixed_keys() {
     println!("Output: {result}");
 
     // 'context' abbreviated, 'myCustomField' preserved
-    assert!(result.contains("c.myCustomField:value"), "Mixed: c.myCustomField");
+    assert!(
+        result.contains("c.myCustomField:value"),
+        "Mixed: c.myCustomField"
+    );
 }
 
 #[test]
@@ -120,8 +150,14 @@ fn test_roundtrip_custom_keys() {
     println!("Machine:  {machine_str}");
 
     // Should preserve custom keys in output
-    assert!(machine_str.contains("myFeature"), "Custom key in machine format");
-    assert!(machine_str.contains("customKey"), "Custom key in machine format");
+    assert!(
+        machine_str.contains("myFeature"),
+        "Custom key in machine format"
+    );
+    assert!(
+        machine_str.contains("customKey"),
+        "Custom key in machine format"
+    );
 
     // Should abbreviate popular keys
     assert!(machine_str.contains("n:dx"), "name → n");
@@ -135,7 +171,10 @@ fn test_all_default_popular_keys() {
     //                   c=context, l=languages, f=forge, s=style, m=media, i=i18n, u=ui
     let mappings = Mappings::get();
 
-    println!("\n📊 Testing all {} popular keys:\n", mappings.compress.len());
+    println!(
+        "\n📊 Testing all {} popular keys:\n",
+        mappings.compress.len()
+    );
 
     let mut tested = 0;
     for (full, short) in &mappings.compress {

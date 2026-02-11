@@ -95,8 +95,8 @@ impl Mappings {
     /// Find the mappings file (.dx/serializer/mappings.dx)
     fn find_mappings_file() -> Result<PathBuf, String> {
         // Start from current directory and search upwards
-        let mut current = std::env::current_dir()
-            .map_err(|e| format!("Failed to get current directory: {e}"))?;
+        let mut current =
+            std::env::current_dir().map_err(|e| format!("Failed to get current directory: {e}"))?;
 
         loop {
             let mappings_path = current.join(".dx").join("serializer").join("mappings.dx");
@@ -151,10 +151,13 @@ impl Mappings {
     /// # Performance
     /// O(1) - Single `HashMap` lookup with instant fallback
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub fn expand_key(&self, key: &str) -> String {
         // NO CACHE NEEDED: HashMap lookup IS the cache (O(1))
-        self.expand.get(key).cloned().unwrap_or_else(|| key.to_string())
+        self.expand
+            .get(key)
+            .cloned()
+            .unwrap_or_else(|| key.to_string())
     }
 
     /// Compress full name to short key (human → machine)
@@ -185,10 +188,13 @@ impl Mappings {
     /// # Performance
     /// O(1) - Single `HashMap` lookup with instant fallback
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub fn compress_key(&self, key: &str) -> String {
         // NO CACHE NEEDED: HashMap lookup IS the cache (O(1))
-        self.compress.get(key).cloned().unwrap_or_else(|| key.to_string())
+        self.compress
+            .get(key)
+            .cloned()
+            .unwrap_or_else(|| key.to_string())
     }
 }
 

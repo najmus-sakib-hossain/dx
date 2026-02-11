@@ -13,9 +13,7 @@ fn main() {
         // Test GPU search performance
         println!("Testing GPU search performance...");
 
-        let test_icons: Vec<String> = (0..10000)
-            .map(|i| format!("icon-{}", i))
-            .collect();
+        let test_icons: Vec<String> = (0..10000).map(|i| format!("icon-{}", i)).collect();
 
         let query = "icon-5000";
 
@@ -27,7 +25,10 @@ fn main() {
             println!("   Icons searched: {}", test_icons.len());
             println!("   Results found: {}", results.len());
             println!("   Time: {:?}", elapsed);
-            println!("   Throughput: {:.0} icons/ms", test_icons.len() as f64 / elapsed.as_secs_f64() / 1000.0);
+            println!(
+                "   Throughput: {:.0} icons/ms",
+                test_icons.len() as f64 / elapsed.as_secs_f64() / 1000.0
+            );
         } else {
             println!("❌ GPU search failed");
         }

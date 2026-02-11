@@ -68,9 +68,7 @@ fn verify_size_claims() {
     for (name, bytes, tokens) in &sizes {
         let vs_json = json_bytes as f64 / *bytes as f64;
         let vs_toon = toon_bytes as f64 / *bytes as f64;
-        println!(
-            "  {name:22} {bytes:6}   {tokens:12}   {vs_json:5.2}x    {vs_toon:5.2}x"
-        );
+        println!("  {name:22} {bytes:6}   {tokens:12}   {vs_json:5.2}x    {vs_toon:5.2}x");
     }
 
     // Verify claim
@@ -190,6 +188,9 @@ fn print_summary() {
 
 fn estimate_tokens(text: &str) -> usize {
     let words = text.split_whitespace().count();
-    let symbols = text.chars().filter(|c| !c.is_alphanumeric() && !c.is_whitespace()).count();
+    let symbols = text
+        .chars()
+        .filter(|c| !c.is_alphanumeric() && !c.is_whitespace())
+        .count();
     (words as f64 * 1.33) as usize + (symbols / 2)
 }

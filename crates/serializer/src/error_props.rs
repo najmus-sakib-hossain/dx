@@ -12,7 +12,7 @@
 #[cfg(test)]
 mod property_tests {
     use crate::error::{
-        DX_MAGIC, DX_VERSION, DxError, MAX_SNIPPET_LENGTH, SourceLocation, extract_snippet,
+        extract_snippet, DxError, SourceLocation, DX_MAGIC, DX_VERSION, MAX_SNIPPET_LENGTH,
     };
     use proptest::prelude::*;
 
@@ -357,13 +357,11 @@ mod property_tests {
         // Recoverable errors
         assert!(DxError::UnknownAlias("test".into()).is_recoverable());
         assert!(DxError::UnknownAnchor("test".into()).is_recoverable());
-        assert!(
-            DxError::TypeMismatch {
-                expected: "int".into(),
-                actual: "string".into()
-            }
-            .is_recoverable()
-        );
+        assert!(DxError::TypeMismatch {
+            expected: "int".into(),
+            actual: "string".into()
+        }
+        .is_recoverable());
 
         // Non-recoverable errors
         assert!(!DxError::UnexpectedEof(0).is_recoverable());

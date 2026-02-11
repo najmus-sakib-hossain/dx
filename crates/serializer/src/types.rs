@@ -165,7 +165,7 @@ pub struct DxArray {
 }
 
 impl DxArray {
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self {
             values: Vec::new(),
@@ -173,7 +173,7 @@ impl DxArray {
         }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn with_capacity(cap: usize) -> Self {
         Self {
             values: Vec::with_capacity(cap),
@@ -181,7 +181,7 @@ impl DxArray {
         }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn stream(values: Vec<DxValue>) -> Self {
         Self {
             values,
@@ -206,7 +206,7 @@ pub struct DxObject {
 }
 
 impl DxObject {
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self {
             fields: Vec::new(),
@@ -214,7 +214,7 @@ impl DxObject {
         }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn with_capacity(cap: usize) -> Self {
         Self {
             fields: Vec::with_capacity(cap),
@@ -232,7 +232,7 @@ impl DxObject {
         }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn get(&self, key: &str) -> Option<&DxValue> {
         self.lookup.get(key).map(|&idx| &self.fields[idx].1)
     }
@@ -269,7 +269,7 @@ pub struct DxTable {
 }
 
 impl DxTable {
-    #[must_use] 
+    #[must_use]
     pub fn new(schema: crate::schema::Schema) -> Self {
         Self {
             schema,
@@ -289,12 +289,12 @@ impl DxTable {
         Ok(())
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn row_count(&self) -> usize {
         self.rows.len()
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn column_count(&self) -> usize {
         self.schema.columns.len()
     }
@@ -302,13 +302,13 @@ impl DxTable {
 
 impl DxValue {
     /// Check if this value is "empty" for ditto logic
-    #[must_use] 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         matches!(self, DxValue::Null)
     }
 
     /// Get type name for error messages
-    #[must_use] 
+    #[must_use]
     pub fn type_name(&self) -> &'static str {
         match self {
             DxValue::Null => "null",
@@ -324,7 +324,7 @@ impl DxValue {
     }
 
     /// Convert to boolean if possible
-    #[must_use] 
+    #[must_use]
     pub fn as_bool(&self) -> Option<bool> {
         match self {
             DxValue::Bool(b) => Some(*b),
@@ -333,7 +333,7 @@ impl DxValue {
     }
 
     /// Convert to integer if possible
-    #[must_use] 
+    #[must_use]
     pub fn as_int(&self) -> Option<i64> {
         match self {
             DxValue::Int(i) => Some(*i),
@@ -343,7 +343,7 @@ impl DxValue {
     }
 
     /// Convert to float if possible
-    #[must_use] 
+    #[must_use]
     pub fn as_float(&self) -> Option<f64> {
         match self {
             DxValue::Float(f) => Some(*f),
@@ -353,7 +353,7 @@ impl DxValue {
     }
 
     /// Convert to string if possible
-    #[must_use] 
+    #[must_use]
     pub fn as_str(&self) -> Option<&str> {
         match self {
             DxValue::String(s) => Some(s),

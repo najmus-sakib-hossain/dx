@@ -66,12 +66,10 @@ impl PromptInteraction for EmailInput {
     fn on(&mut self, event: Event) {
         match event {
             Event::Key(key) => match key {
-                console::Key::Enter => {
-                    match self.validate_email() {
-                        Ok(_) => self.state = State::Submit,
-                        Err(msg) => self.error_message = Some(msg),
-                    }
-                }
+                console::Key::Enter => match self.validate_email() {
+                    Ok(_) => self.state = State::Submit,
+                    Err(msg) => self.error_message = Some(msg),
+                },
                 console::Key::Escape => self.state = State::Cancel,
                 console::Key::Backspace => {
                     self.value.pop();

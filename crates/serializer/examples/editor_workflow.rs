@@ -5,7 +5,7 @@
 // EDITOR WORKFLOW DEMONSTRATION
 // Shows how an LSP/Editor would use bidirectional conversion
 
-use serializer::{Mappings, format_machine};
+use serializer::{format_machine, Mappings};
 
 fn main() {
     println!("╔═══════════════════════════════════════════════════════════════╗");
@@ -61,7 +61,10 @@ build.target            : wasm32
             println!("✅ STEP 5: File saved in ultra-compact format");
             println!("   Original:  ~350 bytes (human readable)");
             println!("   Saved:     {} bytes (compressed)", compressed.len());
-            println!("   Ratio:     {:.1}x smaller\n", 350.0 / compressed.len() as f64);
+            println!(
+                "   Ratio:     {:.1}x smaller\n",
+                350.0 / compressed.len() as f64
+            );
 
             println!("📦 Compressed output (what's actually saved):");
             println!("   ┌─────────────────────────────────────────┐");
@@ -74,7 +77,10 @@ build.target            : wasm32
             // Show mapping stats
             let mappings = Mappings::get();
             println!("📊 MAPPING SYSTEM:");
-            println!("   - Loaded {} abbreviations from .dx/serializer/", mappings.expand.len());
+            println!(
+                "   - Loaded {} abbreviations from .dx/serializer/",
+                mappings.expand.len()
+            );
             println!("   - Bidirectional HashMap (instant lookup)");
             println!("   - Lazy loaded (zero startup cost)");
             println!("   - Version controlled (team consistency)\n");

@@ -123,11 +123,7 @@ impl PromptInteraction for Wizard {
                 lines += 1;
 
                 // Progress indicator
-                let progress = format!(
-                    "Step {} of {}",
-                    self.current_step + 1,
-                    self.steps.len()
-                );
+                let progress = format!("Step {} of {}", self.current_step + 1, self.steps.len());
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
@@ -179,7 +175,9 @@ impl PromptInteraction for Wizard {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("Enter: complete & next, Space: mark complete, ← →: navigate")
+                    theme
+                        .dim
+                        .apply_to("Enter: complete & next, Space: mark complete, ← →: navigate")
                 ))?;
                 lines += 1;
             }
@@ -190,7 +188,11 @@ impl PromptInteraction for Wizard {
                     "{} {}  {}",
                     checkmark,
                     self.message,
-                    theme.dim.apply_to(format!("Completed {} of {} steps", completed, self.steps.len()))
+                    theme.dim.apply_to(format!(
+                        "Completed {} of {} steps",
+                        completed,
+                        self.steps.len()
+                    ))
                 ))?;
                 lines += 1;
                 term.write_line(&format!("{}", theme.dim.apply_to(symbols.bar)))?;

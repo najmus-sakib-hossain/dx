@@ -100,10 +100,18 @@ impl PromptInteraction for TimePicker {
                         self.hour = if self.hour == 23 { 0 } else { self.hour + 1 };
                     }
                     TimeField::Minute => {
-                        self.minute = if self.minute == 59 { 0 } else { self.minute + 1 };
+                        self.minute = if self.minute == 59 {
+                            0
+                        } else {
+                            self.minute + 1
+                        };
                     }
                     TimeField::Second => {
-                        self.second = if self.second == 59 { 0 } else { self.second + 1 };
+                        self.second = if self.second == 59 {
+                            0
+                        } else {
+                            self.second + 1
+                        };
                     }
                 },
                 console::Key::ArrowDown => match self.active_field {
@@ -111,10 +119,18 @@ impl PromptInteraction for TimePicker {
                         self.hour = if self.hour == 0 { 23 } else { self.hour - 1 };
                     }
                     TimeField::Minute => {
-                        self.minute = if self.minute == 0 { 59 } else { self.minute - 1 };
+                        self.minute = if self.minute == 0 {
+                            59
+                        } else {
+                            self.minute - 1
+                        };
                     }
                     TimeField::Second => {
-                        self.second = if self.second == 0 { 59 } else { self.second - 1 };
+                        self.second = if self.second == 0 {
+                            59
+                        } else {
+                            self.second - 1
+                        };
                     }
                 },
                 _ => {}
@@ -148,24 +164,48 @@ impl PromptInteraction for TimePicker {
                 term.write_line(&format!("{}", bar))?;
                 lines += 1;
 
-                let hour_marker = if self.active_field == TimeField::Hour { "▸" } else { " " };
-                let minute_marker = if self.active_field == TimeField::Minute { "▸" } else { " " };
-                let second_marker = if self.active_field == TimeField::Second { "▸" } else { " " };
+                let hour_marker = if self.active_field == TimeField::Hour {
+                    "▸"
+                } else {
+                    " "
+                };
+                let minute_marker = if self.active_field == TimeField::Minute {
+                    "▸"
+                } else {
+                    " "
+                };
+                let second_marker = if self.active_field == TimeField::Second {
+                    "▸"
+                } else {
+                    " "
+                };
 
                 let hour_display = if self.active_field == TimeField::Hour {
-                    theme.primary.apply_to(self.format_hour()).bold().to_string()
+                    theme
+                        .primary
+                        .apply_to(self.format_hour())
+                        .bold()
+                        .to_string()
                 } else {
                     self.format_hour()
                 };
 
                 let minute_display = if self.active_field == TimeField::Minute {
-                    theme.primary.apply_to(format!("{:02}", self.minute)).bold().to_string()
+                    theme
+                        .primary
+                        .apply_to(format!("{:02}", self.minute))
+                        .bold()
+                        .to_string()
                 } else {
                     format!("{:02}", self.minute)
                 };
 
                 let second_display = if self.active_field == TimeField::Second {
-                    theme.primary.apply_to(format!("{:02}", self.second)).bold().to_string()
+                    theme
+                        .primary
+                        .apply_to(format!("{:02}", self.second))
+                        .bold()
+                        .to_string()
                 } else {
                     format!("{:02}", self.second)
                 };
@@ -196,7 +236,12 @@ impl PromptInteraction for TimePicker {
                 } else {
                     format!(
                         "🕐 {} {}",
-                        format!("{}:{:02}:{:02}", self.format_hour(), self.minute, self.second),
+                        format!(
+                            "{}:{:02}:{:02}",
+                            self.format_hour(),
+                            self.minute,
+                            self.second
+                        ),
                         self.am_pm()
                     )
                 };
@@ -211,7 +256,9 @@ impl PromptInteraction for TimePicker {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("Tab: switch field, ↑↓: adjust, Enter: confirm")
+                    theme
+                        .dim
+                        .apply_to("Tab: switch field, ↑↓: adjust, Enter: confirm")
                 ))?;
                 lines += 1;
             }

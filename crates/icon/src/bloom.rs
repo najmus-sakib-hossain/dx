@@ -20,14 +20,14 @@ impl BloomFilter {
         let bits_per_element = 10; // 1% false positive rate
         let size = capacity * bits_per_element;
         let num_hashes = 7; // Optimal for 10 bits/element
-        
+
         Self {
-            bits: vec![0u64; (size + 63) / 64],
+            bits: vec![0u64; size.div_ceil(64)],
             num_hashes,
             size,
         }
     }
-    
+
     /// Add icon name to filter
     pub fn insert(&mut self, name: &str) {
         for i in 0..self.num_hashes {
@@ -36,7 +36,7 @@ impl BloomFilter {
             self.bits[idx / 64] |= 1u64 << (idx % 64);
         }
     }
-    
+
     /// Check if query might match (fast rejection)
     #[inline(always)]
     pub fn might_contain(&self, query: &str) -> bool {
@@ -49,7 +49,7 @@ impl BloomFilter {
         }
         true // Might be present (or false positive)
     }
-    
+
     /// Hash function with seed
     #[inline(always)]
     fn hash(&self, s: &str, seed: usize) -> usize {
@@ -73,7 +73,7 @@ impl IconBloomFilters {
             .iter()
             .map(|name| {
                 let mut filter = BloomFilter::new(name.len());
-                
+
                 // Insert all 2-grams and 3-grams
                 let bytes = name.as_bytes();
                 for i in 0..bytes.len().saturating_sub(1) {
@@ -82,23 +82,23 @@ impl IconBloomFilters {
                 for i in 0..bytes.len().saturating_sub(2) {
                     filter.insert(&name[i..i + 3]);
                 }
-                
+
                 filter
             })
             .collect();
-        
+
         Self { filters }
     }
-    
+
     /// Quick rejection test (90%+ of non-matches rejected)
     #[inline(always)]
     pub fn might_match(&self, icon_idx: usize, query: &str) -> bool {
         if query.len() < 2 {
             return true; // Too short for bloom filter
         }
-        
+
         let filter = &self.filters[icon_idx];
-        
+
         // Check if all query n-grams are present
         let bytes = query.as_bytes();
         for i in 0..bytes.len().saturating_sub(1) {
@@ -106,7 +106,7 @@ impl IconBloomFilters {
                 return false; // Definitely doesn't match
             }
         }
-        
+
         true // Might match
     }
 }
@@ -114,28 +114,25 @@ impl IconBloomFilters {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_bloom_filter() {
         let mut filter = BloomFilter::new(100);
-        
+
         filter.insert("home");
         filter.insert("arrow");
-        
+
         assert!(filter.might_contain("home"));
         assert!(filter.might_contain("arrow"));
         // High probability of rejection for non-inserted items
     }
-    
+
     #[test]
     fn test_icon_bloom_filters() {
-        let names = vec![
-            "home-icon".to_string(),
-            "arrow-left".to_string(),
-        ];
-        
+        let names = vec!["home-icon".to_string(), "arrow-left".to_string()];
+
         let filters = IconBloomFilters::build(&names);
-        
+
         assert!(filters.might_match(0, "home"));
         assert!(filters.might_match(1, "arrow"));
         // Should reject most non-matches quickly

@@ -132,7 +132,10 @@ impl PromptInteraction for Tags {
                         self.placeholder
                             .as_ref()
                             .map(|p| theme.dim.apply_to(p).to_string())
-                            .unwrap_or_else(|| theme.dim.apply_to("Type and press Enter or comma").to_string())
+                            .unwrap_or_else(|| theme
+                                .dim
+                                .apply_to("Type and press Enter or comma")
+                                .to_string())
                     )
                 } else {
                     format!("{}█", self.current_input)
@@ -144,7 +147,9 @@ impl PromptInteraction for Tags {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("Enter/comma to add tag, Backspace to remove, Enter on empty to finish")
+                    theme.dim.apply_to(
+                        "Enter/comma to add tag, Backspace to remove, Enter on empty to finish"
+                    )
                 ))?;
                 lines += 1;
             }

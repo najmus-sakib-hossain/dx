@@ -49,12 +49,12 @@ struct ResponseContent {
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 enum ResponsePart {
-    FunctionCall { 
+    FunctionCall {
         #[serde(rename = "functionCall")]
-        function_call: FunctionCall 
+        function_call: FunctionCall,
     },
-    Text { 
-        text: String 
+    Text {
+        text: String,
     },
 }
 
@@ -114,7 +114,7 @@ async fn main() -> Result<()> {
     // Test 1: Weather function call
     println!("📍 Test 1: Weather Query");
     println!("User: What's the weather in Tokyo?");
-    
+
     let request = FunctionCallRequest {
         contents: vec![Content {
             parts: vec![Part {
@@ -131,7 +131,7 @@ async fn main() -> Result<()> {
     // Test 2: Math calculation
     println!("🔢 Test 2: Math Calculation");
     println!("User: Calculate 25 * 48 + 137");
-    
+
     let request = FunctionCallRequest {
         contents: vec![Content {
             parts: vec![Part {
@@ -148,7 +148,7 @@ async fn main() -> Result<()> {
     // Test 3: Multiple function calls
     println!("🌍 Test 3: Multiple Queries");
     println!("User: What's the weather in London and Paris? Also calculate 100 / 5");
-    
+
     let request = FunctionCallRequest {
         contents: vec![Content {
             parts: vec![Part {
@@ -190,12 +190,16 @@ async fn call_api(api_key: &str, model: &str, request: &FunctionCallRequest) -> 
                 ResponsePart::FunctionCall { function_call } => {
                     println!("🔧 Function Call Detected:");
                     println!("   Function: {}", function_call.name);
-                    println!("   Arguments: {}", serde_json::to_string_pretty(&function_call.args)?);
-                    
+                    println!(
+                        "   Arguments: {}",
+                        serde_json::to_string_pretty(&function_call.args)?
+                    );
+
                     // Simulate function execution
                     match function_call.name.as_str() {
                         "get_weather" => {
-                            let location = function_call.args["location"].as_str().unwrap_or("Unknown");
+                            let location =
+                                function_call.args["location"].as_str().unwrap_or("Unknown");
                             println!("   ✅ Executing: Getting weather for {}", location);
                             println!("   📊 Result: Sunny, 22°C");
                         }

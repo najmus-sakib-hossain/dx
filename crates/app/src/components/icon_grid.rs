@@ -1,6 +1,6 @@
-use gpui::{div, svg, prelude::*, px, IntoElement, MouseButton, SharedString};
-use crate::theme::{colors::Radius, Theme};
 use crate::components::ui::misc::EmptyState;
+use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, svg, IntoElement, MouseButton, SharedString};
 
 // ─── IconGrid ───────────────────────────────────────────────────────────────
 // A responsive grid of icon cards with selection, hover, and click support.
@@ -63,9 +63,8 @@ impl IconGrid {
             .on_mouse_move(|_event, _window, _cx| {});
 
         for item in self.items {
-            grid = grid.child(
-                IconCell::new(item, self.cell_size, self.icon_display_size).render(theme),
-            );
+            grid = grid
+                .child(IconCell::new(item, self.cell_size, self.icon_display_size).render(theme));
         }
 
         grid.into_any_element()
@@ -91,8 +90,16 @@ impl IconCell {
 
     fn render(self, theme: &Theme) -> impl IntoElement {
         let is_selected = self.item.selected;
-        let border_col = if is_selected { theme.ring } else { theme.border };
-        let bg = if is_selected { theme.accent } else { theme.card };
+        let border_col = if is_selected {
+            theme.ring
+        } else {
+            theme.border
+        };
+        let bg = if is_selected {
+            theme.accent
+        } else {
+            theme.card
+        };
         let hover_bg = theme.accent;
         let icon_name = self.item.name.clone();
         let icon_pack = self.item.pack.clone();
@@ -129,7 +136,7 @@ impl IconCell {
             // Label
             .child(
                 div()
-                    .font_size(px(11.0))
+                    .text_size(px(11.0))
                     .text_color(theme.muted_foreground)
                     .overflow_x_hidden()
                     .max_w(self.cell_size - px(8.0))
@@ -139,10 +146,8 @@ impl IconCell {
     }
 
     fn render_icon_preview(&self, theme: &Theme) -> impl IntoElement {
-        let asset_path = SharedString::from(format!(
-            "icons/{}/{}.svg",
-            self.item.pack, self.item.name
-        ));
+        let asset_path =
+            SharedString::from(format!("icons/{}/{}.svg", self.item.pack, self.item.name));
         svg()
             .path(asset_path)
             .text_color(theme.foreground)

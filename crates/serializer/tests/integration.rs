@@ -78,7 +78,10 @@ fn test_vacuum_parsing() {
 
     if let DxValue::Object(obj) = value {
         if let Some(DxValue::Table(table)) = obj.get("users") {
-            assert_eq!(table.rows[0][1], DxValue::String("Alice Johnson".to_string()));
+            assert_eq!(
+                table.rows[0][1],
+                DxValue::String("Alice Johnson".to_string())
+            );
             assert_eq!(table.rows[1][1], DxValue::String("Bob Smith".to_string()));
         } else {
             panic!("Expected table");

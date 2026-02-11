@@ -90,15 +90,19 @@ impl TableEditor {
             for (col_idx, cell) in row.iter().enumerate() {
                 let width = widths.get(col_idx).copied().unwrap_or(10);
                 let is_active = row_idx == self.cursor_row && col_idx == self.cursor_col;
-                
+
                 let cell_display = if is_active && self.editing {
                     format!("{}█", self.edit_buffer)
                 } else if is_active {
-                    theme.primary.apply_to(format!("{:width$}", cell, width = width)).bold().to_string()
+                    theme
+                        .primary
+                        .apply_to(format!("{:width$}", cell, width = width))
+                        .bold()
+                        .to_string()
                 } else {
                     format!("{:width$}", cell, width = width)
                 };
-                
+
                 row_line.push_str(&format!("{} │ ", cell_display));
             }
             lines.push(row_line);
@@ -120,7 +124,9 @@ impl PromptInteraction for TableEditor {
             match event {
                 Event::Key(key) => match key {
                     console::Key::Enter => {
-                        if self.cursor_row < self.rows.len() && self.cursor_col < self.rows[self.cursor_row].len() {
+                        if self.cursor_row < self.rows.len()
+                            && self.cursor_col < self.rows[self.cursor_row].len()
+                        {
                             self.rows[self.cursor_row][self.cursor_col] = self.edit_buffer.clone();
                         }
                         self.editing = false;
@@ -146,7 +152,9 @@ impl PromptInteraction for TableEditor {
                     console::Key::Enter => self.state = State::Submit,
                     console::Key::Escape => self.state = State::Cancel,
                     console::Key::Char('e') | console::Key::Char(' ') => {
-                        if self.cursor_row < self.rows.len() && self.cursor_col < self.rows[self.cursor_row].len() {
+                        if self.cursor_row < self.rows.len()
+                            && self.cursor_col < self.rows[self.cursor_row].len()
+                        {
                             self.editing = true;
                             self.edit_buffer = self.rows[self.cursor_row][self.cursor_col].clone();
                         }
@@ -226,7 +234,9 @@ impl PromptInteraction for TableEditor {
                     "{} {}  {}",
                     checkmark,
                     self.message,
-                    theme.dim.apply_to(format!("{} rows edited", self.rows.len()))
+                    theme
+                        .dim
+                        .apply_to(format!("{} rows edited", self.rows.len()))
                 ))?;
                 lines += 1;
                 term.write_line(&format!("{}", theme.dim.apply_to(symbols.bar)))?;

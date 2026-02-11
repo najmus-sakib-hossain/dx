@@ -3,9 +3,9 @@
 //! Schedule and execute tasks using cron expressions.
 //! Runs tasks like checking emails, updating todos, etc.
 
-use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use tracing::info;
 
 use crate::Result;
@@ -15,7 +15,7 @@ use crate::Result;
 pub struct CronSchedule {
     /// Cron expression (e.g., "0 * * * *" for every hour)
     pub expression: String,
-    
+
     /// Human-readable description
     pub description: String,
 }
@@ -27,21 +27,21 @@ impl CronSchedule {
             description: "Every minute".to_string(),
         }
     }
-    
+
     pub fn every_hour() -> Self {
         Self {
             expression: "0 * * * *".to_string(),
             description: "Every hour".to_string(),
         }
     }
-    
+
     pub fn every_day_at(hour: u32) -> Self {
         Self {
             expression: format!("0 {} * * *", hour),
             description: format!("Every day at {}:00", hour),
         }
     }
-    
+
     pub fn every_week_on(day: &str, hour: u32) -> Self {
         let day_num = match day.to_lowercase().as_str() {
             "sunday" | "sun" => 0,
@@ -74,7 +74,13 @@ pub struct Task {
 }
 
 impl Task {
-    pub fn new(name: &str, description: &str, schedule: CronSchedule, skill_name: &str, skill_context: &str) -> Self {
+    pub fn new(
+        name: &str,
+        description: &str,
+        schedule: CronSchedule,
+        skill_name: &str,
+        skill_context: &str,
+    ) -> Self {
         Self {
             name: name.to_string(),
             description: description.to_string(),
@@ -86,59 +92,59 @@ impl Task {
             enabled: true,
         }
     }
-    
+
     pub fn name(&self) -> &str {
         &self.name
     }
-    
+
     pub fn description(&self) -> &str {
         &self.description
     }
-    
+
     pub fn skill_name(&self) -> &str {
         &self.skill_name
     }
-    
+
     pub fn skill_context(&self) -> &str {
         &self.skill_context
     }
-    
+
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
-    
+
     pub fn enable(&mut self) {
         self.enabled = true;
     }
-    
+
     pub fn disable(&mut self) {
         self.enabled = false;
     }
-    
+
     /// Check if the task is due to run
     pub fn is_due(&self) -> bool {
         if !self.enabled {
             return false;
         }
-        
+
         match self.next_run {
             Some(next) => Utc::now() >= next,
             None => true, // Never run before, so it's due
         }
     }
-    
+
     /// Execute the task
     pub async fn execute(&self) -> Result<()> {
         info!("Executing task: {}", self.name);
-        
+
         // In a real implementation, this would call the skill
         // For now, just log
         info!("  Skill: {}", self.skill_name);
         info!("  Context: {}", self.skill_context);
-        
+
         Ok(())
     }
-    
+
     /// Update the next run time
     pub fn update_next_run(&mut self) {
         self.last_run = Some(Utc::now());
@@ -146,7 +152,7 @@ impl Task {
         // For now, set to 1 hour from now
         self.next_run = Some(Utc::now() + chrono::Duration::hours(1));
     }
-    
+
     /// Convert to DX format
     pub fn to_dx(&self) -> String {
         format!(
@@ -173,63 +179,62 @@ impl TaskScheduler {
             running: false,
         })
     }
-    
+
     /// Start the scheduler
     pub async fn start(&self) -> Result<()> {
         info!("Task scheduler started");
         Ok(())
     }
-    
+
     /// Stop the scheduler
     pub async fn stop(&self) -> Result<()> {
         info!("Task scheduler stopped");
         Ok(())
     }
-    
+
     /// Add a task
     pub fn add_task(&mut self, task: Task) {
         let name = task.name.clone();
         self.tasks.insert(name.clone(), task);
         info!("Task added: {}", name);
     }
-    
+
     /// Remove a task
     pub fn remove_task(&mut self, name: &str) {
         self.tasks.remove(name);
         info!("Task removed: {}", name);
     }
-    
+
     /// Get a task by name
     pub fn get_task(&self, name: &str) -> Option<&Task> {
         self.tasks.get(name)
     }
-    
+
     /// Get all tasks that are due to run
     pub async fn get_due_tasks(&self) -> Vec<Task> {
-        self.tasks.values()
+        self.tasks
+            .values()
             .filter(|t| t.is_due())
             .cloned()
             .collect()
     }
-    
+
     /// List all tasks in DX format
     pub fn list_as_dx(&self) -> String {
-        let tasks: Vec<String> = self.tasks.values()
-            .map(|t| t.to_dx())
-            .collect();
-        
+        let tasks: Vec<String> = self.tasks.values().map(|t| t.to_dx()).collect();
+
         format!("tasks:{}[{}]", tasks.len(), tasks.join(" "))
     }
-    
+
     /// Load tasks from DX format
     pub fn load_from_dx(&mut self, _dx: &str) -> Result<()> {
         // Parse DX format and add tasks
         // Format: task:1[name=x schedule=y skill=z enabled=true]
-        
+
         // Placeholder - would parse in production
         Ok(())
     }
-    
+
     /// Create default tasks
     pub fn create_defaults(&mut self) {
         // Check email every hour
@@ -238,25 +243,25 @@ impl TaskScheduler {
             "Check and summarize new emails",
             CronSchedule::every_hour(),
             "check_email",
-            "count=10"
+            "count=10",
         ));
-        
+
         // Daily summary at 9 AM
         self.add_task(Task::new(
             "daily_summary",
             "Generate daily summary of tasks and emails",
             CronSchedule::every_day_at(9),
             "browse_web",
-            "url=https://calendar.google.com"
+            "url=https://calendar.google.com",
         ));
-        
+
         // Weekly review on Sunday at 6 PM
         self.add_task(Task::new(
             "weekly_review",
             "Weekly review and planning",
             CronSchedule::every_week_on("sunday", 18),
             "create_todo",
-            "title=Weekly_Review"
+            "title=Weekly_Review",
         ));
     }
 }

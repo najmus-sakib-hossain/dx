@@ -72,13 +72,13 @@ pub mod wasm_runtime;
 pub use auth::{AuthProvider, OAuthFlow, TokenStore};
 pub use capabilities::{Capability, CapabilityRegistry};
 pub use daemon::{AgentDaemon, DaemonConfig};
-pub use integrations::{Integration, IntegrationManager, IntegrationConfig};
+pub use integrations::{Integration, IntegrationConfig, IntegrationManager};
 pub use llm::{LlmClient, LlmMessage, LlmResponse};
 pub use plugins::{Plugin, PluginLoader, PluginManifest};
-pub use pr_detector::{PrDetector, LocalDiff};
-pub use scheduler::{Task, TaskScheduler, CronSchedule};
-pub use skills::{Skill, SkillRegistry, SkillDefinition};
-pub use wasm_runtime::{WasmRuntime, WasmModule, WasmPlugin};
+pub use pr_detector::{LocalDiff, PrDetector};
+pub use scheduler::{CronSchedule, Task, TaskScheduler};
+pub use skills::{Skill, SkillDefinition, SkillRegistry};
+pub use wasm_runtime::{WasmModule, WasmPlugin, WasmRuntime};
 
 use thiserror::Error;
 
@@ -87,25 +87,25 @@ use thiserror::Error;
 pub enum AgentError {
     #[error("Integration not found: {0}")]
     IntegrationNotFound(String),
-    
+
     #[error("Authentication failed for {provider}: {message}")]
     AuthFailed { provider: String, message: String },
-    
+
     #[error("WASM compilation failed: {0}")]
     WasmCompilationFailed(String),
-    
+
     #[error("Skill execution failed: {0}")]
     SkillExecutionFailed(String),
-    
+
     #[error("Plugin load failed: {0}")]
     PluginLoadFailed(String),
-    
+
     #[error("Serialization error: {0}")]
     SerializationError(String),
-    
+
     #[error("Network error: {0}")]
     NetworkError(String),
-    
+
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
 }

@@ -211,7 +211,12 @@ where
                         String::new()
                     };
 
-                    format!("{}{}{}", left, cursor_char.to_string().on_white().black(), right)
+                    format!(
+                        "{}{}{}",
+                        left,
+                        cursor_char.to_string().on_white().black(),
+                        right
+                    )
                 };
                 term.write_line(&format!("{}  {}", bar, display))?;
                 lines += 1;

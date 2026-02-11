@@ -271,7 +271,8 @@ mod property_tests {
             }
             (DxLlmValue::Obj(x), DxLlmValue::Obj(y)) => {
                 x.len() == y.len()
-                    && x.iter().all(|(k, v)| y.get(k).is_some_and(|yv| values_equal(v, yv)))
+                    && x.iter()
+                        .all(|(k, v)| y.get(k).is_some_and(|yv| values_equal(v, yv)))
             }
             // References may be resolved to strings
             (DxLlmValue::Ref(_), DxLlmValue::Str(_)) => true,
@@ -322,7 +323,10 @@ mod property_tests {
         for (key_a, val_a) in &a.context {
             // Try to find the key in b, accounting for abbreviation
             let compressed_key = abbrev.compress(key_a);
-            let val_b = b.context.get(key_a).or_else(|| b.context.get(&compressed_key));
+            let val_b = b
+                .context
+                .get(key_a)
+                .or_else(|| b.context.get(&compressed_key));
 
             if let Some(val_b) = val_b {
                 if !values_equal(val_a, val_b) {
@@ -618,9 +622,12 @@ mod property_tests {
         let serializer = LlmSerializer::new();
         let mut doc = DxDocument::new();
 
-        doc.context.insert("name".to_string(), DxLlmValue::Str("Test".to_string()));
-        doc.context.insert("count".to_string(), DxLlmValue::Num(42.0));
-        doc.context.insert("active".to_string(), DxLlmValue::Bool(true));
+        doc.context
+            .insert("name".to_string(), DxLlmValue::Str("Test".to_string()));
+        doc.context
+            .insert("count".to_string(), DxLlmValue::Num(42.0));
+        doc.context
+            .insert("active".to_string(), DxLlmValue::Bool(true));
 
         let llm_string = serializer.serialize(&doc);
         let parsed = LlmParser::parse(&llm_string).unwrap();
@@ -636,21 +643,38 @@ mod property_tests {
         let serializer = LlmSerializer::new();
         let mut doc = DxDocument::new();
 
-        doc.context.insert("true_val".to_string(), DxLlmValue::Bool(true));
-        doc.context.insert("false_val".to_string(), DxLlmValue::Bool(false));
+        doc.context
+            .insert("true_val".to_string(), DxLlmValue::Bool(true));
+        doc.context
+            .insert("false_val".to_string(), DxLlmValue::Bool(false));
         doc.context.insert("null_val".to_string(), DxLlmValue::Null);
 
         let llm_string = serializer.serialize(&doc);
 
         // Verify Dx Serializer format uses true/false/null with :: or : delimiter
-        assert!(llm_string.contains("true"), "Should contain true for boolean true");
-        assert!(llm_string.contains("false"), "Should contain false for boolean false");
-        assert!(llm_string.contains("null"), "Should contain null for null value");
+        assert!(
+            llm_string.contains("true"),
+            "Should contain true for boolean true"
+        );
+        assert!(
+            llm_string.contains("false"),
+            "Should contain false for boolean false"
+        );
+        assert!(
+            llm_string.contains("null"),
+            "Should contain null for null value"
+        );
 
         let parsed = LlmParser::parse(&llm_string).unwrap();
 
-        assert_eq!(parsed.context.get("true_val").unwrap().as_bool(), Some(true));
-        assert_eq!(parsed.context.get("false_val").unwrap().as_bool(), Some(false));
+        assert_eq!(
+            parsed.context.get("true_val").unwrap().as_bool(),
+            Some(true)
+        );
+        assert_eq!(
+            parsed.context.get("false_val").unwrap().as_bool(),
+            Some(false)
+        );
         assert!(parsed.context.get("null_val").unwrap().is_null());
     }
 }

@@ -1,8 +1,8 @@
 //! Integration tests for DX-Zero format
 
 use serializer::zero::{
-    DxFormat, DxZeroBuilder, DxZeroHeader, DxZeroSlot, FLAG_HAS_HEAP, FLAG_LITTLE_ENDIAN,
-    HEAP_MARKER, INLINE_MARKER, detect_format,
+    detect_format, DxFormat, DxZeroBuilder, DxZeroHeader, DxZeroSlot, FLAG_HAS_HEAP,
+    FLAG_LITTLE_ENDIAN, HEAP_MARKER, INLINE_MARKER,
 };
 
 #[test]
@@ -269,7 +269,11 @@ fn test_unicode_strings() {
 
     // All should work with UTF-8
     // Header(4) + 3 slots(48) = 52 minimum
-    assert!(buffer.len() >= 52, "buffer.len() {} should be >= 52", buffer.len());
+    assert!(
+        buffer.len() >= 52,
+        "buffer.len() {} should be >= 52",
+        buffer.len()
+    );
 }
 
 #[test]

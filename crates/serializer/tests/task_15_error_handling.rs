@@ -127,7 +127,11 @@ mod error_position_tests {
 
         for (input, description) in test_cases {
             let result = LlmParser::parse(input);
-            assert!(result.is_err(), "Test case '{}' should produce an error", description);
+            assert!(
+                result.is_err(),
+                "Test case '{}' should produce an error",
+                description
+            );
 
             if let Err(e) = result {
                 // Every error should provide some way to locate the problem
@@ -170,7 +174,10 @@ mod input_validation_tests {
         let large_input = "x".repeat(100_000_001);
         let result = LlmParser::parse(&large_input);
 
-        assert!(result.is_err(), "Should reject input exceeding maximum size");
+        assert!(
+            result.is_err(),
+            "Should reject input exceeding maximum size"
+        );
         if let Err(ParseError::InputTooLarge { size, max }) = result {
             assert_eq!(size, large_input.len(), "Should report actual size");
             assert_eq!(max, 100_000_000, "Should report maximum size");
@@ -185,7 +192,10 @@ mod input_validation_tests {
         let large_input = vec![b'x'; 100_000_001];
         let result = LlmParser::parse_bytes(&large_input);
 
-        assert!(result.is_err(), "Should reject byte input exceeding maximum size");
+        assert!(
+            result.is_err(),
+            "Should reject byte input exceeding maximum size"
+        );
         if let Err(ParseError::InputTooLarge { size, max }) = result {
             assert_eq!(size, large_input.len(), "Should report actual size");
             assert_eq!(max, 100_000_000, "Should report maximum size");
@@ -204,7 +214,10 @@ mod input_validation_tests {
 
         assert!(result.is_err(), "Should fail on invalid UTF-8");
         if let Err(ParseError::Utf8Error { offset }) = result {
-            assert_eq!(offset, invalid_pos, "Should report correct byte offset of invalid UTF-8");
+            assert_eq!(
+                offset, invalid_pos,
+                "Should report correct byte offset of invalid UTF-8"
+            );
         }
     }
 
@@ -215,7 +228,10 @@ mod input_validation_tests {
 
         assert!(result.is_err(), "Should fail on invalid UTF-8 at start");
         if let Err(ParseError::Utf8Error { offset }) = result {
-            assert_eq!(offset, 0, "Should report offset 0 for invalid UTF-8 at start");
+            assert_eq!(
+                offset, 0,
+                "Should report offset 0 for invalid UTF-8 at start"
+            );
         }
     }
 
@@ -251,9 +267,15 @@ mod input_validation_tests {
         let result = LlmParser::parse("   \n\t\n   ");
 
         // Whitespace-only input should parse successfully
-        assert!(result.is_ok(), "Whitespace-only input should parse successfully");
+        assert!(
+            result.is_ok(),
+            "Whitespace-only input should parse successfully"
+        );
         let doc = result.unwrap();
-        assert!(doc.is_empty(), "Whitespace-only input should produce empty document");
+        assert!(
+            doc.is_empty(),
+            "Whitespace-only input should produce empty document"
+        );
     }
 
     #[test]
@@ -355,7 +377,10 @@ mod schema_mismatch_tests {
         let input = "table:2(id name email)[\n1 Alice\n]";
         let result = LlmParser::parse(input);
 
-        assert!(result.is_err(), "Should fail on schema mismatch in multiline format");
+        assert!(
+            result.is_err(),
+            "Should fail on schema mismatch in multiline format"
+        );
         if let Err(ParseError::SchemaMismatch { expected, got }) = result {
             assert_eq!(expected, 3, "Should expect 3 columns");
             assert_eq!(got, 2, "Should report 2 columns");
@@ -451,9 +476,18 @@ mod schema_mismatch_tests {
             assert_eq!(got, 3, "Should report 3 columns");
 
             // Verify the error can be formatted clearly
-            let error_msg = format!("Schema mismatch: expected {} columns, got {}", expected, got);
-            assert!(error_msg.contains("4"), "Error message should contain expected count");
-            assert!(error_msg.contains("3"), "Error message should contain actual count");
+            let error_msg = format!(
+                "Schema mismatch: expected {} columns, got {}",
+                expected, got
+            );
+            assert!(
+                error_msg.contains("4"),
+                "Error message should contain expected count"
+            );
+            assert!(
+                error_msg.contains("3"),
+                "Error message should contain actual count"
+            );
         }
     }
 
@@ -534,7 +568,10 @@ mod integration_tests {
             // Verify error can be displayed
             if let Err(e) = result {
                 let error_string = format!("{}", e);
-                assert!(!error_string.is_empty(), "Error should have non-empty display string");
+                assert!(
+                    !error_string.is_empty(),
+                    "Error should have non-empty display string"
+                );
             }
         }
     }

@@ -46,18 +46,18 @@ impl Default for HumanFormatConfig {
 }
 
 impl HumanFormatConfig {
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn with_key_padding(mut self, padding: usize) -> Self {
         self.key_padding = padding;
         self
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn for_tables() -> Self {
         Self { key_padding: 28 }
     }
@@ -69,20 +69,20 @@ pub struct HumanFormatter {
 }
 
 impl HumanFormatter {
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self {
             config: HumanFormatConfig::default(),
         }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn with_config(config: HumanFormatConfig) -> Self {
         Self { config }
     }
 
     /// Format `DxDocument` to Human Format string
-    #[must_use] 
+    #[must_use]
     pub fn format(&self, doc: &DxDocument) -> String {
         let mut sections: Vec<String> = Vec::new();
 
@@ -112,8 +112,11 @@ impl HumanFormatter {
         for id in section_ids {
             if let Some(section) = doc.sections.get(id) {
                 // Use the full section name from section_names, or fall back to char ID
-                let section_name =
-                    doc.section_names.get(id).cloned().unwrap_or_else(|| id.to_string());
+                let section_name = doc
+                    .section_names
+                    .get(id)
+                    .cloned()
+                    .unwrap_or_else(|| id.to_string());
 
                 let section_output = if self.is_tabular_section(section) {
                     // For tabular sections with multiple rows, create [section:N] for each row
@@ -355,10 +358,14 @@ mod tests {
     fn test_format_scalar_values() {
         let formatter = HumanFormatter::new();
         let mut doc = DxDocument::new();
-        doc.context.insert("name".to_string(), DxLlmValue::Str("dx".to_string()));
-        doc.context.insert("version".to_string(), DxLlmValue::Str("0.0.1".to_string()));
-        doc.context.insert("count".to_string(), DxLlmValue::Num(42.0));
-        doc.context.insert("active".to_string(), DxLlmValue::Bool(true));
+        doc.context
+            .insert("name".to_string(), DxLlmValue::Str("dx".to_string()));
+        doc.context
+            .insert("version".to_string(), DxLlmValue::Str("0.0.1".to_string()));
+        doc.context
+            .insert("count".to_string(), DxLlmValue::Num(42.0));
+        doc.context
+            .insert("active".to_string(), DxLlmValue::Bool(true));
 
         let output = formatter.format(&doc);
         assert!(output.contains("name"));

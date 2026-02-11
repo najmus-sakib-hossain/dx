@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, IntoElement};
 use crate::theme::Theme;
+use gpui::{div, prelude::*, px, IntoElement};
 
 // ─── Separator ──────────────────────────────────────────────────────────────
 // A shadcn-ui style Separator (divider line).
@@ -52,7 +52,7 @@ impl Separator {
                 .child(
                     div()
                         .text_color(theme.muted_foreground)
-                        .font_size(px(12.0))
+                        .text_size(px(12.0))
                         .child(label),
                 )
                 .child(div().flex_1().h(px(1.0)).bg(theme.border))

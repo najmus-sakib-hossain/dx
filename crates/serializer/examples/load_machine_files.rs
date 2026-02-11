@@ -11,7 +11,7 @@
 //! 4. Verify data integrity
 
 use serializer::llm::convert::{
-    MachineFormat, machine_to_document, machine_to_human, machine_to_llm,
+    machine_to_document, machine_to_human, machine_to_llm, MachineFormat,
 };
 use std::fs;
 use std::path::Path;

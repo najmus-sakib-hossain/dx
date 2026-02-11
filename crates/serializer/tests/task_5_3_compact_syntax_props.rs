@@ -581,7 +581,10 @@ mod unit_tests {
 
         // Should parse as compact syntax (no = between key and value)
         assert!(doc.context.contains_key("config"));
-        assert!(matches!(doc.context.get("config"), Some(DxLlmValue::Obj(_))));
+        assert!(matches!(
+            doc.context.get("config"),
+            Some(DxLlmValue::Obj(_))
+        ));
     }
 
     #[test]

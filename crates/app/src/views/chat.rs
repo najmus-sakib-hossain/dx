@@ -1,14 +1,11 @@
 #![allow(dead_code)]
 
-use gpui::{div, prelude::*, px, Context, IntoElement, Window};
+use crate::components::ui::{Breadcrumb, HStack, VStack};
 use crate::components::{
-    Avatar, AvatarSize, Badge, BadgeVariant, Button, ButtonVariant, Card, CardHeader,
-    InputArea, Kbd, Label, Separator, Sidebar, SidebarItem, SidebarSection, SidebarThread,
-};
-use crate::components::ui::{
-    Breadcrumb, Container, EmptyState, HStack, Stat, StatTrend, Tabs, VStack,
+    Avatar, AvatarSize, Badge, Button, Card, InputArea, Sidebar, SidebarItem, SidebarSection,
 };
 use crate::theme::Theme;
+use gpui::{div, prelude::*, px, Context, IntoElement, Window};
 
 /// The main chat view — demonstrates comprehensive usage of the component library.
 pub struct ChatView {
@@ -84,7 +81,7 @@ impl ChatView {
                     .child(div().h(px(24.0)))
                     .child(
                         div()
-                            .font_size(px(14.0))
+                            .text_size(px(14.0))
                             .text_color(self.theme.muted_foreground)
                             .child("Explore more"),
                     )
@@ -119,12 +116,10 @@ impl ChatView {
                     .child(
                         HStack::new()
                             .gap(px(4.0))
-                            .child(
-                                Badge::outline("lawn").render(&self.theme),
-                            )
+                            .child(Badge::outline("lawn").render(&self.theme))
                             .child(
                                 div()
-                                    .font_size(px(12.0))
+                                    .text_size(px(12.0))
                                     .text_color(self.theme.muted_foreground)
                                     .child("▼"),
                             )
@@ -138,8 +133,7 @@ impl ChatView {
         HStack::new()
             .gap(px(16.0))
             .child(
-                Card::simple("🎮", "Build a classic Snake game in this repo.")
-                    .render(&self.theme),
+                Card::simple("🎮", "Build a classic Snake game in this repo.").render(&self.theme),
             )
             .child(
                 Card::simple("📄", "Create a one-page PDF that summarizes this app.")
@@ -159,30 +153,19 @@ impl ChatView {
             .header_item(SidebarItem::new("📝", "New thread"))
             .header_item(SidebarItem::new("⚙️", "Automations"))
             .header_item(SidebarItem::new("🎯", "Skills"))
-            .section(
-                SidebarSection::new()
-                    .title("lawn")
-                    .threads(vec![
-                        ("Design blog post organization", "2h"),
-                        ("Add archived blog post flow", "2h"),
-                        ("Research blog overhaul options", "4h"),
-                    ]),
-            )
-            .section(
-                SidebarSection::new()
-                    .title("t3.gg"),
-            )
-            .section(
-                SidebarSection::new()
-                    .title("t3-native-proto")
-                    .threads(vec![
-                        ("Reorganize auth UI to use metad...", "6d"),
-                        ("I have done a bunch of research ...", "4d"),
-                        ("Fix chat layout when keyboard o...", "5d"),
-                        ("Make auth session persist", "5d"),
-                        ("Fix markdown and simplify storage", "5d"),
-                    ]),
-            )
+            .section(SidebarSection::new().title("lawn").threads(vec![
+                ("Design blog post organization", "2h"),
+                ("Add archived blog post flow", "2h"),
+                ("Research blog overhaul options", "4h"),
+            ]))
+            .section(SidebarSection::new().title("t3.gg"))
+            .section(SidebarSection::new().title("t3-native-proto").threads(vec![
+                ("Reorganize auth UI to use metad...", "6d"),
+                ("I have done a bunch of research ...", "4d"),
+                ("Fix chat layout when keyboard o...", "5d"),
+                ("Make auth session persist", "5d"),
+                ("Fix markdown and simplify storage", "5d"),
+            ]))
             .footer(
                 HStack::new()
                     .gap(px(8.0))
@@ -194,7 +177,7 @@ impl ChatView {
                     )
                     .child(
                         div()
-                            .font_size(px(14.0))
+                            .text_size(px(14.0))
                             .text_color(self.theme.sidebar_foreground)
                             .child("Personal"),
                     )

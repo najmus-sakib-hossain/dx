@@ -71,7 +71,10 @@ _ Bench 3.5 +";
 
     println!("  DX:   {:.2}µs per parse", dx_per_op as f64 / 1000.0);
     println!("  JSON: {:.2}µs per parse", json_per_op as f64 / 1000.0);
-    println!("  Speedup: {:.1}x faster\n", json_per_op as f64 / dx_per_op as f64);
+    println!(
+        "  Speedup: {:.1}x faster\n",
+        json_per_op as f64 / dx_per_op as f64
+    );
 
     // Human format
     println!("👁️  HUMAN-READABLE FORMAT:");

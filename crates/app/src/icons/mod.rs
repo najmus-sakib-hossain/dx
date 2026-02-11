@@ -1,6 +1,6 @@
-pub mod loader;
 pub mod data;
-pub mod svg_renderer;
+pub mod loader;
 pub mod svg_element;
+pub mod svg_renderer;
 
 pub use loader::IconDataLoader;

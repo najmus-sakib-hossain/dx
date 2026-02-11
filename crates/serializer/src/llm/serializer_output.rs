@@ -18,7 +18,7 @@
 //! 2. LLM (.llm) - LLM-optimized format in .dx folder
 //! 3. Machine (.machine) - Binary for fast runtime loading
 
-use crate::llm::convert::{ConvertError, document_to_machine, llm_to_document};
+use crate::llm::convert::{document_to_machine, llm_to_document, ConvertError};
 use crate::llm::human_formatter::HumanFormatter;
 use crate::llm::types::DxDocument;
 use std::collections::HashMap;
@@ -72,7 +72,7 @@ impl Default for SerializerOutputConfig {
 
 impl SerializerOutputConfig {
     /// Create a new config with default settings
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
@@ -84,14 +84,14 @@ impl SerializerOutputConfig {
     }
 
     /// Set whether to generate LLM format
-    #[must_use] 
+    #[must_use]
     pub fn with_llm(mut self, generate: bool) -> Self {
         self.generate_llm = generate;
         self
     }
 
     /// Set whether to generate machine format
-    #[must_use] 
+    #[must_use]
     pub fn with_machine(mut self, generate: bool) -> Self {
         self.generate_machine = generate;
         self
@@ -179,7 +179,7 @@ pub struct SerializerManifest {
 impl SerializerManifest {
     pub const VERSION: u32 = 1;
 
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self {
             version: Self::VERSION,
@@ -195,7 +195,7 @@ pub struct SerializerOutput {
 
 impl SerializerOutput {
     /// Create a new serializer output with default config
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self {
             config: SerializerOutputConfig::default(),
@@ -203,16 +203,18 @@ impl SerializerOutput {
     }
 
     /// Create with custom config
-    #[must_use] 
+    #[must_use]
     pub fn with_config(config: SerializerOutputConfig) -> Self {
         Self { config }
     }
 
     /// Get output paths for a source file
-    #[must_use] 
+    #[must_use]
     pub fn get_paths(&self, source_path: &Path) -> SerializerPaths {
-        let stem = source_path
-            .file_stem().map_or_else(|| "unknown".to_string(), |s| s.to_string_lossy().to_string());
+        let stem = source_path.file_stem().map_or_else(
+            || "unknown".to_string(),
+            |s| s.to_string_lossy().to_string(),
+        );
 
         SerializerPaths {
             source: source_path.to_path_buf(),
@@ -312,7 +314,11 @@ impl SerializerOutput {
         // Get modification time
         let modified = fs::metadata(source_path)?
             .modified()
-            .map(|t| t.duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_secs())
+            .map(|t| {
+                t.duration_since(std::time::UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_secs()
+            })
             .unwrap_or(0);
 
         // Add/update entry
@@ -368,7 +374,7 @@ impl SerializerOutput {
     }
 
     /// Check if outputs are up-to-date for a source file
-    #[must_use] 
+    #[must_use]
     pub fn is_up_to_date(&self, source_path: &Path) -> bool {
         let paths = self.get_paths(source_path);
 
@@ -391,7 +397,7 @@ impl SerializerOutput {
     }
 
     /// Get the config
-    #[must_use] 
+    #[must_use]
     pub fn config(&self) -> &SerializerOutputConfig {
         &self.config
     }
@@ -433,7 +439,10 @@ mod tests {
         let paths = output.get_paths(Path::new("rules/javascript-lint.sr"));
 
         assert_eq!(paths.llm.file_name().unwrap(), "javascript-lint.llm");
-        assert_eq!(paths.machine.file_name().unwrap(), "javascript-lint.machine");
+        assert_eq!(
+            paths.machine.file_name().unwrap(),
+            "javascript-lint.machine"
+        );
     }
 
     #[test]

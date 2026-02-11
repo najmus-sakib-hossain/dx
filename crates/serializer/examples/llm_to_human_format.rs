@@ -16,7 +16,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let dx_llm = Path::new(".dx/serializer/dx.llm");
     if dx_llm.exists() {
         let content = fs::read_to_string(dx_llm)?;
-        println!("LLM content (first 100 chars): {}", &content[..100.min(content.len())]);
+        println!(
+            "LLM content (first 100 chars): {}",
+            &content[..100.min(content.len())]
+        );
         let human_content = llm_to_human(&content)?;
         println!(
             "Human content (first 200 chars): {}",

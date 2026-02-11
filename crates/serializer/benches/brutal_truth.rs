@@ -1,4 +1,4 @@
-use criterion::{Criterion, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use rkyv::{Archive, Deserialize, Serialize};
 use serializer::machine::{deserialize, deserialize_batch, serialize, serialize_batch};
 
@@ -113,7 +113,10 @@ fn test_correctness() {
     println!("Testing DX-Machine batch serialize...");
     match serialize_batch(&items) {
         Ok(batches) => {
-            println!("✓ DX-Machine batch serialize: SUCCESS ({} items)", batches.len());
+            println!(
+                "✓ DX-Machine batch serialize: SUCCESS ({} items)",
+                batches.len()
+            );
 
             println!("Testing DX-Machine batch deserialize...");
             let deserialized = unsafe { deserialize_batch::<Vec<TestData>>(&batches) };

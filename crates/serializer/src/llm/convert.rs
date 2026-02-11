@@ -176,7 +176,7 @@ pub fn document_to_human(doc: &DxDocument) -> String {
 }
 
 /// Convert `DxDocument` to Human format string with custom config
-#[must_use] 
+#[must_use]
 pub fn document_to_human_with_config(doc: &DxDocument, config: HumanFormatConfig) -> String {
     let formatter = HumanFormatter::with_config(config);
     formatter.format(doc)
@@ -202,7 +202,7 @@ pub fn human_to_machine(human_input: &str) -> Result<MachineFormat, ConvertError
 }
 
 /// Convert `DxDocument` to Machine format (binary, uncompressed)
-#[must_use] 
+#[must_use]
 pub fn document_to_machine(doc: &DxDocument) -> MachineFormat {
     let mut data = Vec::new();
 
@@ -244,7 +244,7 @@ pub fn document_to_machine(doc: &DxDocument) -> MachineFormat {
 
 /// Convert `DxDocument` to Machine format (binary with LZ4 compression)
 #[cfg(feature = "compression")]
-#[must_use] 
+#[must_use]
 pub fn document_to_machine_compressed(doc: &DxDocument) -> MachineFormat {
     use crate::machine::compress::DxCompressed;
 
@@ -448,9 +448,11 @@ fn read_u32(data: &[u8], pos: &mut usize) -> Result<u32, ConvertError> {
         });
     }
     let bytes: [u8; 4] =
-        data[*pos..*pos + 4].try_into().map_err(|_| ConvertError::MachineFormat {
-            msg: "Failed to read u32".to_string(),
-        })?;
+        data[*pos..*pos + 4]
+            .try_into()
+            .map_err(|_| ConvertError::MachineFormat {
+                msg: "Failed to read u32".to_string(),
+            })?;
     *pos += 4;
     Ok(u32::from_le_bytes(bytes))
 }
@@ -493,9 +495,11 @@ fn read_value(data: &[u8], pos: &mut usize) -> Result<crate::llm::types::DxLlmVa
                 });
             }
             let bytes: [u8; 8] =
-                data[*pos..*pos + 8].try_into().map_err(|_| ConvertError::MachineFormat {
-                    msg: "Failed to read f64".to_string(),
-                })?;
+                data[*pos..*pos + 8]
+                    .try_into()
+                    .map_err(|_| ConvertError::MachineFormat {
+                        msg: "Failed to read f64".to_string(),
+                    })?;
             *pos += 8;
             Ok(DxLlmValue::Num(f64::from_le_bytes(bytes)))
         }
@@ -562,16 +566,25 @@ mod tests {
     #[test]
     fn test_machine_format_round_trip() {
         let mut doc = DxDocument::new();
-        doc.context.insert("name".to_string(), DxLlmValue::Str("Test".to_string()));
-        doc.context.insert("count".to_string(), DxLlmValue::Num(42.0));
-        doc.context.insert("active".to_string(), DxLlmValue::Bool(true));
+        doc.context
+            .insert("name".to_string(), DxLlmValue::Str("Test".to_string()));
+        doc.context
+            .insert("count".to_string(), DxLlmValue::Num(42.0));
+        doc.context
+            .insert("active".to_string(), DxLlmValue::Bool(true));
 
         let machine = document_to_machine(&doc);
         let round_trip_doc = machine_to_document(&machine).unwrap();
 
         assert_eq!(doc.context.len(), round_trip_doc.context.len());
-        assert_eq!(round_trip_doc.context.get("name").unwrap().as_str(), Some("Test"));
-        assert_eq!(round_trip_doc.context.get("count").unwrap().as_num(), Some(42.0));
+        assert_eq!(
+            round_trip_doc.context.get("name").unwrap().as_str(),
+            Some("Test")
+        );
+        assert_eq!(
+            round_trip_doc.context.get("count").unwrap().as_num(),
+            Some(42.0)
+        );
     }
 
     #[test]

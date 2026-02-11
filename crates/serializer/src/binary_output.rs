@@ -51,7 +51,7 @@ impl BinaryConfig {
 /// Compute hash for a file path (8 hex characters)
 ///
 /// Uses FNV-1a for speed and good distribution
-#[must_use] 
+#[must_use]
 pub fn hash_path(relative_path: &str) -> String {
     // FNV-1a 64-bit
     const FNV_OFFSET: u64 = 0xcbf2_9ce4_8422_2325;
@@ -104,10 +104,14 @@ pub fn get_binary_path<P: AsRef<Path>>(source_path: P, config: &BinaryConfig) ->
 
     // Get filename and change extension to .dxs
     let filename = source
-        .file_stem().map_or_else(|| "dx".to_string(), |s| s.to_string_lossy().to_string());
+        .file_stem()
+        .map_or_else(|| "dx".to_string(), |s| s.to_string_lossy().to_string());
 
     // Build output path: .dx/serializer/{hash}/{filename}.dxs
-    config.output_dir.join(&hash).join(format!("{filename}.dxs"))
+    config
+        .output_dir
+        .join(&hash)
+        .join(format!("{filename}.dxs"))
 }
 
 /// Write binary data to the correct .dxs path

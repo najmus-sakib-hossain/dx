@@ -11,10 +11,10 @@
 //!
 //! **Validates: Requirements 9.1, 9.2, 9.3**
 
-use criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use serializer::{
-    DxDocument, DxLlmValue, DxValue, deserialize, document_to_llm, encode, llm_to_document, parse,
-    serialize,
+    deserialize, document_to_llm, encode, llm_to_document, parse, serialize, DxDocument,
+    DxLlmValue, DxValue,
 };
 
 // =============================================================================
@@ -77,16 +77,23 @@ fn generate_dx_document(num_entries: usize) -> DxDocument {
     let mut doc = DxDocument::new();
 
     // Add context entries
+    doc.context.insert(
+        "project".to_string(),
+        DxLlmValue::Str("BenchmarkTest".to_string()),
+    );
     doc.context
-        .insert("project".to_string(), DxLlmValue::Str("BenchmarkTest".to_string()));
-    doc.context.insert("version".to_string(), DxLlmValue::Str("1.0.0".to_string()));
-    doc.context.insert("status".to_string(), DxLlmValue::Str("active".to_string()));
+        .insert("version".to_string(), DxLlmValue::Str("1.0.0".to_string()));
+    doc.context
+        .insert("status".to_string(), DxLlmValue::Str("active".to_string()));
 
     // Add many entries to reach target size
     for i in 0..num_entries {
-        doc.context.insert(format!("item{}", i), DxLlmValue::Str(format!("value{}", i)));
-        doc.context.insert(format!("count{}", i), DxLlmValue::Num(i as f64 * 10.0));
-        doc.context.insert(format!("active{}", i), DxLlmValue::Bool(true));
+        doc.context
+            .insert(format!("item{}", i), DxLlmValue::Str(format!("value{}", i)));
+        doc.context
+            .insert(format!("count{}", i), DxLlmValue::Num(i as f64 * 10.0));
+        doc.context
+            .insert(format!("active{}", i), DxLlmValue::Bool(true));
     }
 
     doc
@@ -99,7 +106,10 @@ fn generate_dx_value(num_entries: usize) -> DxValue {
     let mut obj = DxObject::with_capacity(num_entries * 3 + 3);
 
     // Add header entries
-    obj.insert("project".to_string(), DxValue::String("BenchmarkTest".to_string()));
+    obj.insert(
+        "project".to_string(),
+        DxValue::String("BenchmarkTest".to_string()),
+    );
     obj.insert("version".to_string(), DxValue::String("1.0.0".to_string()));
     obj.insert("status".to_string(), DxValue::String("active".to_string()));
 
@@ -141,24 +151,30 @@ fn bench_parse_machine(c: &mut Criterion) {
     // Small input (~100 bytes)
     let small = generate_machine_input(SMALL_SIZE);
     group.throughput(Throughput::Bytes(small.len() as u64));
-    group.bench_with_input(BenchmarkId::new("small", small.len()), &small, |b, input| {
-        b.iter(|| parse(black_box(input)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("small", small.len()),
+        &small,
+        |b, input| b.iter(|| parse(black_box(input))),
+    );
 
     // Medium input (~10 KB)
     let medium = generate_machine_input(MEDIUM_SIZE);
     group.throughput(Throughput::Bytes(medium.len() as u64));
-    group.bench_with_input(BenchmarkId::new("medium", medium.len()), &medium, |b, input| {
-        b.iter(|| parse(black_box(input)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("medium", medium.len()),
+        &medium,
+        |b, input| b.iter(|| parse(black_box(input))),
+    );
 
     // Large input (~1 MB)
     let large = generate_machine_input(LARGE_SIZE);
     group.throughput(Throughput::Bytes(large.len() as u64));
     group.sample_size(20); // Reduce sample size for large inputs
-    group.bench_with_input(BenchmarkId::new("large", large.len()), &large, |b, input| {
-        b.iter(|| parse(black_box(input)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("large", large.len()),
+        &large,
+        |b, input| b.iter(|| parse(black_box(input))),
+    );
 
     group.finish();
 }
@@ -173,24 +189,30 @@ fn bench_parse_llm(c: &mut Criterion) {
     // Small input (~100 bytes)
     let small = generate_llm_input(SMALL_SIZE);
     group.throughput(Throughput::Bytes(small.len() as u64));
-    group.bench_with_input(BenchmarkId::new("small", small.len()), &small, |b, input| {
-        b.iter(|| llm_to_document(black_box(input)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("small", small.len()),
+        &small,
+        |b, input| b.iter(|| llm_to_document(black_box(input))),
+    );
 
     // Medium input (~10 KB)
     let medium = generate_llm_input(MEDIUM_SIZE);
     group.throughput(Throughput::Bytes(medium.len() as u64));
-    group.bench_with_input(BenchmarkId::new("medium", medium.len()), &medium, |b, input| {
-        b.iter(|| llm_to_document(black_box(input)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("medium", medium.len()),
+        &medium,
+        |b, input| b.iter(|| llm_to_document(black_box(input))),
+    );
 
     // Large input (~1 MB)
     let large = generate_llm_input(LARGE_SIZE);
     group.throughput(Throughput::Bytes(large.len() as u64));
     group.sample_size(20); // Reduce sample size for large inputs
-    group.bench_with_input(BenchmarkId::new("large", large.len()), &large, |b, input| {
-        b.iter(|| llm_to_document(black_box(input)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("large", large.len()),
+        &large,
+        |b, input| b.iter(|| llm_to_document(black_box(input))),
+    );
 
     group.finish();
 }
@@ -204,22 +226,28 @@ fn bench_serialize_machine(c: &mut Criterion) {
 
     // Small document
     let small = generate_dx_value(SMALL_ENTRIES);
-    group.bench_with_input(BenchmarkId::new("small", SMALL_ENTRIES), &small, |b, value| {
-        b.iter(|| encode(black_box(value)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("small", SMALL_ENTRIES),
+        &small,
+        |b, value| b.iter(|| encode(black_box(value))),
+    );
 
     // Medium document
     let medium = generate_dx_value(MEDIUM_ENTRIES);
-    group.bench_with_input(BenchmarkId::new("medium", MEDIUM_ENTRIES), &medium, |b, value| {
-        b.iter(|| encode(black_box(value)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("medium", MEDIUM_ENTRIES),
+        &medium,
+        |b, value| b.iter(|| encode(black_box(value))),
+    );
 
     // Large document
     let large = generate_dx_value(LARGE_ENTRIES);
     group.sample_size(20); // Reduce sample size for large inputs
-    group.bench_with_input(BenchmarkId::new("large", LARGE_ENTRIES), &large, |b, value| {
-        b.iter(|| encode(black_box(value)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("large", LARGE_ENTRIES),
+        &large,
+        |b, value| b.iter(|| encode(black_box(value))),
+    );
 
     group.finish();
 }
@@ -233,22 +261,28 @@ fn bench_serialize_llm(c: &mut Criterion) {
 
     // Small document
     let small = generate_dx_document(SMALL_ENTRIES);
-    group.bench_with_input(BenchmarkId::new("small", SMALL_ENTRIES), &small, |b, doc| {
-        b.iter(|| document_to_llm(black_box(doc)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("small", SMALL_ENTRIES),
+        &small,
+        |b, doc| b.iter(|| document_to_llm(black_box(doc))),
+    );
 
     // Medium document
     let medium = generate_dx_document(MEDIUM_ENTRIES);
-    group.bench_with_input(BenchmarkId::new("medium", MEDIUM_ENTRIES), &medium, |b, doc| {
-        b.iter(|| document_to_llm(black_box(doc)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("medium", MEDIUM_ENTRIES),
+        &medium,
+        |b, doc| b.iter(|| document_to_llm(black_box(doc))),
+    );
 
     // Large document
     let large = generate_dx_document(LARGE_ENTRIES);
     group.sample_size(20); // Reduce sample size for large inputs
-    group.bench_with_input(BenchmarkId::new("large", LARGE_ENTRIES), &large, |b, doc| {
-        b.iter(|| document_to_llm(black_box(doc)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("large", LARGE_ENTRIES),
+        &large,
+        |b, doc| b.iter(|| document_to_llm(black_box(doc))),
+    );
 
     group.finish();
 }
@@ -262,31 +296,43 @@ fn bench_roundtrip_machine(c: &mut Criterion) {
 
     // Small
     let small = generate_dx_value(SMALL_ENTRIES);
-    group.bench_with_input(BenchmarkId::new("small", SMALL_ENTRIES), &small, |b, value| {
-        b.iter(|| {
-            let encoded = encode(black_box(value)).expect("encode failed");
-            parse(black_box(&encoded))
-        })
-    });
+    group.bench_with_input(
+        BenchmarkId::new("small", SMALL_ENTRIES),
+        &small,
+        |b, value| {
+            b.iter(|| {
+                let encoded = encode(black_box(value)).expect("encode failed");
+                parse(black_box(&encoded))
+            })
+        },
+    );
 
     // Medium
     let medium = generate_dx_value(MEDIUM_ENTRIES);
-    group.bench_with_input(BenchmarkId::new("medium", MEDIUM_ENTRIES), &medium, |b, value| {
-        b.iter(|| {
-            let encoded = encode(black_box(value)).expect("encode failed");
-            parse(black_box(&encoded))
-        })
-    });
+    group.bench_with_input(
+        BenchmarkId::new("medium", MEDIUM_ENTRIES),
+        &medium,
+        |b, value| {
+            b.iter(|| {
+                let encoded = encode(black_box(value)).expect("encode failed");
+                parse(black_box(&encoded))
+            })
+        },
+    );
 
     // Large
     let large = generate_dx_value(LARGE_ENTRIES);
     group.sample_size(20);
-    group.bench_with_input(BenchmarkId::new("large", LARGE_ENTRIES), &large, |b, value| {
-        b.iter(|| {
-            let encoded = encode(black_box(value)).expect("encode failed");
-            parse(black_box(&encoded))
-        })
-    });
+    group.bench_with_input(
+        BenchmarkId::new("large", LARGE_ENTRIES),
+        &large,
+        |b, value| {
+            b.iter(|| {
+                let encoded = encode(black_box(value)).expect("encode failed");
+                parse(black_box(&encoded))
+            })
+        },
+    );
 
     group.finish();
 }
@@ -296,31 +342,43 @@ fn bench_roundtrip_llm(c: &mut Criterion) {
 
     // Small
     let small = generate_dx_document(SMALL_ENTRIES);
-    group.bench_with_input(BenchmarkId::new("small", SMALL_ENTRIES), &small, |b, doc| {
-        b.iter(|| {
-            let serialized = serialize(black_box(doc));
-            deserialize(black_box(&serialized))
-        })
-    });
+    group.bench_with_input(
+        BenchmarkId::new("small", SMALL_ENTRIES),
+        &small,
+        |b, doc| {
+            b.iter(|| {
+                let serialized = serialize(black_box(doc));
+                deserialize(black_box(&serialized))
+            })
+        },
+    );
 
     // Medium
     let medium = generate_dx_document(MEDIUM_ENTRIES);
-    group.bench_with_input(BenchmarkId::new("medium", MEDIUM_ENTRIES), &medium, |b, doc| {
-        b.iter(|| {
-            let serialized = serialize(black_box(doc));
-            deserialize(black_box(&serialized))
-        })
-    });
+    group.bench_with_input(
+        BenchmarkId::new("medium", MEDIUM_ENTRIES),
+        &medium,
+        |b, doc| {
+            b.iter(|| {
+                let serialized = serialize(black_box(doc));
+                deserialize(black_box(&serialized))
+            })
+        },
+    );
 
     // Large
     let large = generate_dx_document(LARGE_ENTRIES);
     group.sample_size(20);
-    group.bench_with_input(BenchmarkId::new("large", LARGE_ENTRIES), &large, |b, doc| {
-        b.iter(|| {
-            let serialized = serialize(black_box(doc));
-            deserialize(black_box(&serialized))
-        })
-    });
+    group.bench_with_input(
+        BenchmarkId::new("large", LARGE_ENTRIES),
+        &large,
+        |b, doc| {
+            b.iter(|| {
+                let serialized = serialize(black_box(doc));
+                deserialize(black_box(&serialized))
+            })
+        },
+    );
 
     group.finish();
 }

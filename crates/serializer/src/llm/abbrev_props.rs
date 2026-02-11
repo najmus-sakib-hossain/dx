@@ -31,7 +31,11 @@ mod property_tests {
     /// Generate a random full key from the dictionary
     fn arb_full_key() -> impl Strategy<Value = String> {
         let dict = AbbrevDict::new();
-        let fulls: Vec<String> = dict.global_mappings().values().map(std::string::ToString::to_string).collect();
+        let fulls: Vec<String> = dict
+            .global_mappings()
+            .values()
+            .map(std::string::ToString::to_string)
+            .collect();
         proptest::sample::select(fulls)
     }
 

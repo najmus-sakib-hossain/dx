@@ -38,10 +38,7 @@ impl FastMultiPatternMatcher {
 
     /// Search for all patterns in text simultaneously
     pub fn find_all(&self, text: &str) -> Vec<u32> {
-        self.dac
-            .find_iter(text)
-            .map(|mat| mat.value())
-            .collect()
+        self.dac.find_iter(text).map(|mat| mat.value()).collect()
     }
 
     /// Find first match (best for autocomplete)
@@ -56,7 +53,11 @@ mod tests {
 
     #[test]
     fn test_multi_pattern() {
-        let patterns = vec!["home".to_string(), "arrow".to_string(), "search".to_string()];
+        let patterns = vec![
+            "home".to_string(),
+            "arrow".to_string(),
+            "search".to_string(),
+        ];
         let matcher = FastMultiPatternMatcher::new(&patterns);
 
         let results = matcher.find_all("home-arrow-search");

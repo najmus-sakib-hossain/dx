@@ -55,7 +55,11 @@ fn main() {
         }
         arena.to_vec()
     });
-    println!("   Processed {} items in {} chunks", items.len(), results.len());
+    println!(
+        "   Processed {} items in {} chunks",
+        items.len(),
+        results.len()
+    );
     println!("   Chunk size: {} bytes\n", results[0].len());
 
     // Example 4: Large-scale parallel processing

@@ -1,13 +1,14 @@
 #![allow(dead_code)]
 
 use gpui::{
-    div, prelude::*, px, Context, FocusHandle, IntoElement, KeyDownEvent, MouseButton, Window,
+    div, prelude::*, px, Context, FocusHandle, IntoElement, KeyDownEvent, MouseButton,
+    SharedString, Window,
 };
 use std::sync::Arc;
 
 use crate::components::icon_grid::{IconGrid, IconGridItem};
-use crate::components::{Badge, BadgeVariant, Button, ButtonSize, ButtonVariant, Kbd};
-use crate::components::ui::{Container, EmptyState, HStack, Pagination, Stat, VStack};
+use crate::components::ui::{EmptyState, HStack, Stat, VStack};
+use crate::components::{Badge, BadgeVariant, Button, ButtonSize, Kbd};
 use crate::icons::data::IconSource;
 use crate::icons::IconDataLoader;
 use crate::theme::{Radius, Spacing, Theme};
@@ -150,16 +151,19 @@ impl IconPickerView {
                 HStack::new()
                     .gap(Spacing::TWO)
                     .child(
-                        Badge::new(&format!("{} results", self.filtered_icons.len()))
+                        Badge::new(format!("{} results", self.filtered_icons.len()))
                             .variant(BadgeVariant::Secondary)
                             .render(&self.theme),
                     )
                     .child(
-                        Stat::new("Page", &format!(
-                            "{}/{}",
-                            self.page_offset / ICONS_PER_PAGE + 1,
-                            ((self.filtered_icons.len() + ICONS_PER_PAGE - 1) / ICONS_PER_PAGE).max(1)
-                        ))
+                        Stat::new(
+                            "Page",
+                            format!(
+                                "{}/{}",
+                                self.page_offset / ICONS_PER_PAGE + 1,
+                                self.filtered_icons.len().div_ceil(ICONS_PER_PAGE).max(1)
+                            ),
+                        )
                         .render(&self.theme),
                     )
                     .render(),
@@ -168,11 +172,7 @@ impl IconPickerView {
 
     // ── Search Bar ──
 
-    fn render_search_bar(
-        &self,
-        cx: &mut Context<Self>,
-        window: &mut Window,
-    ) -> impl IntoElement {
+    fn render_search_bar(&self, cx: &mut Context<Self>, window: &mut Window) -> impl IntoElement {
         let is_focused = self.search_focus.is_focused(window);
 
         div()
@@ -255,12 +255,7 @@ impl IconPickerView {
                                     }),
                             )
                             .when(is_focused, |el| {
-                                el.child(
-                                    div()
-                                        .w(px(2.0))
-                                        .h(px(16.0))
-                                        .bg(self.theme.foreground),
-                                )
+                                el.child(div().w(px(2.0)).h(px(16.0)).bg(self.theme.foreground))
                             }),
                     )
                     // Clear button
@@ -284,7 +279,12 @@ impl IconPickerView {
     // ── Pack Filter Chips ──
 
     fn render_pack_chips(&self, cx: &mut Context<Self>) -> impl IntoElement {
-        let mut row = div().flex().flex_wrap().gap(Spacing::TWO).px(Spacing::SIX).py(Spacing::THREE);
+        let mut row = div()
+            .flex()
+            .flex_wrap()
+            .gap(Spacing::TWO)
+            .px(Spacing::SIX)
+            .py(Spacing::THREE);
 
         // "All" chip
         let all_active = self.selected_pack.is_none();
@@ -337,9 +337,7 @@ impl IconPickerView {
                     view.set_selected_pack(pack.clone(), cx);
                 }),
             )
-            .child(
-                div().text_xs().text_color(fg).child(label.to_string()),
-            )
+            .child(div().text_xs().text_color(fg).child(label.to_string()))
     }
 
     // ── Icon Grid ──
@@ -351,9 +349,8 @@ impl IconPickerView {
 
         if self.filtered_icons.is_empty() {
             return div().flex_1().child(
-                EmptyState::new()
+                EmptyState::new("No icons found")
                     .icon("🔍")
-                    .title("No icons found")
                     .description("Try a different search or change the pack filter.")
                     .render(&self.theme),
             );
@@ -374,7 +371,9 @@ impl IconPickerView {
             })
             .collect();
 
-        div().flex_1().child(IconGrid::new(visible_icons).render(&self.theme))
+        div()
+            .flex_1()
+            .child(IconGrid::new(visible_icons).render(&self.theme))
     }
 
     // ── Pagination ──
@@ -382,7 +381,7 @@ impl IconPickerView {
     fn render_pagination(&self, cx: &mut Context<Self>) -> impl IntoElement {
         let total = self.filtered_icons.len();
         let page = self.page_offset / ICONS_PER_PAGE + 1;
-        let total_pages = ((total + ICONS_PER_PAGE - 1) / ICONS_PER_PAGE).max(1);
+        let total_pages = total.div_ceil(ICONS_PER_PAGE).max(1);
         let can_prev = self.page_offset > 0;
         let can_next = self.page_offset + ICONS_PER_PAGE < total;
 
@@ -406,9 +405,7 @@ impl IconPickerView {
                 }
                 btn.render(&self.theme)
             })
-            .child(
-                Badge::outline(&format!("{} / {}", page, total_pages)).render(&self.theme),
-            )
+            .child(Badge::outline(format!("{} / {}", page, total_pages)).render(&self.theme))
             .child({
                 let mut btn = Button::outline("Next →").size(ButtonSize::Sm);
                 if !can_next {
@@ -459,14 +456,8 @@ impl IconPickerView {
                     .py(Spacing::THREE)
                     .border_t_1()
                     .border_color(theme.sidebar_border)
-                    .child(
-                        Stat::new("Total", &format!("{}", self.total_count))
-                            .render(theme),
-                    )
-                    .child(
-                        Stat::new("Packs", &format!("{}", self.pack_names.len()))
-                            .render(theme),
-                    ),
+                    .child(Stat::new("Total", format!("{}", self.total_count)).render(theme))
+                    .child(Stat::new("Packs", format!("{}", self.pack_names.len())).render(theme)),
             )
     }
 
@@ -494,19 +485,12 @@ impl IconPickerView {
                     .text_color(self.theme.muted_foreground)
                     .child(label.to_string()),
             )
-            .child(
-                Badge::secondary(&format!("{}", count))
-                    .render(&self.theme),
-            )
+            .child(Badge::secondary(format!("{}", count)).render(&self.theme))
     }
 
     // ── Main Content ──
 
-    fn render_main_content(
-        &self,
-        cx: &mut Context<Self>,
-        window: &mut Window,
-    ) -> impl IntoElement {
+    fn render_main_content(&self, cx: &mut Context<Self>, window: &mut Window) -> impl IntoElement {
         div()
             .flex()
             .flex_col()

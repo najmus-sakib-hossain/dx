@@ -7,7 +7,7 @@
 //!
 //! **Validates: Requirements 2.1, 2.2**
 
-use criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use serializer::machine::{DxArena, DxMmap, QuantumWriter};
 use std::fs;
 use std::io::Write;
@@ -154,7 +154,9 @@ fn bench_vec_vs_arena_1mb(c: &mut Criterion) {
     let mut group = c.benchmark_group("vec_vs_arena_1mb");
     group.throughput(Throughput::Bytes(SIZE_1MB as u64));
 
-    group.bench_function("vec_allocation", |b| b.iter(|| serialize_with_vec(black_box(&records))));
+    group.bench_function("vec_allocation", |b| {
+        b.iter(|| serialize_with_vec(black_box(&records)))
+    });
 
     group.bench_function("arena_allocation", |b| {
         b.iter(|| serialize_with_arena(black_box(&records)))
@@ -169,7 +171,9 @@ fn bench_vec_vs_arena_10mb(c: &mut Criterion) {
     group.throughput(Throughput::Bytes(SIZE_10MB as u64));
     group.sample_size(20); // Reduce samples for large data
 
-    group.bench_function("vec_allocation", |b| b.iter(|| serialize_with_vec(black_box(&records))));
+    group.bench_function("vec_allocation", |b| {
+        b.iter(|| serialize_with_vec(black_box(&records)))
+    });
 
     group.bench_function("arena_allocation", |b| {
         b.iter(|| serialize_with_arena(black_box(&records)))
@@ -184,7 +188,9 @@ fn bench_vec_vs_arena_100mb(c: &mut Criterion) {
     group.throughput(Throughput::Bytes(SIZE_100MB as u64));
     group.sample_size(10); // Minimal samples for very large data
 
-    group.bench_function("vec_allocation", |b| b.iter(|| serialize_with_vec(black_box(&records))));
+    group.bench_function("vec_allocation", |b| {
+        b.iter(|| serialize_with_vec(black_box(&records)))
+    });
 
     group.bench_function("arena_allocation", |b| {
         b.iter(|| serialize_with_arena(black_box(&records)))
@@ -336,8 +342,9 @@ fn bench_batch_operations(c: &mut Criterion) {
 
     // Small batches (1000 records)
     let small_batch = generate_records(1000 * TestRecord::size());
-    group
-        .bench_function("batch_1000", |b| b.iter(|| serialize_with_arena(black_box(&small_batch))));
+    group.bench_function("batch_1000", |b| {
+        b.iter(|| serialize_with_arena(black_box(&small_batch)))
+    });
 
     // Medium batches (10000 records)
     let medium_batch = generate_records(10000 * TestRecord::size());
@@ -404,7 +411,12 @@ criterion_group!(
     bench_vec_vs_arena_100mb,
 );
 
-criterion_group!(file_io, bench_file_io_1mb, bench_file_io_10mb, bench_file_io_100mb,);
+criterion_group!(
+    file_io,
+    bench_file_io_1mb,
+    bench_file_io_10mb,
+    bench_file_io_100mb,
+);
 
 criterion_group!(read_perf, bench_read_performance,);
 

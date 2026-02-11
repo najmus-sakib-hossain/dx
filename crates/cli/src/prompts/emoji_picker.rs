@@ -33,46 +33,58 @@ impl EmojiPicker {
 
     fn init_default_emojis(&mut self) {
         self.categories = vec![
-            ("Smileys".to_string(), vec![
-                ("😀".to_string(), "grinning".to_string()),
-                ("😃".to_string(), "smile".to_string()),
-                ("😄".to_string(), "happy".to_string()),
-                ("😁".to_string(), "grin".to_string()),
-                ("😅".to_string(), "sweat".to_string()),
-                ("😂".to_string(), "joy".to_string()),
-                ("🤣".to_string(), "rofl".to_string()),
-                ("😊".to_string(), "blush".to_string()),
-            ]),
-            ("Gestures".to_string(), vec![
-                ("👍".to_string(), "thumbsup".to_string()),
-                ("👎".to_string(), "thumbsdown".to_string()),
-                ("👏".to_string(), "clap".to_string()),
-                ("🙌".to_string(), "raised_hands".to_string()),
-                ("👋".to_string(), "wave".to_string()),
-                ("🤝".to_string(), "handshake".to_string()),
-                ("🙏".to_string(), "pray".to_string()),
-                ("✌️".to_string(), "peace".to_string()),
-            ]),
-            ("Objects".to_string(), vec![
-                ("💻".to_string(), "laptop".to_string()),
-                ("📱".to_string(), "phone".to_string()),
-                ("⌨️".to_string(), "keyboard".to_string()),
-                ("🖱️".to_string(), "mouse".to_string()),
-                ("🖥️".to_string(), "desktop".to_string()),
-                ("📧".to_string(), "email".to_string()),
-                ("📁".to_string(), "folder".to_string()),
-                ("📊".to_string(), "chart".to_string()),
-            ]),
-            ("Symbols".to_string(), vec![
-                ("✅".to_string(), "check".to_string()),
-                ("❌".to_string(), "cross".to_string()),
-                ("⚠️".to_string(), "warning".to_string()),
-                ("🔥".to_string(), "fire".to_string()),
-                ("⭐".to_string(), "star".to_string()),
-                ("💡".to_string(), "bulb".to_string()),
-                ("🚀".to_string(), "rocket".to_string()),
-                ("🎯".to_string(), "target".to_string()),
-            ]),
+            (
+                "Smileys".to_string(),
+                vec![
+                    ("😀".to_string(), "grinning".to_string()),
+                    ("😃".to_string(), "smile".to_string()),
+                    ("😄".to_string(), "happy".to_string()),
+                    ("😁".to_string(), "grin".to_string()),
+                    ("😅".to_string(), "sweat".to_string()),
+                    ("😂".to_string(), "joy".to_string()),
+                    ("🤣".to_string(), "rofl".to_string()),
+                    ("😊".to_string(), "blush".to_string()),
+                ],
+            ),
+            (
+                "Gestures".to_string(),
+                vec![
+                    ("👍".to_string(), "thumbsup".to_string()),
+                    ("👎".to_string(), "thumbsdown".to_string()),
+                    ("👏".to_string(), "clap".to_string()),
+                    ("🙌".to_string(), "raised_hands".to_string()),
+                    ("👋".to_string(), "wave".to_string()),
+                    ("🤝".to_string(), "handshake".to_string()),
+                    ("🙏".to_string(), "pray".to_string()),
+                    ("✌️".to_string(), "peace".to_string()),
+                ],
+            ),
+            (
+                "Objects".to_string(),
+                vec![
+                    ("💻".to_string(), "laptop".to_string()),
+                    ("📱".to_string(), "phone".to_string()),
+                    ("⌨️".to_string(), "keyboard".to_string()),
+                    ("🖱️".to_string(), "mouse".to_string()),
+                    ("🖥️".to_string(), "desktop".to_string()),
+                    ("📧".to_string(), "email".to_string()),
+                    ("📁".to_string(), "folder".to_string()),
+                    ("📊".to_string(), "chart".to_string()),
+                ],
+            ),
+            (
+                "Symbols".to_string(),
+                vec![
+                    ("✅".to_string(), "check".to_string()),
+                    ("❌".to_string(), "cross".to_string()),
+                    ("⚠️".to_string(), "warning".to_string()),
+                    ("🔥".to_string(), "fire".to_string()),
+                    ("⭐".to_string(), "star".to_string()),
+                    ("💡".to_string(), "bulb".to_string()),
+                    ("🚀".to_string(), "rocket".to_string()),
+                    ("🎯".to_string(), "target".to_string()),
+                ],
+            ),
         ];
     }
 
@@ -86,7 +98,7 @@ impl EmojiPicker {
 
         let query_lower = self.query.to_lowercase();
         let mut results = Vec::new();
-        
+
         for (_, emojis) in &self.categories {
             for (emoji, name) in emojis {
                 if name.to_lowercase().contains(&query_lower) {
@@ -94,7 +106,7 @@ impl EmojiPicker {
                 }
             }
         }
-        
+
         results
     }
 }
@@ -185,7 +197,9 @@ impl PromptInteraction for EmojiPicker {
                 lines += 1;
 
                 if self.query.is_empty() {
-                    let category_names: Vec<String> = self.categories.iter()
+                    let category_names: Vec<String> = self
+                        .categories
+                        .iter()
                         .enumerate()
                         .map(|(i, (name, _))| {
                             if i == self.current_category {
@@ -219,7 +233,11 @@ impl PromptInteraction for EmojiPicker {
                 }
 
                 if emojis.len() > 8 {
-                    term.write_line(&format!("{}  {}", bar, theme.dim.apply_to(format!("... {} more", emojis.len() - 8))))?;
+                    term.write_line(&format!(
+                        "{}  {}",
+                        bar,
+                        theme.dim.apply_to(format!("... {} more", emojis.len() - 8))
+                    ))?;
                     lines += 1;
                 }
 
@@ -237,7 +255,10 @@ impl PromptInteraction for EmojiPicker {
             State::Submit => {
                 let checkmark = theme.success.apply_to("✓");
                 let emojis = self.get_filtered_emojis();
-                let selected = emojis.get(self.cursor).map(|(e, n)| format!("{} {}", e, n)).unwrap_or_default();
+                let selected = emojis
+                    .get(self.cursor)
+                    .map(|(e, n)| format!("{} {}", e, n))
+                    .unwrap_or_default();
                 term.write_line(&format!(
                     "{} {}  {}",
                     checkmark,
@@ -257,7 +278,8 @@ impl PromptInteraction for EmojiPicker {
 
     fn value(&self) -> String {
         let emojis = self.get_filtered_emojis();
-        emojis.get(self.cursor)
+        emojis
+            .get(self.cursor)
             .map(|(emoji, _)| emoji.clone())
             .unwrap_or_default()
     }

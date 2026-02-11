@@ -132,7 +132,11 @@ impl PromptInteraction for Rating {
                 let rating_text = if self.value == 0 {
                     theme.dim.apply_to("No rating selected").to_string()
                 } else {
-                    format!("{} / {}", theme.primary.apply_to(self.value.to_string()).bold(), self.max)
+                    format!(
+                        "{} / {}",
+                        theme.primary.apply_to(self.value.to_string()).bold(),
+                        self.max
+                    )
                 };
                 term.write_line(&format!("{}  {}", bar, rating_text))?;
                 lines += 1;
@@ -141,14 +145,18 @@ impl PromptInteraction for Rating {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("Use ← → arrows or numbers, Enter to confirm")
+                    theme
+                        .dim
+                        .apply_to("Use ← → arrows or numbers, Enter to confirm")
                 ))?;
                 lines += 1;
             }
             State::Submit => {
                 let checkmark = theme.success.apply_to("✓");
                 let stars = "★".repeat(self.value);
-                let display = theme.dim.apply_to(format!("{} ({}/{})", stars, self.value, self.max));
+                let display = theme
+                    .dim
+                    .apply_to(format!("{} ({}/{})", stars, self.value, self.max));
                 term.write_line(&format!("{} {}  {}", checkmark, self.message, display))?;
                 lines += 1;
                 term.write_line(&format!("{}", theme.dim.apply_to(symbols.bar)))?;

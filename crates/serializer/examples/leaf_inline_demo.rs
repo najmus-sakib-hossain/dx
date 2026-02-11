@@ -81,9 +81,12 @@ config.regex:: ^[a-zA-Z0-9]+$";
         "forge.repository".to_string(),
         DxLlmValue::Str("https://github.com/user/repo".to_string()),
     );
+    doc.context.insert(
+        "api.base".to_string(),
+        DxLlmValue::Str("http://localhost:3000".to_string()),
+    );
     doc.context
-        .insert("api.base".to_string(), DxLlmValue::Str("http://localhost:3000".to_string()));
-    doc.context.insert("name".to_string(), DxLlmValue::Str("my-app".to_string()));
+        .insert("name".to_string(), DxLlmValue::Str("my-app".to_string()));
 
     // Serialize
     let serializer = LlmSerializer::new();

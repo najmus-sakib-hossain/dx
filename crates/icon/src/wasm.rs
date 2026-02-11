@@ -1,10 +1,10 @@
 // WASM bindings for browser usage
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
-use serde::{Deserialize, Serialize};
 use crate::engine::IconSearchEngine;
 use crate::index::IconIndex;
 use crate::search::SearchResult;
+use serde::{Deserialize, Serialize};
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
@@ -35,17 +35,17 @@ impl WasmIconSearch {
         // Deserialize index from bytes
         let index: IconIndex = rkyv::from_bytes(index_data)
             .map_err(|e| JsValue::from_str(&format!("Failed to deserialize index: {}", e)))?;
-        
+
         let engine = IconSearchEngine::from_index(index)
             .map_err(|e| JsValue::from_str(&format!("Failed to create engine: {}", e)))?;
-        
+
         Ok(WasmIconSearch { engine })
     }
-    
+
     #[wasm_bindgen]
     pub fn search(&self, query: &str, limit: usize) -> Result<JsValue, JsValue> {
         let results = self.engine.search(query, limit);
-        
+
         let wasm_results: Vec<WasmSearchResult> = results
             .into_iter()
             .map(|r| WasmSearchResult {
@@ -55,16 +55,16 @@ impl WasmIconSearch {
                 match_type: format!("{:?}", r.match_type),
             })
             .collect();
-        
+
         serde_wasm_bindgen::to_value(&wasm_results)
             .map_err(|e| JsValue::from_str(&format!("Serialization error: {}", e)))
     }
-    
+
     #[wasm_bindgen]
     pub fn total_icons(&self) -> usize {
         self.engine.total_icons()
     }
-    
+
     #[wasm_bindgen]
     pub fn clear_cache(&mut self) {
         self.engine.clear_cache();

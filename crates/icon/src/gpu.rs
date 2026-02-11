@@ -64,7 +64,11 @@ impl GpuSearchEngine {
     }
 
     /// Search icons on GPU (parallel across all GPU cores)
-    pub async fn search(&self, query: &str, icon_names: &[String]) -> Result<Vec<u32>, anyhow::Error> {
+    pub async fn search(
+        &self,
+        query: &str,
+        icon_names: &[String],
+    ) -> Result<Vec<u32>, anyhow::Error> {
         // Convert query to lowercase and then to u32 array
         let query_lower = query.to_lowercase();
         let query_u32: Vec<u32> = query_lower.as_bytes().iter().map(|&b| b as u32).collect();
@@ -150,9 +154,9 @@ impl GpuSearchEngine {
             });
             compute_pass.set_pipeline(&self.pipeline);
             compute_pass.set_bind_group(0, &bind_group, &[]);
-            
+
             // Dispatch workgroups (64 threads per workgroup)
-            let workgroups = (icon_names.len() as u32 + 63) / 64;
+            let workgroups = (icon_names.len() as u32).div_ceil(64);
             compute_pass.dispatch_workgroups(workgroups, 1, 1);
         }
 
@@ -182,7 +186,7 @@ impl GpuSearchEngine {
         });
 
         self.device.poll(wgpu::Maintain::Wait);
-        
+
         if let Some(Ok(())) = rx.receive().await {
             let data = buffer_slice.get_mapped_range();
             let results: Vec<u32> = bytemuck::cast_slice(&data).to_vec();

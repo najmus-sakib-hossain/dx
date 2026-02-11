@@ -13,21 +13,20 @@ use views::IconPickerView;
 
 fn main() {
     // Detect project root (look for Cargo.toml in ancestors)
-    let project_root = detect_project_root().unwrap_or_else(|| {
-        std::env::current_dir().expect("Could not determine current directory")
-    });
+    let project_root = detect_project_root()
+        .unwrap_or_else(|| std::env::current_dir().expect("Could not determine current directory"));
 
     // Load all icon data before launching the UI
     let mut loader = IconDataLoader::new(&project_root);
     let _ = loader.load_all(); // Ignore errors silently
-    
+
     // Create dynamic SVG asset source and register all loaded icons
     let dynamic_assets = DynamicSvgAssets::new();
     for icon in loader.icons() {
         let path = format!("icons/{}/{}.svg", icon.pack, icon.name);
         dynamic_assets.register_svg(path, &icon.svg_body, icon.width, icon.height);
     }
-    
+
     let loader = Arc::new(loader);
 
     // Create application with asset sources
@@ -62,7 +61,10 @@ fn detect_project_root() -> Option<std::path::PathBuf> {
     let mut dir = std::env::current_dir().ok()?;
     loop {
         // Check for the monorepo marker files
-        if dir.join("Cargo.toml").exists() && dir.join("apps").exists() && dir.join("crates").exists() {
+        if dir.join("Cargo.toml").exists()
+            && dir.join("apps").exists()
+            && dir.join("crates").exists()
+        {
             return Some(dir);
         }
         if !dir.pop() {
@@ -74,7 +76,10 @@ fn detect_project_root() -> Option<std::path::PathBuf> {
     if let Ok(exe) = std::env::current_exe() {
         let mut dir = exe.parent()?.to_path_buf();
         loop {
-            if dir.join("Cargo.toml").exists() && dir.join("apps").exists() && dir.join("crates").exists() {
+            if dir.join("Cargo.toml").exists()
+                && dir.join("apps").exists()
+                && dir.join("crates").exists()
+            {
                 return Some(dir);
             }
             if !dir.pop() {

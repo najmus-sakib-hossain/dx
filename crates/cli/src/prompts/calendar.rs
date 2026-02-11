@@ -82,37 +82,41 @@ impl CalendarView {
     fn render_calendar(&self) -> Vec<String> {
         let theme = THEME.read().unwrap();
         let mut lines = Vec::new();
-        
+
         lines.push(format!("  Su Mo Tu We Th Fr Sa"));
-        
+
         let first_day = self.first_day_of_month();
         let days_in_month = self.days_in_month();
-        
+
         let mut week = String::from("  ");
         for _ in 0..first_day {
             week.push_str("   ");
         }
-        
+
         for day in 1..=days_in_month {
             let day_str = if day == self.selected_day {
-                theme.primary.apply_to(format!("{:2}", day)).bold().to_string()
+                theme
+                    .primary
+                    .apply_to(format!("{:2}", day))
+                    .bold()
+                    .to_string()
             } else {
                 format!("{:2}", day)
             };
-            
+
             week.push_str(&day_str);
             week.push(' ');
-            
+
             if (first_day + day) % 7 == 0 {
                 lines.push(week.clone());
                 week = String::from("  ");
             }
         }
-        
+
         if !week.trim().is_empty() {
             lines.push(week);
         }
-        
+
         lines
     }
 }
@@ -227,7 +231,9 @@ impl PromptInteraction for CalendarView {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("Arrow keys: navigate, n/p: next/prev month, Enter: select")
+                    theme
+                        .dim
+                        .apply_to("Arrow keys: navigate, n/p: next/prev month, Enter: select")
                 ))?;
                 lines += 1;
             }
@@ -237,7 +243,10 @@ impl PromptInteraction for CalendarView {
                     "{} {}  {}",
                     checkmark,
                     self.message,
-                    theme.dim.apply_to(format!("{}-{:02}-{:02}", self.year, self.month, self.selected_day))
+                    theme.dim.apply_to(format!(
+                        "{}-{:02}-{:02}",
+                        self.year, self.month, self.selected_day
+                    ))
                 ))?;
                 lines += 1;
                 term.write_line(&format!("{}", theme.dim.apply_to(symbols.bar)))?;

@@ -43,7 +43,7 @@ impl UrlInput {
         }
 
         let lower = self.value.to_lowercase();
-        
+
         if !lower.starts_with("http://") && !lower.starts_with("https://") {
             return Err("URL must start with http:// or https://".to_string());
         }
@@ -70,12 +70,10 @@ impl PromptInteraction for UrlInput {
     fn on(&mut self, event: Event) {
         match event {
             Event::Key(key) => match key {
-                console::Key::Enter => {
-                    match self.validate_url() {
-                        Ok(_) => self.state = State::Submit,
-                        Err(msg) => self.error_message = Some(msg),
-                    }
-                }
+                console::Key::Enter => match self.validate_url() {
+                    Ok(_) => self.state = State::Submit,
+                    Err(msg) => self.error_message = Some(msg),
+                },
                 console::Key::Escape => self.state = State::Cancel,
                 console::Key::Backspace => {
                     self.value.pop();

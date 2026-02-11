@@ -182,8 +182,14 @@ fn main() {
         );
     }
 
-    println!("\nTotal serialize time: {:.2} µs", total_serialize_time as f64 / 1000.0);
-    println!("Total deserialize time: {:.2} µs", total_deserialize_time as f64 / 1000.0);
+    println!(
+        "\nTotal serialize time: {:.2} µs",
+        total_serialize_time as f64 / 1000.0
+    );
+    println!(
+        "Total deserialize time: {:.2} µs",
+        total_deserialize_time as f64 / 1000.0
+    );
 
     println!("\n✅ Real-world test complete!");
     println!("Check essence/*.machine files for binary output");

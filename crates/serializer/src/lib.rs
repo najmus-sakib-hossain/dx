@@ -306,39 +306,39 @@ pub mod watch;
 
 // Re-export derive macro when feature is enabled
 #[cfg(feature = "derive")]
-pub use dx_serializer_derive::{QuantumLayout, dx_static_serialize, include_serialized};
+pub use dx_serializer_derive::{dx_static_serialize, include_serialized, QuantumLayout};
 
 pub use base62::{decode_base62, encode_base62};
 pub use binary_output::{
-    BinaryConfig, get_binary_path, hash_path, is_cache_valid, read_binary, write_binary,
+    get_binary_path, hash_path, is_cache_valid, read_binary, write_binary, BinaryConfig,
 };
 pub use compress::{compress_to_writer, format_machine};
 pub use converters::{convert_to_dx, dx_to_toon, toon_to_dx};
 #[cfg(feature = "converters")]
 pub use converters::{json_to_dx, toml_to_dx, yaml_to_dx};
-pub use encoder::{Encoder, encode, encode_to_writer};
+pub use encoder::{encode, encode_to_writer, Encoder};
 pub use error::{DxError, Result};
-pub use formatter::{HumanFormatter as BinaryHumanFormatter, format_human};
+pub use formatter::{format_human, HumanFormatter as BinaryHumanFormatter};
 pub use mappings::Mappings;
 pub use optimizer::{optimize_key, optimize_path};
-pub use parser::{Parser, parse, parse_stream};
+pub use parser::{parse, parse_stream, Parser};
 pub use schema::{Schema, TypeHint};
 pub use types::{DxArray, DxObject, DxValue};
 pub use utf8::{
-    Utf8ValidationError, validate_string_input, validate_utf8, validate_utf8_detailed,
-    validate_utf8_owned,
+    validate_string_input, validate_utf8, validate_utf8_detailed, validate_utf8_owned,
+    Utf8ValidationError,
 };
 
 // Re-export LLM/Human format types at crate root for convenience
 pub use llm::{
-    AbbrevDict, ConvertError, DxDocument, DxLlmValue, DxSection, HumanFormatConfig, HumanFormatter,
-    HumanParseError, HumanParser, LlmParser, LlmSerializer, MachineFormat,
-    ParseError as LlmParseError,
-};
-pub use llm::{
     document_to_human, document_to_llm, document_to_machine, human_to_document, human_to_llm,
     human_to_machine, is_llm_format, llm_to_document, llm_to_human, machine_to_document,
     machine_to_human, machine_to_llm,
+};
+pub use llm::{
+    AbbrevDict, ConvertError, DxDocument, DxLlmValue, DxSection, HumanFormatConfig, HumanFormatter,
+    HumanParseError, HumanParser, LlmParser, LlmSerializer, MachineFormat,
+    ParseError as LlmParseError,
 };
 
 // Re-export Serializer Output types for .dx/serializer/ generation
@@ -358,8 +358,8 @@ pub use llm::{ModelType, TokenCounter, TokenInfo};
 
 // Re-export LLM model pricing and analysis
 pub use llm_models::{
-    LLM_MODELS, LlmModel, Provider, TokenAnalysis, analyze_all_models, format_cost, format_tokens,
-    models_by_provider,
+    analyze_all_models, format_cost, format_tokens, models_by_provider, LlmModel, Provider,
+    TokenAnalysis, LLM_MODELS,
 };
 
 // Re-export DX Serializer format types (token-efficient LLM format)
@@ -369,7 +369,7 @@ pub use llm::{
 };
 
 // Re-export WASM types for VS Code extension
-pub use wasm::{DxSerializer, SerializerConfig, TransformResult, ValidationResult, smart_quote};
+pub use wasm::{smart_quote, DxSerializer, SerializerConfig, TransformResult, ValidationResult};
 
 // Re-export builder pattern for advanced configuration
 pub use builder::{Serializer, SerializerBuilder};
@@ -488,10 +488,14 @@ active:+";
     fn test_serialize_deserialize_convenience() {
         // Test the simplified API
         let mut doc = DxDocument::new();
-        doc.context.insert("name".to_string(), DxLlmValue::Str("TestApp".to_string()));
-        doc.context.insert("version".to_string(), DxLlmValue::Str("1.0.0".to_string()));
-        doc.context.insert("count".to_string(), DxLlmValue::Num(42.0));
-        doc.context.insert("active".to_string(), DxLlmValue::Bool(true));
+        doc.context
+            .insert("name".to_string(), DxLlmValue::Str("TestApp".to_string()));
+        doc.context
+            .insert("version".to_string(), DxLlmValue::Str("1.0.0".to_string()));
+        doc.context
+            .insert("count".to_string(), DxLlmValue::Num(42.0));
+        doc.context
+            .insert("active".to_string(), DxLlmValue::Bool(true));
 
         // Serialize
         let text = serialize(&doc);

@@ -95,7 +95,12 @@ pub fn filter_icons_batch<const CHUNK: usize>(
 
     icons
         .par_chunks(CHUNK)
-        .flat_map(|chunk| chunk.iter().filter(|icon| predicate(icon)).collect::<Vec<_>>())
+        .flat_map(|chunk| {
+            chunk
+                .iter()
+                .filter(|icon| predicate(icon))
+                .collect::<Vec<_>>()
+        })
         .collect()
 }
 

@@ -149,7 +149,10 @@ fn main() {
         "With newlines:     {} tokens",
         counter.count(with_newlines, ModelType::Gpt4o).count
     );
-    println!("Inline:            {} tokens", counter.count(inline, ModelType::Gpt4o).count);
+    println!(
+        "Inline:            {} tokens",
+        counter.count(inline, ModelType::Gpt4o).count
+    );
     println!();
 
     // Test 10: Indentation cost

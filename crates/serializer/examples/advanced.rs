@@ -4,7 +4,7 @@
 
 //! Example: Advanced features
 
-use serializer::{parse, format_human, encode};
+use serializer::{encode, format_human, parse};
 
 fn main() -> serializer::error::Result<()> {
     println!("=== Advanced DX Features ===\n");

@@ -115,7 +115,10 @@ pub fn optimize_key(key: &str) -> String {
 /// Optimize a nested key path (e.g., "media.images.path" -> "m.img.p")
 #[must_use]
 pub fn optimize_path(path: &str) -> String {
-    path.split('.').map(optimize_key).collect::<Vec<_>>().join(".")
+    path.split('.')
+        .map(optimize_key)
+        .collect::<Vec<_>>()
+        .join(".")
 }
 
 /// Determine if values should be inlined with ^ operator
@@ -130,7 +133,8 @@ pub fn should_inline(values: &[(String, String)]) -> bool {
         return false;
     }
 
-    let total_len: usize = values.iter()
+    let total_len: usize = values
+        .iter()
         .map(|(k, v)| k.len() + v.len() + 2) // key:val^
         .sum();
 

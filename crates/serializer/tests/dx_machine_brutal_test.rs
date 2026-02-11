@@ -123,12 +123,27 @@ fn test_batch_users_roundtrip() {
     // Verify each user
     for (i, (original, arch)) in users.iter().zip(archived.iter()).enumerate() {
         assert_eq!(arch.id, original.id, "User {i} id mismatch");
-        assert_eq!(arch.username.as_str(), original.username, "User {i} username mismatch");
-        assert_eq!(arch.email.as_str(), original.email, "User {i} email mismatch");
+        assert_eq!(
+            arch.username.as_str(),
+            original.username,
+            "User {i} username mismatch"
+        );
+        assert_eq!(
+            arch.email.as_str(),
+            original.email,
+            "User {i} email mismatch"
+        );
         assert_eq!(arch.age, original.age, "User {i} age mismatch");
-        assert_eq!(arch.is_active, original.is_active, "User {i} is_active mismatch");
+        assert_eq!(
+            arch.is_active, original.is_active,
+            "User {i} is_active mismatch"
+        );
         assert_eq!(arch.balance, original.balance, "User {i} balance mismatch");
-        assert_eq!(arch.tags.len(), original.tags.len(), "User {i} tags length mismatch");
+        assert_eq!(
+            arch.tags.len(),
+            original.tags.len(),
+            "User {i} tags length mismatch"
+        );
     }
 }
 
@@ -195,8 +210,14 @@ fn test_nested_order_roundtrip() {
             arch_item.product_id, original_item.product_id,
             "Item {i} product_id mismatch"
         );
-        assert_eq!(arch_item.quantity, original_item.quantity, "Item {i} quantity mismatch");
-        assert_eq!(arch_item.price, original_item.price, "Item {i} price mismatch");
+        assert_eq!(
+            arch_item.quantity, original_item.quantity,
+            "Item {i} quantity mismatch"
+        );
+        assert_eq!(
+            arch_item.price, original_item.price,
+            "Item {i} price mismatch"
+        );
     }
 }
 

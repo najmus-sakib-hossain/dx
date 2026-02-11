@@ -94,26 +94,22 @@ impl PromptInteraction for RangeSlider {
                         Handle::Max => Handle::Min,
                     };
                 }
-                console::Key::ArrowLeft | console::Key::Char('h') => {
-                    match self.active_handle {
-                        Handle::Min => {
-                            self.min_value = (self.min_value - 1).max(self.range_min);
-                        }
-                        Handle::Max => {
-                            self.max_value = (self.max_value - 1).max(self.min_value);
-                        }
+                console::Key::ArrowLeft | console::Key::Char('h') => match self.active_handle {
+                    Handle::Min => {
+                        self.min_value = (self.min_value - 1).max(self.range_min);
                     }
-                }
-                console::Key::ArrowRight | console::Key::Char('l') => {
-                    match self.active_handle {
-                        Handle::Min => {
-                            self.min_value = (self.min_value + 1).min(self.max_value);
-                        }
-                        Handle::Max => {
-                            self.max_value = (self.max_value + 1).min(self.range_max);
-                        }
+                    Handle::Max => {
+                        self.max_value = (self.max_value - 1).max(self.min_value);
                     }
-                }
+                },
+                console::Key::ArrowRight | console::Key::Char('l') => match self.active_handle {
+                    Handle::Min => {
+                        self.min_value = (self.min_value + 1).min(self.max_value);
+                    }
+                    Handle::Max => {
+                        self.max_value = (self.max_value + 1).min(self.range_max);
+                    }
+                },
                 _ => {}
             },
             Event::Error => self.state = State::Error,
@@ -149,8 +145,16 @@ impl PromptInteraction for RangeSlider {
                 term.write_line(&format!("{}  {}", bar, theme.primary.apply_to(slider)))?;
                 lines += 1;
 
-                let min_marker = if self.active_handle == Handle::Min { "▸" } else { " " };
-                let max_marker = if self.active_handle == Handle::Max { "▸" } else { " " };
+                let min_marker = if self.active_handle == Handle::Min {
+                    "▸"
+                } else {
+                    " "
+                };
+                let max_marker = if self.active_handle == Handle::Max {
+                    "▸"
+                } else {
+                    " "
+                };
 
                 term.write_line(&format!(
                     "{}  {} Min: {}",
@@ -171,7 +175,9 @@ impl PromptInteraction for RangeSlider {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("Tab: switch handle, ← →: adjust, Enter: confirm")
+                    theme
+                        .dim
+                        .apply_to("Tab: switch handle, ← →: adjust, Enter: confirm")
                 ))?;
                 lines += 1;
             }
@@ -181,7 +187,9 @@ impl PromptInteraction for RangeSlider {
                     "{} {}  {}",
                     checkmark,
                     self.message,
-                    theme.dim.apply_to(format!("{} - {}", self.min_value, self.max_value))
+                    theme
+                        .dim
+                        .apply_to(format!("{} - {}", self.min_value, self.max_value))
                 ))?;
                 lines += 1;
                 term.write_line(&format!("{}", theme.dim.apply_to(symbols.bar)))?;

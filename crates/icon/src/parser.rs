@@ -34,5 +34,8 @@ pub fn parse_icon_files(data_dir: &Path) -> Result<Vec<IconMetadata>> {
 
 /// Extract icon names for FST building
 pub fn extract_icon_names(icons: &[IconMetadata]) -> Vec<(String, u32)> {
-    icons.iter().map(|icon| (icon.name.clone(), icon.id)).collect()
+    icons
+        .iter()
+        .map(|icon| (icon.name.clone(), icon.id))
+        .collect()
 }

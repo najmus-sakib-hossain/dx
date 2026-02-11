@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, IntoElement};
 use crate::theme::Theme;
+use gpui::{div, prelude::*, px, IntoElement};
 
 // ─── Label ──────────────────────────────────────────────────────────────────
 // A shadcn-ui style Label for form fields.
@@ -50,37 +50,33 @@ impl Label {
             theme.foreground
         };
 
-        let mut label = div()
-            .flex()
-            .flex_col()
-            .gap(px(4.0))
-            .child(
-                div()
-                    .flex()
-                    .items_center()
-                    .gap(px(2.0))
-                    .child(
+        let mut label = div().flex().flex_col().gap(px(4.0)).child(
+            div()
+                .flex()
+                .items_center()
+                .gap(px(2.0))
+                .child(
+                    div()
+                        .text_size(px(14.0))
+                        .font_weight(gpui::FontWeight::MEDIUM)
+                        .text_color(text_color)
+                        .line_height(px(14.0))
+                        .child(self.text),
+                )
+                .when(self.required, |this| {
+                    this.child(
                         div()
-                            .font_size(px(14.0))
-                            .font_weight(gpui::FontWeight::MEDIUM)
-                            .text_color(text_color)
-                            .leading(px(14.0))
-                            .child(self.text),
+                            .text_color(theme.destructive)
+                            .text_size(px(14.0))
+                            .child("*"),
                     )
-                    .when(self.required, |this| {
-                        this.child(
-                            div()
-                                .text_color(theme.destructive)
-                                .font_size(px(14.0))
-                                .child("*"),
-                        )
-                    }),
-            );
+                }),
+        );
 
         if let Some(desc) = self.description {
             label = label.child(
                 div()
-                    .font_size(px(12.0))
+                    .text_size(px(12.0))
                     .text_color(theme.muted_foreground)
                     .child(desc),
             );
@@ -115,7 +111,7 @@ impl Kbd {
             .bg(theme.muted)
             .border_1()
             .border_color(theme.border)
-            .font_size(px(11.0))
+            .text_size(px(11.0))
             .font_weight(gpui::FontWeight::MEDIUM)
             .text_color(theme.muted_foreground)
             .child(self.keys)

@@ -4,7 +4,7 @@
 
 //! Example: Basic usage of dx-serializer
 
-use serializer::{parse, format_human, encode};
+use serializer::{encode, format_human, parse};
 
 fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     println!("=== DX Serializer Example ===\n");
@@ -83,7 +83,10 @@ priorities>high|medium|low";
         (1.0 - ditto_encoded.len() as f64 / ditto_dx.len() as f64) * 100.0
     );
 
-    println!("Encoded output:\n{}", String::from_utf8_lossy(&ditto_encoded));
+    println!(
+        "Encoded output:\n{}",
+        String::from_utf8_lossy(&ditto_encoded)
+    );
 
     Ok(())
 }

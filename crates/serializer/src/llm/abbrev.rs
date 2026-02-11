@@ -23,7 +23,7 @@ pub struct AbbrevDict {
 
 impl AbbrevDict {
     /// Create dictionary with all standard mappings (100+ entries)
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         let mut global = HashMap::new();
         let mut reverse = HashMap::new();
@@ -478,7 +478,7 @@ impl AbbrevDict {
     ///
     /// Uses context-aware expansion for ambiguous single-letter keys.
     /// Falls back to global dictionary, then returns original if not found.
-    #[must_use] 
+    #[must_use]
     pub fn expand(&self, abbrev: &str, context: &str) -> String {
         // First try context-specific expansion
         if let Some(&full) = self.contextual.get(&(abbrev, context)) {
@@ -505,7 +505,7 @@ impl AbbrevDict {
     ///
     /// Uses the shortest unambiguous abbreviation from the dictionary.
     /// Returns original if not found.
-    #[must_use] 
+    #[must_use]
     pub fn compress(&self, full: &str) -> String {
         if let Some(&abbrev) = self.reverse.get(full) {
             return abbrev.to_string();
@@ -516,44 +516,44 @@ impl AbbrevDict {
     }
 
     /// Check if an abbreviation exists in the dictionary
-    #[must_use] 
+    #[must_use]
     pub fn has_abbrev(&self, abbrev: &str) -> bool {
         self.global.contains_key(abbrev)
     }
 
     /// Check if a full key exists in the dictionary
-    #[must_use] 
+    #[must_use]
     pub fn has_full(&self, full: &str) -> bool {
         self.reverse.contains_key(full)
     }
 
     /// Get all global abbreviation mappings
-    #[must_use] 
+    #[must_use]
     pub fn global_mappings(&self) -> &HashMap<&'static str, &'static str> {
         &self.global
     }
 
     /// Get the number of global mappings
-    #[must_use] 
+    #[must_use]
     pub fn len(&self) -> usize {
         self.global.len()
     }
 
     /// Check if the dictionary is empty
-    #[must_use] 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.global.is_empty()
     }
 
     /// Get compression ratio for a key (1.0 = no savings, <1.0 = savings)
-    #[must_use] 
+    #[must_use]
     pub fn compression_ratio(&self, full: &str) -> f64 {
         let compressed = self.compress(full);
         compressed.len() as f64 / full.len() as f64
     }
 
     /// Get average compression ratio across all mappings
-    #[must_use] 
+    #[must_use]
     pub fn average_compression_ratio(&self) -> f64 {
         if self.reverse.is_empty() {
             return 1.0;
@@ -724,6 +724,9 @@ mod tests {
         let avg = dict.average_compression_ratio();
 
         // Average should be significantly less than 1.0 (good compression)
-        assert!(avg < 0.6, "Expected average compression ratio < 0.6, got {avg}");
+        assert!(
+            avg < 0.6,
+            "Expected average compression ratio < 0.6, got {avg}"
+        );
     }
 }

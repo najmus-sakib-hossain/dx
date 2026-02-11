@@ -202,9 +202,10 @@ impl<T: Clone> PromptInteraction for Autocomplete<T> {
                     term.write_line(&format!(
                         "{}  {}",
                         bar,
-                        theme
-                            .dim
-                            .apply_to(format!("... {} more", self.filtered_indices.len() - max_visible))
+                        theme.dim.apply_to(format!(
+                            "... {} more",
+                            self.filtered_indices.len() - max_visible
+                        ))
                     ))?;
                     lines += 1;
                 }

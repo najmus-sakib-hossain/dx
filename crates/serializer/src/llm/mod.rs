@@ -54,9 +54,9 @@ mod llm_props;
 pub use abbrev::AbbrevDict;
 pub use cache_generator::{CacheConfig, CacheError, CacheGenerator, CachePaths, CacheResult};
 pub use convert::{
-    ConvertError, MachineFormat, document_to_human, document_to_llm, document_to_machine,
-    human_to_document, human_to_llm, human_to_machine, is_llm_format, llm_to_document,
-    llm_to_human, machine_to_document, machine_to_human, machine_to_llm,
+    document_to_human, document_to_llm, document_to_machine, human_to_document, human_to_llm,
+    human_to_machine, is_llm_format, llm_to_document, llm_to_human, machine_to_document,
+    machine_to_human, machine_to_llm, ConvertError, MachineFormat,
 };
 pub use human_formatter::{HumanFormatConfig, HumanFormatter};
 pub use human_parser::{HumanParseError, HumanParser};

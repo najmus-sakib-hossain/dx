@@ -38,7 +38,7 @@ pub struct DxMachineSlot {
 impl DxMachineSlot {
     /// Create empty slot (inline, zero length)
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub const fn new() -> Self {
         Self { data: [0; 16] }
     }
@@ -64,7 +64,7 @@ impl DxMachineSlot {
 
     /// Create heap reference slot
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub fn heap_reference(offset: u32, length: u32) -> Self {
         let mut slot = Self::new();
         slot.data[0..4].copy_from_slice(&offset.to_le_bytes());
@@ -75,21 +75,21 @@ impl DxMachineSlot {
 
     /// Check if slot contains inline data
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub const fn is_inline(&self) -> bool {
         self.data[15] == INLINE_MARKER
     }
 
     /// Check if slot is heap reference
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub const fn is_heap(&self) -> bool {
         self.data[15] == HEAP_MARKER
     }
 
     /// Get inline data length (panics if not inline)
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub const fn inline_len(&self) -> usize {
         debug_assert!(self.is_inline());
         self.data[0] as usize
@@ -97,7 +97,7 @@ impl DxMachineSlot {
 
     /// Get inline data (panics if not inline)
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub fn inline_data(&self) -> &[u8] {
         debug_assert!(self.is_inline());
         let len = self.inline_len();
@@ -112,7 +112,7 @@ impl DxMachineSlot {
     /// for fallible conversion.
     #[inline]
     #[allow(clippy::expect_used)] // Intentional panic - documented behavior, use inline_str_checked() for fallible version
-    #[must_use] 
+    #[must_use]
     pub fn inline_str(&self) -> &str {
         debug_assert!(self.is_inline());
         let data = self.inline_data();
@@ -126,7 +126,7 @@ impl DxMachineSlot {
     ///
     /// This is the fallible version of [`Self::inline_str`].
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub fn inline_str_checked(&self) -> Option<&str> {
         if !self.is_inline() {
             return None;
@@ -137,7 +137,7 @@ impl DxMachineSlot {
 
     /// Get heap offset (panics if not heap)
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub fn heap_offset(&self) -> u32 {
         debug_assert!(self.is_heap());
         u32::from_le_bytes([self.data[0], self.data[1], self.data[2], self.data[3]])
@@ -145,7 +145,7 @@ impl DxMachineSlot {
 
     /// Get heap data length (panics if not heap)
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub fn heap_length(&self) -> u32 {
         debug_assert!(self.is_heap());
         u32::from_le_bytes([self.data[4], self.data[5], self.data[6], self.data[7]])
@@ -153,7 +153,7 @@ impl DxMachineSlot {
 
     /// Get heap reference (panics if not heap)
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub fn heap_ref(&self) -> (u32, u32) {
         debug_assert!(self.is_heap());
         (self.heap_offset(), self.heap_length())
@@ -188,7 +188,7 @@ impl DxMachineSlot {
 
     /// Compare inline data with byte slice (optimized)
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub fn eq_inline_bytes(&self, other: &[u8]) -> bool {
         if !self.is_inline() {
             return false;
@@ -204,14 +204,14 @@ impl DxMachineSlot {
 
     /// Compare inline data with string (optimized)
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub fn eq_inline_str(&self, other: &str) -> bool {
         self.eq_inline_bytes(other.as_bytes())
     }
 
     /// Get data size (inline or heap)
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub fn size(&self) -> usize {
         if self.is_inline() {
             self.inline_len()
@@ -328,7 +328,10 @@ mod tests {
         let data = b"123456789012345"; // 15 bytes (too large)
         let result = DxMachineSlot::inline_from_bytes(data);
 
-        assert!(matches!(result, Err(SlotError::DataTooLarge { size: 15, max: 14 })));
+        assert!(matches!(
+            result,
+            Err(SlotError::DataTooLarge { size: 15, max: 14 })
+        ));
     }
 
     #[test]

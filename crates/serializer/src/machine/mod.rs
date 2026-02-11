@@ -111,7 +111,7 @@ pub mod compress;
 // Core exports (RKYV-based)
 pub use api::{deserialize, deserialize_batch, serialize, serialize_batch};
 pub use builder::DxMachineBuilder;
-pub use format::{DxFormat, FormatMode, detect_format, parse_auto};
+pub use format::{detect_format, parse_auto, DxFormat, FormatMode};
 pub use header::{
     DxMachineHeader, FLAG_HAS_HEAP, FLAG_HAS_INTERN, FLAG_HAS_LENGTH_TABLE, FLAG_LITTLE_ENDIAN,
 };

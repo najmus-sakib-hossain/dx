@@ -43,7 +43,7 @@ pub struct HumanFormatter {
 }
 
 impl HumanFormatter {
-    #[must_use] 
+    #[must_use]
     pub fn new(config: FormatterConfig) -> Self {
         Self {
             config,
@@ -52,7 +52,7 @@ impl HumanFormatter {
         }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn with_defaults() -> Self {
         Self::new(FormatterConfig::default())
     }
@@ -75,8 +75,12 @@ impl HumanFormatter {
     fn write_header(&mut self) {
         let line = "─".repeat(70);
         writeln!(self.output, "┌{line}┐").unwrap();
-        writeln!(self.output, "│  DX HUMAN VIEW  •  Enhanced Readability Mode{}│", " ".repeat(31))
-            .unwrap();
+        writeln!(
+            self.output,
+            "│  DX HUMAN VIEW  •  Enhanced Readability Mode{}│",
+            " ".repeat(31)
+        )
+        .unwrap();
         writeln!(self.output, "└{line}┘").unwrap();
         writeln!(self.output).unwrap();
     }

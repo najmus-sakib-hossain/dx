@@ -49,7 +49,7 @@ impl IconDataLoader {
         Ok(())
     }
 
-    /// Load all Iconify JSON pack files from a directory 
+    /// Load all Iconify JSON pack files from a directory
     fn load_iconify_dir(&mut self, dir: &Path, source: IconSource) -> Result<()> {
         for entry in std::fs::read_dir(dir)? {
             let entry = entry?;
@@ -223,7 +223,11 @@ impl IconDataLoader {
         }
 
         results.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
-        results.into_iter().take(limit).map(|(icon, _)| icon).collect()
+        results
+            .into_iter()
+            .take(limit)
+            .map(|(icon, _)| icon)
+            .collect()
     }
 
     /// Get total icon count

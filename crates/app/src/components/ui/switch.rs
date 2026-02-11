@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, IntoElement};
 
 // ─── Switch ─────────────────────────────────────────────────────────────────
 // A shadcn-ui style toggle Switch.
@@ -83,7 +83,7 @@ impl Switch {
         if let Some(label) = self.label {
             container = container.child(
                 div()
-                    .font_size(px(14.0))
+                    .text_size(px(14.0))
                     .text_color(if self.disabled {
                         theme.muted_foreground
                     } else {
@@ -182,7 +182,7 @@ impl Checkbox {
         if !icon.is_empty() {
             checkbox = checkbox.child(
                 div()
-                    .font_size(px(10.0))
+                    .text_size(px(10.0))
                     .font_weight(gpui::FontWeight::BOLD)
                     .text_color(check_color)
                     .child(icon),
@@ -200,7 +200,7 @@ impl Checkbox {
         if let Some(label) = self.label {
             container = container.child(
                 div()
-                    .font_size(px(14.0))
+                    .text_size(px(14.0))
                     .text_color(if self.disabled {
                         theme.muted_foreground
                     } else {
@@ -328,12 +328,7 @@ impl RadioItem {
             .flex_shrink_0();
 
         if self.selected {
-            circle = circle.child(
-                div()
-                    .size(px(8.0))
-                    .rounded(Radius::FULL)
-                    .bg(theme.primary),
-            );
+            circle = circle.child(div().size(px(8.0)).rounded(Radius::FULL).bg(theme.primary));
         }
 
         if !self.disabled {
@@ -345,7 +340,7 @@ impl RadioItem {
         container = container.child(circle);
         container = container.child(
             div()
-                .font_size(px(14.0))
+                .text_size(px(14.0))
                 .text_color(if self.disabled {
                     theme.muted_foreground
                 } else {

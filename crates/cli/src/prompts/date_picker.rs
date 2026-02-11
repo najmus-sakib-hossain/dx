@@ -161,44 +161,65 @@ impl PromptInteraction for DatePicker {
                 term.write_line(&format!("{}", bar))?;
                 lines += 1;
 
-                let year_marker = if self.active_field == DateField::Year { "▸" } else { " " };
-                let month_marker = if self.active_field == DateField::Month { "▸" } else { " " };
-                let day_marker = if self.active_field == DateField::Day { "▸" } else { " " };
+                let year_marker = if self.active_field == DateField::Year {
+                    "▸"
+                } else {
+                    " "
+                };
+                let month_marker = if self.active_field == DateField::Month {
+                    "▸"
+                } else {
+                    " "
+                };
+                let day_marker = if self.active_field == DateField::Day {
+                    "▸"
+                } else {
+                    " "
+                };
 
                 let year_display = if self.active_field == DateField::Year {
-                    theme.primary.apply_to(self.year.to_string()).bold().to_string()
+                    theme
+                        .primary
+                        .apply_to(self.year.to_string())
+                        .bold()
+                        .to_string()
                 } else {
                     self.year.to_string()
                 };
 
                 let month_display = if self.active_field == DateField::Month {
-                    theme.primary.apply_to(format!("{:02}", self.month)).bold().to_string()
+                    theme
+                        .primary
+                        .apply_to(format!("{:02}", self.month))
+                        .bold()
+                        .to_string()
                 } else {
                     format!("{:02}", self.month)
                 };
 
                 let day_display = if self.active_field == DateField::Day {
-                    theme.primary.apply_to(format!("{:02}", self.day)).bold().to_string()
+                    theme
+                        .primary
+                        .apply_to(format!("{:02}", self.day))
+                        .bold()
+                        .to_string()
                 } else {
                     format!("{:02}", self.day)
                 };
 
-                term.write_line(&format!(
-                    "{}  {} Year:  {}",
-                    bar, year_marker, year_display
-                ))?;
+                term.write_line(&format!("{}  {} Year:  {}", bar, year_marker, year_display))?;
                 lines += 1;
 
                 term.write_line(&format!(
                     "{}  {} Month: {} ({})",
-                    bar, month_marker, month_display, self.month_name()
+                    bar,
+                    month_marker,
+                    month_display,
+                    self.month_name()
                 ))?;
                 lines += 1;
 
-                term.write_line(&format!(
-                    "{}  {} Day:   {}",
-                    bar, day_marker, day_display
-                ))?;
+                term.write_line(&format!("{}  {} Day:   {}", bar, day_marker, day_display))?;
                 lines += 1;
 
                 term.write_line(&format!("{}", bar))?;
@@ -216,7 +237,9 @@ impl PromptInteraction for DatePicker {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("Tab: switch field, ↑↓: adjust, Enter: confirm")
+                    theme
+                        .dim
+                        .apply_to("Tab: switch field, ↑↓: adjust, Enter: confirm")
                 ))?;
                 lines += 1;
             }
@@ -226,7 +249,9 @@ impl PromptInteraction for DatePicker {
                     "{} {}  {}",
                     checkmark,
                     self.message,
-                    theme.dim.apply_to(format!("{}-{:02}-{:02}", self.year, self.month, self.day))
+                    theme
+                        .dim
+                        .apply_to(format!("{}-{:02}-{:02}", self.year, self.month, self.day))
                 ))?;
                 lines += 1;
                 term.write_line(&format!("{}", theme.dim.apply_to(symbols.bar)))?;

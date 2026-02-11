@@ -85,12 +85,10 @@ impl FileBrowser {
                 .collect();
 
             // Sort: directories first, then files, alphabetically
-            entries.sort_by(|a, b| {
-                match (a.is_dir, b.is_dir) {
-                    (true, false) => std::cmp::Ordering::Less,
-                    (false, true) => std::cmp::Ordering::Greater,
-                    _ => a.name.to_lowercase().cmp(&b.name.to_lowercase()),
-                }
+            entries.sort_by(|a, b| match (a.is_dir, b.is_dir) {
+                (true, false) => std::cmp::Ordering::Less,
+                (false, true) => std::cmp::Ordering::Greater,
+                _ => a.name.to_lowercase().cmp(&b.name.to_lowercase()),
             });
 
             self.entries.extend(entries);
@@ -210,7 +208,9 @@ impl PromptInteraction for FileBrowser {
                     term.write_line(&format!(
                         "{}  {}",
                         bar,
-                        theme.dim.apply_to(format!("... and {} more", self.entries.len() - 10))
+                        theme
+                            .dim
+                            .apply_to(format!("... and {} more", self.entries.len() - 10))
                     ))?;
                     lines += 1;
                 }
@@ -228,7 +228,9 @@ impl PromptInteraction for FileBrowser {
             }
             State::Submit => {
                 let checkmark = theme.success.apply_to("✓");
-                let selected_path = self.entries.get(self.cursor)
+                let selected_path = self
+                    .entries
+                    .get(self.cursor)
                     .map(|e| e.path.display().to_string())
                     .unwrap_or_default();
                 term.write_line(&format!(
@@ -249,7 +251,8 @@ impl PromptInteraction for FileBrowser {
     }
 
     fn value(&self) -> PathBuf {
-        self.entries.get(self.cursor)
+        self.entries
+            .get(self.cursor)
             .map(|e| e.path.clone())
             .unwrap_or_else(|| self.current_dir.clone())
     }

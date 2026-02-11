@@ -1,5 +1,5 @@
+use crate::theme::Theme;
 use gpui::{div, prelude::*, px, IntoElement};
-use crate::theme::{colors::Radius, Theme};
 
 // ─── TitleBar ───────────────────────────────────────────────────────────────
 // A shadcn-ui style window TitleBar with window controls.
@@ -51,7 +51,7 @@ impl TitleBar {
 
         title_section = title_section.child(
             div()
-                .font_size(px(13.0))
+                .text_size(px(13.0))
                 .font_weight(gpui::FontWeight::SEMIBOLD)
                 .text_color(theme.foreground)
                 .child(self.title),
@@ -60,7 +60,7 @@ impl TitleBar {
         if let Some(subtitle) = self.subtitle {
             title_section = title_section.child(
                 div()
-                    .font_size(px(12.0))
+                    .text_size(px(12.0))
                     .text_color(theme.muted_foreground)
                     .child(subtitle),
             );
@@ -139,7 +139,7 @@ impl WindowControlButton {
             .hover(move |style| style.bg(hover_bg).text_color(hover_text))
             .child(
                 div()
-                    .font_size(px(14.0))
+                    .text_size(px(14.0))
                     .text_color(theme.foreground)
                     .child(icon),
             )

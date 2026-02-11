@@ -1,4 +1,4 @@
-use criterion::{BenchmarkId, Criterion, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use serde::{Deserialize, Serialize};
 use serializer::machine::serde_compat::{from_bytes, to_bytes};
 
@@ -55,7 +55,9 @@ fn create_test_order(num_products: usize) -> Order {
     Order {
         order_id: 12345,
         customer: create_test_person(),
-        products: (0..num_products).map(|i| create_test_product(i as u64)).collect(),
+        products: (0..num_products)
+            .map(|i| create_test_product(i as u64))
+            .collect(),
         total: 199.99,
         timestamp: 1704067200,
     }
@@ -156,7 +158,10 @@ fn verify_correctness() {
     let person = create_test_person();
     let bytes = to_bytes(&person).expect("Failed to serialize person");
     println!("Person serialized: {} bytes", bytes.len());
-    println!("Binary (hex): {}", hex::encode(&bytes[..bytes.len().min(64)]));
+    println!(
+        "Binary (hex): {}",
+        hex::encode(&bytes[..bytes.len().min(64)])
+    );
 
     let decoded: Person = from_bytes(&bytes).expect("Failed to deserialize person");
     assert_eq!(person, decoded, "Person roundtrip failed");
@@ -166,7 +171,10 @@ fn verify_correctness() {
     let product = create_test_product(42);
     let bytes = to_bytes(&product).expect("Failed to serialize product");
     println!("Product serialized: {} bytes", bytes.len());
-    println!("Binary (hex): {}", hex::encode(&bytes[..bytes.len().min(64)]));
+    println!(
+        "Binary (hex): {}",
+        hex::encode(&bytes[..bytes.len().min(64)])
+    );
 
     let decoded: Product = from_bytes(&bytes).expect("Failed to deserialize product");
     assert_eq!(product, decoded, "Product roundtrip failed");
@@ -176,7 +184,11 @@ fn verify_correctness() {
     for num_products in [1, 10, 100] {
         let order = create_test_order(num_products);
         let bytes = to_bytes(&order).expect("Failed to serialize order");
-        println!("Order with {} products serialized: {} bytes", num_products, bytes.len());
+        println!(
+            "Order with {} products serialized: {} bytes",
+            num_products,
+            bytes.len()
+        );
 
         let decoded: Order = from_bytes(&bytes).expect("Failed to deserialize order");
         assert_eq!(order, decoded, "Order roundtrip failed");

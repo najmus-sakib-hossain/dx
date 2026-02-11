@@ -3,8 +3,8 @@
 //! Communicates with LLMs using DX Serializer format to save 70%+ tokens.
 //! Supports multiple LLM providers (Anthropic, OpenAI, etc.)
 
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use tracing::info;
 
 use crate::{AgentError, Result};
@@ -23,26 +23,26 @@ impl LlmMessage {
             content: content.to_string(),
         }
     }
-    
+
     pub fn user(content: &str) -> Self {
         Self {
             role: "user".to_string(),
             content: content.to_string(),
         }
     }
-    
+
     pub fn assistant(content: &str) -> Self {
         Self {
             role: "assistant".to_string(),
             content: content.to_string(),
         }
     }
-    
+
     /// Convert message to DX LLM format (saves tokens)
     pub fn to_dx_llm(&self) -> String {
         format!("{}:{}", self.role, self.content.replace('\n', "\\n"))
     }
-    
+
     /// Parse message from DX LLM format
     pub fn from_dx_llm(s: &str) -> Option<Self> {
         let (role, content) = s.split_once(':')?;
@@ -71,7 +71,7 @@ impl LlmResponse {
         response.parse_skills_and_context();
         response
     }
-    
+
     /// Parse skills and context from the response
     fn parse_skills_and_context(&mut self) {
         // Look for skill references in DX format: use_skill:skill_name
@@ -80,7 +80,7 @@ impl LlmResponse {
                 let skill = line.trim_start_matches("use_skill:").trim();
                 self.skills.push(skill.to_string());
             }
-            
+
             // Look for context in DX format: context:key=value
             if line.starts_with("context:") {
                 let rest = line.trim_start_matches("context:").trim();
@@ -90,15 +90,15 @@ impl LlmResponse {
             }
         }
     }
-    
+
     pub fn text(&self) -> &str {
         &self.text
     }
-    
+
     pub fn required_skills(&self) -> &[String] {
         &self.skills
     }
-    
+
     pub fn context(&self) -> &HashMap<String, String> {
         &self.context
     }
@@ -121,7 +121,7 @@ impl LlmClient {
             system_prompt: Self::default_system_prompt(),
         })
     }
-    
+
     /// Default system prompt that instructs the LLM to use DX format
     fn default_system_prompt() -> String {
         r#"You are DX Agent, an AGI-like AI assistant that can connect to any app and control any tool.
@@ -160,26 +160,26 @@ context:message=Hello_from_DX!
 
 Always be concise. The DX format saves 52-73% tokens vs JSON."#.to_string()
     }
-    
+
     /// Set the API key
     pub fn set_api_key(&mut self, key: &str) {
         self.api_key = Some(key.to_string());
     }
-    
+
     /// Set the model to use
     pub fn set_model(&mut self, model: &str) {
         self.model = model.to_string();
     }
-    
+
     /// Set a custom system prompt
     pub fn set_system_prompt(&mut self, prompt: &str) {
         self.system_prompt = prompt.to_string();
     }
-    
+
     /// Process a message and get a response
     pub async fn process_message(&self, message: &str) -> Result<LlmResponse> {
         info!("Processing message with LLM...");
-        
+
         // Build the request in DX format for our internal tracking
         let dx_request = format!(
             "request:1[model={} messages[2]=system:{} user:{}]",
@@ -187,27 +187,28 @@ Always be concise. The DX format saves 52-73% tokens vs JSON."#.to_string()
             self.system_prompt.len(),
             message.len()
         );
-        
+
         info!("DX Request: {}", dx_request);
-        
+
         // In a real implementation, this would call the LLM API
         // For now, return a placeholder response
         let response_text = self.call_llm(message).await?;
-        
+
         Ok(LlmResponse::new(response_text))
     }
-    
+
     /// Call the LLM API
     async fn call_llm(&self, message: &str) -> Result<String> {
-        let api_key = self.api_key.as_ref().ok_or_else(|| {
-            AgentError::AuthFailed {
+        let api_key = self
+            .api_key
+            .as_ref()
+            .ok_or_else(|| AgentError::AuthFailed {
                 provider: "llm".to_string(),
                 message: "API key not set. Set DX_API_KEY environment variable.".to_string(),
-            }
-        })?;
-        
+            })?;
+
         let client = reqwest::Client::new();
-        
+
         // Build the request body
         let body = serde_json::json!({
             "model": self.model,
@@ -217,7 +218,7 @@ Always be concise. The DX format saves 52-73% tokens vs JSON."#.to_string()
                 {"role": "user", "content": message}
             ]
         });
-        
+
         let response = client
             .post(&self.endpoint)
             .header("Content-Type", "application/json")
@@ -227,50 +228,58 @@ Always be concise. The DX format saves 52-73% tokens vs JSON."#.to_string()
             .send()
             .await
             .map_err(|e| AgentError::NetworkError(e.to_string()))?;
-        
+
         if !response.status().is_success() {
             let status = response.status();
             let text = response.text().await.unwrap_or_default();
-            return Err(AgentError::NetworkError(format!("LLM API error: {} - {}", status, text)));
+            return Err(AgentError::NetworkError(format!(
+                "LLM API error: {} - {}",
+                status, text
+            )));
         }
-        
+
         let json: serde_json::Value = response
             .json()
             .await
             .map_err(|e| AgentError::SerializationError(e.to_string()))?;
-        
+
         // Extract the response text
         let text = json["content"][0]["text"]
             .as_str()
             .unwrap_or("No response")
             .to_string();
-        
+
         Ok(text)
     }
-    
+
     /// Stream a response (for real-time output)
-    pub async fn stream_message(&self, message: &str) -> Result<impl futures::Stream<Item = Result<String>>> {
+    pub async fn stream_message(
+        &self,
+        message: &str,
+    ) -> Result<impl futures::Stream<Item = Result<String>>> {
         // Placeholder - would implement SSE streaming in production
         let response = self.process_message(message).await?;
-        Ok(futures::stream::once(async move { Ok(response.text().to_string()) }))
+        Ok(futures::stream::once(async move {
+            Ok(response.text().to_string())
+        }))
     }
-    
+
     /// Count tokens in a message (using DX Serializer's tokenizer)
     pub fn count_tokens(&self, text: &str) -> usize {
         // Approximate token count (in production, use tiktoken)
         text.split_whitespace().count()
     }
-    
+
     /// Convert JSON to DX format for token savings
     pub fn json_to_dx(&self, json: &str) -> Result<String> {
         // Use DX Serializer to convert
         // This saves 52-73% tokens!
         let value: serde_json::Value = serde_json::from_str(json)
             .map_err(|e| AgentError::SerializationError(e.to_string()))?;
-        
+
         Ok(self.value_to_dx(&value))
     }
-    
+
     /// Convert a JSON value to DX format
     fn value_to_dx(&self, value: &serde_json::Value) -> String {
         match value {
@@ -283,7 +292,8 @@ Always be concise. The DX format saves 52-73% tokens vs JSON."#.to_string()
                 format!("[{}]={}", items.len(), items.join(" "))
             }
             serde_json::Value::Object(obj) => {
-                let pairs: Vec<String> = obj.iter()
+                let pairs: Vec<String> = obj
+                    .iter()
                     .map(|(k, v)| format!("{}={}", k, self.value_to_dx(v)))
                     .collect();
                 format!(":{}[{}]", obj.len(), pairs.join(" "))

@@ -59,7 +59,7 @@ use crate::llm::human_formatter::HumanFormatConfig;
 use crate::llm::pretty_printer::{PrettyPrinter, PrettyPrinterConfig};
 use crate::llm::serializer_output::{SerializerOutput, SerializerOutputConfig};
 use crate::llm::types::DxDocument;
-use crate::llm::{ConvertError, document_to_llm, llm_to_document};
+use crate::llm::{document_to_llm, llm_to_document, ConvertError};
 use std::path::PathBuf;
 
 /// Builder for configuring serialization options
@@ -117,7 +117,7 @@ impl Default for SerializerBuilder {
 
 impl SerializerBuilder {
     /// Create a new `SerializerBuilder` with default settings
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
@@ -136,7 +136,7 @@ impl SerializerBuilder {
     ///     .indent_size(4)
     ///     .build();
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn indent_size(mut self, size: usize) -> Self {
         self.indent_size = size;
         self
@@ -156,7 +156,7 @@ impl SerializerBuilder {
     ///     .expand_keys(false)  // Keep "nm" instead of expanding to "name"
     ///     .build();
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn expand_keys(mut self, expand: bool) -> Self {
         self.expand_keys = expand;
         self
@@ -175,7 +175,7 @@ impl SerializerBuilder {
     /// ```text
     /// items = first | second
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn use_list_format(mut self, use_list: bool) -> Self {
         self.use_list_format = use_list;
         self
@@ -185,7 +185,7 @@ impl SerializerBuilder {
     ///
     /// When true (default): `key = value`
     /// When false: `key=value`
-    #[must_use] 
+    #[must_use]
     pub fn space_around_equals(mut self, space: bool) -> Self {
         self.space_around_equals = space;
         self
@@ -198,7 +198,7 @@ impl SerializerBuilder {
     ///
     /// Note: Currently disabled by default since V3 format round-trip
     /// is not fully implemented.
-    #[must_use] 
+    #[must_use]
     pub fn validate_output(mut self, validate: bool) -> Self {
         self.validate_output = validate;
         self
@@ -209,7 +209,7 @@ impl SerializerBuilder {
     /// When enabled (requires `validate_output`), the serializer will
     /// verify that parsing the formatted output produces an equivalent
     /// document to the original.
-    #[must_use] 
+    #[must_use]
     pub fn check_round_trip(mut self, check: bool) -> Self {
         self.check_round_trip = check;
         self
@@ -237,7 +237,7 @@ impl SerializerBuilder {
     /// Set whether to generate LLM format files
     ///
     /// When true (default), .llm files are generated in .dx/serializer.
-    #[must_use] 
+    #[must_use]
     pub fn generate_llm(mut self, generate: bool) -> Self {
         self.generate_llm = generate;
         self
@@ -246,7 +246,7 @@ impl SerializerBuilder {
     /// Set whether to generate machine format files
     ///
     /// When true (default), .machine files are generated for runtime use.
-    #[must_use] 
+    #[must_use]
     pub fn generate_machine(mut self, generate: bool) -> Self {
         self.generate_machine = generate;
         self
@@ -256,7 +256,7 @@ impl SerializerBuilder {
     ///
     /// When true (default), a manifest.json file is maintained to track
     /// all generated files and their modification times.
-    #[must_use] 
+    #[must_use]
     pub fn update_manifest(mut self, update: bool) -> Self {
         self.update_manifest = update;
         self
@@ -266,7 +266,7 @@ impl SerializerBuilder {
     ///
     /// Note: Comment preservation is not yet fully implemented.
     /// This option is reserved for future use.
-    #[must_use] 
+    #[must_use]
     pub fn preserve_comments(mut self, preserve: bool) -> Self {
         self.preserve_comments = preserve;
         self
@@ -276,7 +276,7 @@ impl SerializerBuilder {
     ///
     /// When true, arrays are formatted more compactly.
     /// This is equivalent to setting `use_list_format(false)`.
-    #[must_use] 
+    #[must_use]
     pub fn compact_arrays(mut self, compact: bool) -> Self {
         self.compact_arrays = compact;
         if compact {
@@ -299,7 +299,7 @@ impl SerializerBuilder {
     ///     .for_tables()
     ///     .build();
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn for_tables(mut self) -> Self {
         self.indent_size = 20;
         self.use_list_format = false;
@@ -312,7 +312,7 @@ impl SerializerBuilder {
     ///
     /// This preset minimizes whitespace and uses abbreviated keys.
     /// Useful for token-efficient LLM format.
-    #[must_use] 
+    #[must_use]
     pub fn for_compact(mut self) -> Self {
         self.indent_size = 0;
         self.expand_keys = false;
@@ -326,7 +326,7 @@ impl SerializerBuilder {
     ///
     /// This preset maximizes readability with expanded keys,
     /// proper spacing, and list formatting for arrays.
-    #[must_use] 
+    #[must_use]
     pub fn for_humans(mut self) -> Self {
         self.indent_size = 0;
         self.expand_keys = true;
@@ -339,7 +339,7 @@ impl SerializerBuilder {
     /// Build the configured Serializer
     ///
     /// Creates a Serializer instance with all the specified options.
-    #[must_use] 
+    #[must_use]
     pub fn build(self) -> Serializer {
         // Build human format config
         let human_config = HumanFormatConfig {
@@ -355,7 +355,9 @@ impl SerializerBuilder {
 
         // Build output config
         let output_config = SerializerOutputConfig {
-            output_dir: self.output_dir.unwrap_or_else(|| PathBuf::from(".dx/serializer")),
+            output_dir: self
+                .output_dir
+                .unwrap_or_else(|| PathBuf::from(".dx/serializer")),
             generate_llm: self.generate_llm,
             generate_machine: self.generate_machine,
             update_manifest: self.update_manifest,
@@ -394,7 +396,7 @@ impl Serializer {
     /// let serializer = SerializerBuilder::new().build();
     /// let text = serializer.serialize(&doc);
     /// ```
-    #[must_use] 
+    #[must_use]
     pub fn serialize(&self, doc: &DxDocument) -> String {
         document_to_llm(doc)
     }
@@ -439,7 +441,7 @@ impl Serializer {
     ///
     /// Faster than `format_human()` but provides no guarantees about
     /// the output being parseable.
-    #[must_use] 
+    #[must_use]
     pub fn format_human_unchecked(&self, doc: &DxDocument) -> String {
         self.pretty_printer.format_unchecked(doc)
     }
@@ -478,7 +480,7 @@ impl Serializer {
     /// Get the pretty printer instance
     ///
     /// Provides access to the underlying `PrettyPrinter` for advanced use cases.
-    #[must_use] 
+    #[must_use]
     pub fn pretty_printer(&self) -> &PrettyPrinter {
         &self.pretty_printer
     }
@@ -486,7 +488,7 @@ impl Serializer {
     /// Get the output generator instance
     ///
     /// Provides access to the underlying `SerializerOutput` for advanced use cases.
-    #[must_use] 
+    #[must_use]
     pub fn output_generator(&self) -> &SerializerOutput {
         &self.output_generator
     }
@@ -553,8 +555,10 @@ mod tests {
     #[test]
     fn test_serializer_basic_usage() {
         let mut doc = DxDocument::new();
-        doc.context.insert("name".to_string(), DxLlmValue::Str("TestApp".to_string()));
-        doc.context.insert("version".to_string(), DxLlmValue::Str("1.0.0".to_string()));
+        doc.context
+            .insert("name".to_string(), DxLlmValue::Str("TestApp".to_string()));
+        doc.context
+            .insert("version".to_string(), DxLlmValue::Str("1.0.0".to_string()));
 
         let serializer = SerializerBuilder::new().build();
 
@@ -572,7 +576,8 @@ mod tests {
     #[test]
     fn test_serializer_human_format() {
         let mut doc = DxDocument::new();
-        doc.context.insert("name".to_string(), DxLlmValue::Str("TestApp".to_string()));
+        doc.context
+            .insert("name".to_string(), DxLlmValue::Str("TestApp".to_string()));
         doc.context.insert(
             "editor".to_string(),
             DxLlmValue::Arr(vec![
@@ -591,7 +596,8 @@ mod tests {
     #[test]
     fn test_serializer_compact_format() {
         let mut doc = DxDocument::new();
-        doc.context.insert("name".to_string(), DxLlmValue::Str("TestApp".to_string()));
+        doc.context
+            .insert("name".to_string(), DxLlmValue::Str("TestApp".to_string()));
         doc.context.insert(
             "editor".to_string(),
             DxLlmValue::Arr(vec![
@@ -603,7 +609,10 @@ mod tests {
         let serializer = SerializerBuilder::new().for_compact().build();
 
         let human_text = serializer.format_human_unchecked(&doc);
-        assert!(!human_text.is_empty(), "Compact format should produce output");
+        assert!(
+            !human_text.is_empty(),
+            "Compact format should produce output"
+        );
     }
 
     #[test]
@@ -611,12 +620,14 @@ mod tests {
         let mut doc = DxDocument::new();
 
         let mut section = DxSection::new(vec!["id".to_string(), "name".to_string()]);
-        section
-            .rows
-            .push(vec![DxLlmValue::Num(1.0), DxLlmValue::Str("Alpha".to_string())]);
-        section
-            .rows
-            .push(vec![DxLlmValue::Num(2.0), DxLlmValue::Str("Beta".to_string())]);
+        section.rows.push(vec![
+            DxLlmValue::Num(1.0),
+            DxLlmValue::Str("Alpha".to_string()),
+        ]);
+        section.rows.push(vec![
+            DxLlmValue::Num(2.0),
+            DxLlmValue::Str("Beta".to_string()),
+        ]);
         doc.sections.insert('d', section);
 
         let serializer = SerializerBuilder::new().for_tables().build();

@@ -17,7 +17,7 @@
 //!         └── data.dx.bin
 //! ```
 
-use crate::llm::convert::{ConvertError, document_to_llm, document_to_machine};
+use crate::llm::convert::{document_to_llm, document_to_machine, ConvertError};
 use crate::llm::human_parser::HumanParser;
 use crate::llm::types::DxDocument;
 use std::fs;
@@ -70,7 +70,7 @@ impl Default for CacheConfig {
 
 impl CacheConfig {
     /// Create a new config with default settings
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
@@ -82,21 +82,21 @@ impl CacheConfig {
     }
 
     /// Set whether to generate LLM format
-    #[must_use] 
+    #[must_use]
     pub fn with_llm(mut self, generate: bool) -> Self {
         self.generate_llm = generate;
         self
     }
 
     /// Set whether to generate Machine format
-    #[must_use] 
+    #[must_use]
     pub fn with_machine(mut self, generate: bool) -> Self {
         self.generate_machine = generate;
         self
     }
 
     /// Set whether to use atomic writes
-    #[must_use] 
+    #[must_use]
     pub fn with_atomic_writes(mut self, atomic: bool) -> Self {
         self.atomic_writes = atomic;
         self
@@ -111,7 +111,7 @@ pub struct CacheGenerator {
 
 impl CacheGenerator {
     /// Create a new cache generator with default config
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self {
             config: CacheConfig::default(),
@@ -120,7 +120,7 @@ impl CacheGenerator {
     }
 
     /// Create a cache generator with custom config
-    #[must_use] 
+    #[must_use]
     pub fn with_config(config: CacheConfig) -> Self {
         Self {
             config,
@@ -132,7 +132,7 @@ impl CacheGenerator {
     ///
     /// Preserves the relative path structure in the cache directory.
     /// Example: `src/config/data.dx` -> `.dx/cache/llm/src/config/data.dx.llm`
-    #[must_use] 
+    #[must_use]
     pub fn map_path_to_cache(&self, source_path: &Path, base_path: &Path) -> CachePaths {
         // Get relative path from base
         let relative = source_path.strip_prefix(base_path).unwrap_or(source_path);
@@ -141,8 +141,12 @@ impl CacheGenerator {
         let relative_str = relative.to_string_lossy().replace('\\', "/");
 
         // Build cache paths
-        let llm_path =
-            self.config.cache_root.join("llm").join(&relative_str).with_extension("dx.llm");
+        let llm_path = self
+            .config
+            .cache_root
+            .join("llm")
+            .join(&relative_str)
+            .with_extension("dx.llm");
 
         let machine_path = self
             .config
@@ -168,7 +172,10 @@ impl CacheGenerator {
         let content = fs::read_to_string(source_path)?;
 
         // Parse to document
-        let doc = self.parser.parse(&content).map_err(|e| CacheError::Parse(e.to_string()))?;
+        let doc = self
+            .parser
+            .parse(&content)
+            .map_err(|e| CacheError::Parse(e.to_string()))?;
 
         // Generate cache files
         self.generate_from_document(&doc, source_path, base_path)
@@ -227,7 +234,7 @@ impl CacheGenerator {
     }
 
     /// Get the config
-    #[must_use] 
+    #[must_use]
     pub fn config(&self) -> &CacheConfig {
         &self.config
     }
@@ -348,12 +355,15 @@ mod tests {
 
         // Create a simple document
         let mut doc = DxDocument::new();
-        doc.context.insert("nm".to_string(), DxLlmValue::Str("Test".to_string()));
+        doc.context
+            .insert("nm".to_string(), DxLlmValue::Str("Test".to_string()));
 
         let source = Path::new("test.dx");
         let base = Path::new(".");
 
-        let result = generator.generate_from_document(&doc, source, base).unwrap();
+        let result = generator
+            .generate_from_document(&doc, source, base)
+            .unwrap();
 
         assert!(result.llm_generated);
         assert!(result.machine_generated);
@@ -384,12 +394,15 @@ mod tests {
         let generator = CacheGenerator::with_config(config);
 
         let mut doc = DxDocument::new();
-        doc.context.insert("nm".to_string(), DxLlmValue::Str("Test".to_string()));
+        doc.context
+            .insert("nm".to_string(), DxLlmValue::Str("Test".to_string()));
 
         let source = Path::new("test.dx");
         let base = Path::new(".");
 
-        let result = generator.generate_from_document(&doc, source, base).unwrap();
+        let result = generator
+            .generate_from_document(&doc, source, base)
+            .unwrap();
 
         assert!(result.llm_generated);
         assert!(!result.machine_generated);

@@ -52,7 +52,10 @@ fn main() {
     println!("\nSerialized pool size: {} bytes", pool_bytes.len());
 
     // Calculate original size (rough estimate)
-    let original_size: usize = log_entries.iter().map(|(level, msg)| level.len() + msg.len()).sum();
+    let original_size: usize = log_entries
+        .iter()
+        .map(|(level, msg)| level.len() + msg.len())
+        .sum();
     println!("Original string data size: ~{} bytes", original_size);
     println!(
         "Size reduction: {:.1}%",

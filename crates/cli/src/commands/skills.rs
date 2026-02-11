@@ -1,25 +1,27 @@
 //! Skills commands
 
-use colored::Colorize;
 use crate::SkillsCommands;
+use colored::Colorize;
 
 pub async fn run(action: SkillsCommands) -> anyhow::Result<()> {
     match action {
         SkillsCommands::List => {
             crate::commands::list::run(crate::ListCommands::Skills).await?;
         }
-        
+
         SkillsCommands::Show { name } => {
             println!("{} Skill: {}", "🎯".bright_cyan(), name.bright_yellow());
             println!();
-            
+
             // In production: load from skill registry
             match name.as_str() {
                 "send_message" => {
                     println!("  Description: Send messages via any messaging platform");
                     println!();
                     println!("  {} Inputs:", "📥".bright_cyan());
-                    println!("    • platform (string, required) - whatsapp, telegram, discord, etc.");
+                    println!(
+                        "    • platform (string, required) - whatsapp, telegram, discord, etc."
+                    );
                     println!("    • recipient (string, required) - The recipient");
                     println!("    • message (string, required) - The message content");
                     println!();
@@ -45,27 +47,38 @@ pub async fn run(action: SkillsCommands) -> anyhow::Result<()> {
                     println!("    4. Auto-PR created to share with community");
                 }
                 _ => {
-                    println!("  Skill not found. Run {} to see available skills.", "dx skills list".bright_cyan());
+                    println!(
+                        "  Skill not found. Run {} to see available skills.",
+                        "dx skills list".bright_cyan()
+                    );
                 }
             }
         }
-        
+
         SkillsCommands::Add { path } => {
-            println!("{} Adding skill from: {}", "➕".bright_cyan(), path.bright_blue());
-            
+            println!(
+                "{} Adding skill from: {}",
+                "➕".bright_cyan(),
+                path.bright_blue()
+            );
+
             // In production: parse .sr file and add to registry
-            
+
             println!("{} Skill added!", "✅".bright_green());
         }
-        
+
         SkillsCommands::Remove { name } => {
-            println!("{} Removing skill: {}", "🗑️".bright_yellow(), name.bright_yellow());
-            
+            println!(
+                "{} Removing skill: {}",
+                "🗑️".bright_yellow(),
+                name.bright_yellow()
+            );
+
             // In production: remove from registry
-            
+
             println!("{} Skill removed.", "✅".bright_green());
         }
     }
-    
+
     Ok(())
 }

@@ -2,7 +2,7 @@
 
 #[cfg(test)]
 mod roundtrip_tests {
-    use serializer::{Mappings, format_machine};
+    use serializer::{format_machine, Mappings};
 
     #[test]
     fn test_simple_roundtrip() {
@@ -91,7 +91,10 @@ context.description    : https://github.com/dx/dx
         let result = String::from_utf8(machine).unwrap();
 
         // Verify compression
-        assert!(result.len() < human.len(), "Machine format should be smaller");
+        assert!(
+            result.len() < human.len(),
+            "Machine format should be smaller"
+        );
         assert!(result.contains("c.n:dx"));
         assert!(result.contains("n>"));
         assert!(result.contains("c.d:") || result.contains("c.description:"));

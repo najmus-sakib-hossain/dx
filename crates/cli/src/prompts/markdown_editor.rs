@@ -40,7 +40,7 @@ impl MarkdownEditor {
     fn render_preview(&self) -> Vec<String> {
         let lines = self.get_lines();
         let mut preview = Vec::new();
-        
+
         for line in lines {
             if line.starts_with("# ") {
                 preview.push(format!("━━ {} ━━", &line[2..]));
@@ -51,16 +51,16 @@ impl MarkdownEditor {
             } else if line.starts_with("- ") || line.starts_with("* ") {
                 preview.push(format!("  • {}", &line[2..]));
             } else if line.starts_with("**") && line.ends_with("**") && line.len() > 4 {
-                preview.push(line[2..line.len()-2].to_string());
+                preview.push(line[2..line.len() - 2].to_string());
             } else if line.starts_with("*") && line.ends_with("*") && line.len() > 2 {
-                preview.push(line[1..line.len()-1].to_string());
+                preview.push(line[1..line.len() - 1].to_string());
             } else if line.starts_with("`") && line.ends_with("`") && line.len() > 2 {
-                preview.push(format!("「{}」", &line[1..line.len()-1]));
+                preview.push(format!("「{}」", &line[1..line.len() - 1]));
             } else {
                 preview.push(line);
             }
         }
-        
+
         preview
     }
 }
@@ -156,7 +156,7 @@ impl PromptInteraction for MarkdownEditor {
                         term.write_line(&format!("{}  {} {}", bar, marker, line))?;
                         lines += 1;
                     }
-                    
+
                     if content_lines.len() > 8 {
                         term.write_line(&format!("{}  {}", bar, theme.dim.apply_to("...")))?;
                         lines += 1;
@@ -169,7 +169,9 @@ impl PromptInteraction for MarkdownEditor {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("Tab: toggle preview, Enter: new line/submit, Esc: cancel")
+                    theme
+                        .dim
+                        .apply_to("Tab: toggle preview, Enter: new line/submit, Esc: cancel")
                 ))?;
                 lines += 1;
             }

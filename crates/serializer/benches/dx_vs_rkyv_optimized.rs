@@ -1,4 +1,4 @@
-use criterion::{BenchmarkId, Criterion, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use rkyv::{Archive, Deserialize, Serialize};
 use serializer::machine::OptimizedRkyv;
 use std::sync::atomic::{AtomicU32, Ordering};
@@ -66,9 +66,13 @@ fn bench_batch_serialize(c: &mut Criterion) {
             });
         });
 
-        group.bench_with_input(BenchmarkId::new("dx_batch_prealloc", size), &data, |b, data| {
-            b.iter(|| serializer::machine::serialize_batch(black_box(data)).unwrap());
-        });
+        group.bench_with_input(
+            BenchmarkId::new("dx_batch_prealloc", size),
+            &data,
+            |b, data| {
+                b.iter(|| serializer::machine::serialize_batch(black_box(data)).unwrap());
+            },
+        );
 
         group.finish();
     }
@@ -84,15 +88,20 @@ fn bench_parallel_serialize(c: &mut Criterion) {
         let data = create_test_data(*size);
         let mut group = c.benchmark_group(format!("parallel_serialize_{}", size));
 
-        group.bench_with_input(BenchmarkId::new("rkyv_sequential", size), &data, |b, data| {
-            b.iter(|| {
-                let mut results = Vec::with_capacity(data.len());
-                for item in data {
-                    results.push(rkyv::to_bytes::<rkyv::rancor::Error>(black_box(item)).unwrap());
-                }
-                results
-            });
-        });
+        group.bench_with_input(
+            BenchmarkId::new("rkyv_sequential", size),
+            &data,
+            |b, data| {
+                b.iter(|| {
+                    let mut results = Vec::with_capacity(data.len());
+                    for item in data {
+                        results
+                            .push(rkyv::to_bytes::<rkyv::rancor::Error>(black_box(item)).unwrap());
+                    }
+                    results
+                });
+            },
+        );
 
         group.bench_with_input(BenchmarkId::new("dx_parallel", size), &data, |b, data| {
             b.iter(|| {
@@ -140,7 +149,7 @@ fn bench_file_io(c: &mut Criterion) {
 
 #[cfg(feature = "compression")]
 fn bench_compression(c: &mut Criterion) {
-    use serializer::machine::{CompressedRkyv, compress::CompressionLevel};
+    use serializer::machine::{compress::CompressionLevel, CompressedRkyv};
 
     let data = TestData {
         id: 42,

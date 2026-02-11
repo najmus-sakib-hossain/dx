@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 
 // ─── HoverCard ──────────────────────────────────────────────────────────────
 // A shadcn-ui style HoverCard for rich content on hover.
@@ -103,7 +103,7 @@ impl EmptyState {
                     .bg(theme.muted)
                     .child(
                         div()
-                            .font_size(px(24.0))
+                            .text_size(px(24.0))
                             .text_color(theme.muted_foreground)
                             .child(icon),
                     ),
@@ -112,7 +112,7 @@ impl EmptyState {
 
         container = container.child(
             div()
-                .font_size(px(16.0))
+                .text_size(px(16.0))
                 .font_weight(gpui::FontWeight::SEMIBOLD)
                 .text_color(theme.foreground)
                 .child(self.title),
@@ -121,7 +121,7 @@ impl EmptyState {
         if let Some(desc) = self.description {
             container = container.child(
                 div()
-                    .font_size(px(14.0))
+                    .text_size(px(14.0))
                     .text_color(theme.muted_foreground)
                     .text_center()
                     .max_w(px(320.0))
@@ -189,7 +189,7 @@ impl Stat {
         // Label
         container = container.child(
             div()
-                .font_size(px(14.0))
+                .text_size(px(14.0))
                 .font_weight(gpui::FontWeight::MEDIUM)
                 .text_color(theme.muted_foreground)
                 .child(self.label),
@@ -200,10 +200,10 @@ impl Stat {
 
         value_row = value_row.child(
             div()
-                .font_size(px(30.0))
+                .text_size(px(30.0))
                 .font_weight(gpui::FontWeight::BOLD)
                 .text_color(theme.foreground)
-                .leading(px(36.0))
+                .line_height(px(36.0))
                 .child(self.value),
         );
 
@@ -218,7 +218,7 @@ impl Stat {
                     .flex()
                     .items_center()
                     .gap(px(2.0))
-                    .font_size(px(12.0))
+                    .text_size(px(12.0))
                     .text_color(color)
                     .child(icon)
                     .child(text),
@@ -230,7 +230,7 @@ impl Stat {
         if let Some(desc) = self.description {
             container = container.child(
                 div()
-                    .font_size(px(12.0))
+                    .text_size(px(12.0))
                     .text_color(theme.muted_foreground)
                     .child(desc),
             );
@@ -281,14 +281,12 @@ impl Breadcrumb {
             };
             let is_last = idx == total - 1;
 
-            let mut el = div()
-                .font_size(px(14.0))
-                .text_color(text_color);
+            let mut el = div().text_size(px(14.0)).text_color(text_color);
 
             if !is_last {
-                el = el.cursor_pointer().hover(move |style| {
-                    style.text_color(theme.foreground)
-                });
+                el = el
+                    .cursor_pointer()
+                    .hover(move |style| style.text_color(theme.foreground));
             } else {
                 el = el.font_weight(gpui::FontWeight::MEDIUM);
             }
@@ -298,7 +296,7 @@ impl Breadcrumb {
             if !is_last {
                 breadcrumb = breadcrumb.child(
                     div()
-                        .font_size(px(12.0))
+                        .text_size(px(12.0))
                         .text_color(theme.muted_foreground)
                         .child("/"),
                 );
@@ -337,22 +335,19 @@ impl Pagination {
         let mut container = div().flex().items_center().gap(px(4.0));
 
         // Previous
-        container = container.child(
-            PaginationButton::new("←", self.current_page > 1).render(theme),
-        );
+        container =
+            container.child(PaginationButton::new("←", self.current_page > 1).render(theme));
 
         // Page numbers (show up to 5 around current)
         let start = self.current_page.saturating_sub(2).max(1);
         let end = (start + 4).min(self.total_pages);
 
         if start > 1 {
-            container = container.child(
-                PaginationButton::page(1, false).render(theme),
-            );
+            container = container.child(PaginationButton::page(1, false).render(theme));
             if start > 2 {
                 container = container.child(
                     div()
-                        .font_size(px(14.0))
+                        .text_size(px(14.0))
                         .text_color(theme.muted_foreground)
                         .px(px(4.0))
                         .child("..."),
@@ -362,30 +357,26 @@ impl Pagination {
 
         for page in start..=end {
             let is_current = page == self.current_page;
-            container = container.child(
-                PaginationButton::page(page, is_current).render(theme),
-            );
+            container = container.child(PaginationButton::page(page, is_current).render(theme));
         }
 
         if end < self.total_pages {
             if end < self.total_pages - 1 {
                 container = container.child(
                     div()
-                        .font_size(px(14.0))
+                        .text_size(px(14.0))
                         .text_color(theme.muted_foreground)
                         .px(px(4.0))
                         .child("..."),
                 );
             }
-            container = container.child(
-                PaginationButton::page(self.total_pages, false).render(theme),
-            );
+            container =
+                container.child(PaginationButton::page(self.total_pages, false).render(theme));
         }
 
         // Next
-        container = container.child(
-            PaginationButton::new("→", self.current_page < self.total_pages).render(theme),
-        );
+        container = container
+            .child(PaginationButton::new("→", self.current_page < self.total_pages).render(theme));
 
         container
     }
@@ -437,7 +428,7 @@ impl PaginationButton {
             .h(px(32.0))
             .rounded(Radius::DEFAULT)
             .bg(bg)
-            .font_size(px(14.0))
+            .text_size(px(14.0))
             .text_color(text_color)
             .child(self.label);
 

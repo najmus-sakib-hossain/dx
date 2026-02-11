@@ -6,7 +6,7 @@
 //!
 //! Run with: cargo bench --bench `dx_vs_rkyv` -p dx-serializer
 
-use criterion::{Criterion, Throughput, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, Criterion, Throughput};
 use rkyv::{Archive, Deserialize, Serialize};
 use serializer::machine::serialize_batch;
 

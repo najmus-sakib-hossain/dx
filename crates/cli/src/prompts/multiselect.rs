@@ -99,7 +99,9 @@ impl<T: Clone> MultiSelect<T> {
         let item = if hint_str.is_empty() {
             MultiSelectItem::new(value, label).selected(selected)
         } else {
-            MultiSelectItem::new(value, label).hint(hint_str).selected(selected)
+            MultiSelectItem::new(value, label)
+                .hint(hint_str)
+                .selected(selected)
         };
         self.items.push(item);
         self.filtered_indices.push(self.items.len() - 1);
@@ -262,12 +264,13 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
                 // Title line - diamond aligns with │ position
                 let bar = theme.dim.apply_to(symbols.bar);
                 let title_with_spaces = format!("  {}  ", self.message);
-                term.write_line(&format!("{}{}", 
+                term.write_line(&format!(
+                    "{}{}",
                     theme.primary.apply_to(symbols.step_submit),
                     title_with_spaces.bold()
                 ))?;
                 lines += 1;
-                
+
                 // ONE blank line after title (with bar)
                 term.write_line(&format!("{}", bar))?;
                 lines += 1;
@@ -288,9 +291,15 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
 
                     let checkbox = if item.selected {
                         if is_cursor {
-                            theme.primary.apply_to(symbols.checkbox_selected).to_string()
+                            theme
+                                .primary
+                                .apply_to(symbols.checkbox_selected)
+                                .to_string()
                         } else {
-                            theme.success.apply_to(symbols.checkbox_selected).to_string()
+                            theme
+                                .success
+                                .apply_to(symbols.checkbox_selected)
+                                .to_string()
                         }
                     } else if is_cursor {
                         theme.primary.apply_to(symbols.checkbox_active).to_string()
@@ -331,8 +340,12 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
             }
             State::Submit => {
                 let checkmark = theme.success.apply_to("✓");
-                let selected: Vec<_> =
-                    self.items.iter().filter(|i| i.selected).map(|i| i.label.clone()).collect();
+                let selected: Vec<_> = self
+                    .items
+                    .iter()
+                    .filter(|i| i.selected)
+                    .map(|i| i.label.clone())
+                    .collect();
                 let display = if selected.is_empty() {
                     "none".to_string()
                 } else {
@@ -378,7 +391,11 @@ impl<T: Clone> PromptInteraction for MultiSelect<T> {
     }
 
     fn value(&self) -> Vec<T> {
-        self.items.iter().filter(|i| i.selected).map(|i| i.value.clone()).collect()
+        self.items
+            .iter()
+            .filter(|i| i.selected)
+            .map(|i| i.value.clone())
+            .collect()
     }
 }
 

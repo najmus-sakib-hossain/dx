@@ -103,7 +103,10 @@ pub fn arb_dx_value_leaf() -> impl Strategy<Value = DxValue> {
 ///
 /// This is used internally to limit recursion depth.
 pub fn arb_dx_array_leaf() -> impl Strategy<Value = DxArray> {
-    (proptest::collection::vec(arb_dx_value_leaf(), 0..5), proptest::bool::ANY)
+    (
+        proptest::collection::vec(arb_dx_value_leaf(), 0..5),
+        proptest::bool::ANY,
+    )
         .prop_map(|(values, is_stream)| DxArray { values, is_stream })
 }
 
@@ -118,7 +121,10 @@ pub fn arb_dx_array_leaf() -> impl Strategy<Value = DxArray> {
 pub fn arb_dx_array() -> impl Strategy<Value = DxArray> {
     // Use leaf values for array contents to limit recursion
     // Nested arrays would use arb_dx_value_leaf to prevent infinite recursion
-    (proptest::collection::vec(arb_dx_value_shallow(), 0..5), proptest::bool::ANY)
+    (
+        proptest::collection::vec(arb_dx_value_shallow(), 0..5),
+        proptest::bool::ANY,
+    )
         .prop_map(|(values, is_stream)| DxArray { values, is_stream })
 }
 
@@ -223,11 +229,14 @@ pub fn arb_dx_table() -> impl Strategy<Value = DxTable> {
 
         // Generate 0-5 rows
         proptest::collection::vec(
-            row_strategies.into_iter().collect::<Vec<_>>().prop_map(move |_| {
-                // This closure captures num_columns but we need to regenerate values
-                // Use a simpler approach: generate a vec of the right size
-                vec![DxValue::Null; num_columns]
-            }),
+            row_strategies
+                .into_iter()
+                .collect::<Vec<_>>()
+                .prop_map(move |_| {
+                    // This closure captures num_columns but we need to regenerate values
+                    // Use a simpler approach: generate a vec of the right size
+                    vec![DxValue::Null; num_columns]
+                }),
             0..5,
         )
         .prop_flat_map(move |row_count_hint| {
@@ -472,8 +481,10 @@ mod property_tests {
 
         let mut runner = TestRunner::default();
         for _ in 0..10 {
-            let value =
-                arb_dx_value_leaf().new_tree(&mut runner).expect("Failed to generate").current();
+            let value = arb_dx_value_leaf()
+                .new_tree(&mut runner)
+                .expect("Failed to generate")
+                .current();
 
             // All leaf values should be non-recursive
             match value {
@@ -493,7 +504,10 @@ mod property_tests {
 
         let mut runner = TestRunner::default();
         for _ in 0..10 {
-            let obj = arb_dx_object().new_tree(&mut runner).expect("Failed to generate").current();
+            let obj = arb_dx_object()
+                .new_tree(&mut runner)
+                .expect("Failed to generate")
+                .current();
 
             // Object should have at least one field
             assert!(!obj.fields.is_empty(), "Generated empty object");
@@ -514,10 +528,16 @@ mod property_tests {
 
         let mut runner = TestRunner::default();
         for _ in 0..10 {
-            let table = arb_dx_table().new_tree(&mut runner).expect("Failed to generate").current();
+            let table = arb_dx_table()
+                .new_tree(&mut runner)
+                .expect("Failed to generate")
+                .current();
 
             // Schema should have at least one column
-            assert!(!table.schema.columns.is_empty(), "Generated table with empty schema");
+            assert!(
+                !table.schema.columns.is_empty(),
+                "Generated table with empty schema"
+            );
 
             // All rows should match schema length
             for row in &table.rows {

@@ -12,8 +12,8 @@
 //! Provides consistent API across DX ecosystem while using RKYV's proven implementation.
 //! Think of it as a branded re-export with ecosystem integration.
 
-use rkyv::Serialize as RkyvSerialize;
 use rkyv::util::AlignedVec;
+use rkyv::Serialize as RkyvSerialize;
 
 /// Serialize a single value using RKYV format
 ///
@@ -60,7 +60,7 @@ where
 /// # Safety
 /// The bytes must be valid RKYV-serialized data for type T.
 #[inline(always)]
-#[must_use] 
+#[must_use]
 pub unsafe fn deserialize<T>(bytes: &[u8]) -> &T::Archived
 where
     T: rkyv::Archive,

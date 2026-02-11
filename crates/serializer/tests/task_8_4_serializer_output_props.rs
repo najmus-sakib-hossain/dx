@@ -432,7 +432,8 @@ mod unit_tests {
         let mut fields = HashMap::new();
         fields.insert("host".to_string(), DxLlmValue::Str("localhost".to_string()));
         fields.insert("port".to_string(), DxLlmValue::Num(8080.0));
-        doc.context.insert("config".to_string(), DxLlmValue::Obj(fields));
+        doc.context
+            .insert("config".to_string(), DxLlmValue::Obj(fields));
 
         let serializer = LlmSerializer::new();
         let output = serializer.serialize(&doc);
@@ -443,7 +444,11 @@ mod unit_tests {
         assert!(output.contains("host=localhost"), "Output: {}", output);
         assert!(output.contains("port=8080"), "Output: {}", output);
         // Should use space separator (not comma)
-        assert!(!output.contains("host=localhost,port=8080"), "Output: {}", output);
+        assert!(
+            !output.contains("host=localhost,port=8080"),
+            "Output: {}",
+            output
+        );
     }
 
     #[test]
@@ -457,7 +462,8 @@ mod unit_tests {
                 DxLlmValue::Str("fast".to_string()),
             ]),
         );
-        doc.context.insert("item".to_string(), DxLlmValue::Obj(fields));
+        doc.context
+            .insert("item".to_string(), DxLlmValue::Obj(fields));
 
         let serializer = LlmSerializer::new();
         let output = serializer.serialize(&doc);
@@ -469,8 +475,11 @@ mod unit_tests {
     #[test]
     fn test_schema_space_separated() {
         let mut doc = DxDocument::new();
-        let section =
-            DxSection::new(vec!["id".to_string(), "name".to_string(), "email".to_string()]);
+        let section = DxSection::new(vec![
+            "id".to_string(),
+            "name".to_string(),
+            "email".to_string(),
+        ]);
         doc.sections.insert('t', section);
 
         let serializer = LlmSerializer::new();
@@ -498,16 +507,25 @@ mod unit_tests {
         let output = serializer.serialize(&doc);
 
         // Should have space-separated array
-        assert!(output.contains("tags:3=rust performance serialization"), "Output: {}", output);
+        assert!(
+            output.contains("tags:3=rust performance serialization"),
+            "Output: {}",
+            output
+        );
         // Should not have comma-separated array
-        assert!(!output.contains("tags:3=rust,performance,serialization"), "Output: {}", output);
+        assert!(
+            !output.contains("tags:3=rust,performance,serialization"),
+            "Output: {}",
+            output
+        );
     }
 
     #[test]
     fn test_empty_object() {
         let mut doc = DxDocument::new();
         let fields = HashMap::new();
-        doc.context.insert("empty".to_string(), DxLlmValue::Obj(fields));
+        doc.context
+            .insert("empty".to_string(), DxLlmValue::Obj(fields));
 
         let serializer = LlmSerializer::new();
         let output = serializer.serialize(&doc);
@@ -519,8 +537,10 @@ mod unit_tests {
     #[test]
     fn test_single_item_array() {
         let mut doc = DxDocument::new();
-        doc.context
-            .insert("tag".to_string(), DxLlmValue::Arr(vec![DxLlmValue::Str("rust".to_string())]));
+        doc.context.insert(
+            "tag".to_string(),
+            DxLlmValue::Arr(vec![DxLlmValue::Str("rust".to_string())]),
+        );
 
         let serializer = LlmSerializer::new();
         let output = serializer.serialize(&doc);

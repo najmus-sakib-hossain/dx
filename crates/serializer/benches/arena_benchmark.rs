@@ -7,7 +7,7 @@
 //!
 //! **Validates: Requirements 3.1, 3.2**
 
-use criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use serializer::machine::{DxArena, QuantumWriter};
 
 // =============================================================================
@@ -185,31 +185,39 @@ fn bench_batch_sizes(c: &mut Criterion) {
     // 100 records
     let batch_100 = generate_records(BATCH_100);
     group.throughput(Throughput::Elements(BATCH_100 as u64));
-    group.bench_with_input(BenchmarkId::new("arena", BATCH_100), &batch_100, |b, records| {
-        b.iter(|| serialize_with_arena(black_box(records)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("arena", BATCH_100),
+        &batch_100,
+        |b, records| b.iter(|| serialize_with_arena(black_box(records))),
+    );
 
     // 1K records
     let batch_1k = generate_records(BATCH_1K);
     group.throughput(Throughput::Elements(BATCH_1K as u64));
-    group.bench_with_input(BenchmarkId::new("arena", BATCH_1K), &batch_1k, |b, records| {
-        b.iter(|| serialize_with_arena(black_box(records)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("arena", BATCH_1K),
+        &batch_1k,
+        |b, records| b.iter(|| serialize_with_arena(black_box(records))),
+    );
 
     // 10K records
     let batch_10k = generate_records(BATCH_10K);
     group.throughput(Throughput::Elements(BATCH_10K as u64));
-    group.bench_with_input(BenchmarkId::new("arena", BATCH_10K), &batch_10k, |b, records| {
-        b.iter(|| serialize_with_arena(black_box(records)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("arena", BATCH_10K),
+        &batch_10k,
+        |b, records| b.iter(|| serialize_with_arena(black_box(records))),
+    );
 
     // 100K records
     let batch_100k = generate_records(BATCH_100K);
     group.throughput(Throughput::Elements(BATCH_100K as u64));
     group.sample_size(20);
-    group.bench_with_input(BenchmarkId::new("arena", BATCH_100K), &batch_100k, |b, records| {
-        b.iter(|| serialize_with_arena(black_box(records)))
-    });
+    group.bench_with_input(
+        BenchmarkId::new("arena", BATCH_100K),
+        &batch_100k,
+        |b, records| b.iter(|| serialize_with_arena(black_box(records))),
+    );
 
     group.finish();
 }

@@ -15,12 +15,13 @@
 
 use proptest::prelude::*;
 use serializer::{
-    DxError, DxObject, DxValue, encode, format_human, format_machine, parse,
+    encode, format_human, format_machine, parse,
     tokenizer::{Token, Tokenizer},
     zero::{
-        DxZeroHeader, FLAG_HAS_HEAP, FLAG_HAS_INTERN, FLAG_HAS_LENGTH_TABLE, FLAG_LITTLE_ENDIAN,
-        MAGIC, VERSION, header::HeaderError,
+        header::HeaderError, DxZeroHeader, FLAG_HAS_HEAP, FLAG_HAS_INTERN, FLAG_HAS_LENGTH_TABLE,
+        FLAG_LITTLE_ENDIAN, MAGIC, VERSION,
     },
+    DxError, DxObject, DxValue,
 };
 
 // =============================================================================
@@ -232,10 +233,20 @@ mod parser_completeness_props {
             | DxValue::Ref(_) => 1,
             DxValue::Array(arr) => arr.values.iter().map(count_values).sum::<usize>() + 1,
             DxValue::Object(obj) => {
-                obj.fields.iter().map(|(_, v)| count_values(v)).sum::<usize>() + 1
+                obj.fields
+                    .iter()
+                    .map(|(_, v)| count_values(v))
+                    .sum::<usize>()
+                    + 1
             }
             DxValue::Table(table) => {
-                table.rows.iter().flat_map(|row| row.iter()).map(count_values).sum::<usize>() + 1
+                table
+                    .rows
+                    .iter()
+                    .flat_map(|row| row.iter())
+                    .map(count_values)
+                    .sum::<usize>()
+                    + 1
             }
         }
     }
@@ -482,8 +493,10 @@ mod tokenizer_props {
         prop::collection::vec(
             prop_oneof![
                 prop::num::u8::ANY.prop_filter("printable", |&b| b >= 0x20 && b < 0x7F),
-                prop::num::u8::ANY
-                    .prop_filter("control", |&b| b < 0x20 && b != 0x09 && b != 0x0A && b != 0x0D),
+                prop::num::u8::ANY.prop_filter("control", |&b| b < 0x20
+                    && b != 0x09
+                    && b != 0x0A
+                    && b != 0x0D),
             ],
             1..50,
         )
@@ -643,7 +656,10 @@ mod roundtrip_props {
     /// Strategy to generate simple key-value DX objects
     fn simple_dx_object() -> impl Strategy<Value = DxValue> {
         prop::collection::vec(
-            ("[a-z][a-z0-9_]{0,10}".prop_map(String::from), simple_dx_value()),
+            (
+                "[a-z][a-z0-9_]{0,10}".prop_map(String::from),
+                simple_dx_value(),
+            ),
             1..5,
         )
         .prop_map(|pairs| {
@@ -664,7 +680,11 @@ mod roundtrip_props {
             1..10,
         )
         .prop_map(|pairs| {
-            pairs.iter().map(|(k, v)| format!("{}:{}", k, v)).collect::<Vec<_>>().join("\n")
+            pairs
+                .iter()
+                .map(|(k, v)| format!("{}:{}", k, v))
+                .collect::<Vec<_>>()
+                .join("\n")
         })
     }
 
@@ -686,7 +706,10 @@ mod roundtrip_props {
             (DxValue::String(a), DxValue::String(b)) => a == b,
             (DxValue::Array(a), DxValue::Array(b)) => {
                 a.values.len() == b.values.len()
-                    && a.values.iter().zip(b.values.iter()).all(|(x, y)| values_equivalent(x, y))
+                    && a.values
+                        .iter()
+                        .zip(b.values.iter())
+                        .all(|(x, y)| values_equivalent(x, y))
             }
             (DxValue::Object(a), DxValue::Object(b)) => {
                 a.fields.len() == b.fields.len()
@@ -979,7 +1002,10 @@ mod memory_safety_props {
     /// so we test that the parser handles alias definitions correctly
     fn alias_definitions() -> impl Strategy<Value = Vec<(String, String)>> {
         prop::collection::vec(
-            ("[a-z]{1,5}".prop_map(String::from), "[a-z]{1,10}".prop_map(String::from)),
+            (
+                "[a-z]{1,5}".prop_map(String::from),
+                "[a-z]{1,10}".prop_map(String::from),
+            ),
             1..10,
         )
     }
@@ -1250,7 +1276,11 @@ mod thread_safety_props {
     fn concurrent_parse_input() -> impl Strategy<Value = String> {
         prop::collection::vec(("[a-z][a-z0-9_]{0,10}", "[a-zA-Z][a-zA-Z0-9]{0,20}"), 1..5).prop_map(
             |pairs| {
-                pairs.iter().map(|(k, v)| format!("{}:{}", k, v)).collect::<Vec<_>>().join("\n")
+                pairs
+                    .iter()
+                    .map(|(k, v)| format!("{}:{}", k, v))
+                    .collect::<Vec<_>>()
+                    .join("\n")
             },
         )
     }
@@ -1795,7 +1825,10 @@ mod pretty_printer_props {
             let parsed = parse(&encoded).unwrap();
 
             if let DxValue::Object(parsed_obj) = parsed {
-                assert_eq!(parsed_obj.get("name"), Some(&DxValue::String("Alice".to_string())));
+                assert_eq!(
+                    parsed_obj.get("name"),
+                    Some(&DxValue::String("Alice".to_string()))
+                );
             }
         }
 
@@ -1810,7 +1843,10 @@ mod pretty_printer_props {
             let parsed = parse(&encoded).unwrap();
 
             if let DxValue::Object(parsed_obj) = parsed {
-                assert_eq!(parsed_obj.get("greeting"), Some(&DxValue::String("Hello".to_string())));
+                assert_eq!(
+                    parsed_obj.get("greeting"),
+                    Some(&DxValue::String("Hello".to_string()))
+                );
             }
         }
     }
@@ -2140,7 +2176,10 @@ mod error_position_props {
             assert!(result.is_err());
             let err = result.unwrap_err();
             if let Some(offset) = err.offset() {
-                assert!(offset <= input.len(), "Offset should be within input bounds");
+                assert!(
+                    offset <= input.len(),
+                    "Offset should be within input bounds"
+                );
             }
         }
 
@@ -2637,13 +2676,16 @@ mod error_on_invalid_props {
             DxValue::Float(f) => !f.is_nan() || true, // NaN is technically valid
             DxValue::String(s) => {
                 s.is_ascii()
-                    || s.chars().all(|c| !c.is_control() || c == '\n' || c == '\t' || c == '\r')
+                    || s.chars()
+                        .all(|c| !c.is_control() || c == '\n' || c == '\t' || c == '\r')
             }
             DxValue::Ref(_) => true,
             DxValue::Array(arr) => arr.values.iter().all(validate_dx_value),
             DxValue::Object(obj) => {
                 // All keys should be valid strings
-                obj.fields.iter().all(|(k, v)| !k.is_empty() && validate_dx_value(v))
+                obj.fields
+                    .iter()
+                    .all(|(k, v)| !k.is_empty() && validate_dx_value(v))
             }
             DxValue::Table(table) => {
                 // Schema should have columns
@@ -2749,7 +2791,11 @@ mod error_on_invalid_props {
                 let result = parse(input.as_bytes());
                 // Should not panic, should either error or produce valid result
                 if let Ok(value) = &result {
-                    assert!(validate_dx_value(value), "Value should be valid for input: {}", input);
+                    assert!(
+                        validate_dx_value(value),
+                        "Value should be valid for input: {}",
+                        input
+                    );
                 }
             }
         }
@@ -2782,7 +2828,11 @@ mod error_on_invalid_props {
             for input in inputs {
                 // Should not panic
                 let result = std::panic::catch_unwind(|| parse(&input));
-                assert!(result.is_ok(), "Parser should not panic on input: {:?}", input);
+                assert!(
+                    result.is_ok(),
+                    "Parser should not panic on input: {:?}",
+                    input
+                );
             }
         }
 

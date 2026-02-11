@@ -7,6 +7,8 @@
 //! - Multi-threaded WASM support
 //! - LZ4 compression for network transfer
 
+pub mod avx_search;
+pub mod bloom;
 pub mod builder;
 pub mod engine;
 #[cfg(feature = "gpu")]
@@ -15,13 +17,11 @@ pub mod index;
 pub mod multipattern;
 pub mod optimized;
 pub mod parser;
+pub mod perfect_hash;
+pub mod precomputed;
 pub mod search;
 pub mod types;
-pub mod avx_search;
 pub mod zero_alloc;
-pub mod perfect_hash;
-pub mod bloom;
-pub mod precomputed;
 
 #[cfg(feature = "wasm")]
 pub mod wasm;

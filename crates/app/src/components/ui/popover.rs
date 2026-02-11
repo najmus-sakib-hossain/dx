@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 
 // ─── Tooltip ────────────────────────────────────────────────────────────────
 // A shadcn-ui style Tooltip (static display version).
@@ -44,7 +44,7 @@ impl Tooltip {
             .bg(theme.popover)
             .border_1()
             .border_color(theme.border)
-            .font_size(px(12.0))
+            .text_size(px(12.0))
             .text_color(theme.popover_foreground)
             .child(self.content)
     }
@@ -229,21 +229,17 @@ impl DropdownMenu {
                         .py(px(6.0))
                         .mx(px(4.0))
                         .rounded(Radius::SM)
-                        .font_size(px(14.0))
+                        .text_size(px(14.0))
                         .text_color(text_color);
 
                     if !item.disabled {
-                        el = el
-                            .cursor_pointer()
-                            .hover(move |style| style.bg(hover_bg));
+                        el = el.cursor_pointer().hover(move |style| style.bg(hover_bg));
                     } else {
                         el = el.opacity(0.5);
                     }
 
                     if let Some(icon) = item.icon {
-                        el = el.child(
-                            div().w(px(16.0)).text_color(text_color).child(icon),
-                        );
+                        el = el.child(div().w(px(16.0)).text_color(text_color).child(icon));
                     }
 
                     el = el.child(div().flex_1().child(item.label));
@@ -251,7 +247,7 @@ impl DropdownMenu {
                     if let Some(shortcut) = item.shortcut {
                         el = el.child(
                             div()
-                                .font_size(px(12.0))
+                                .text_size(px(12.0))
                                 .text_color(theme.muted_foreground)
                                 .child(shortcut),
                         );
@@ -260,16 +256,14 @@ impl DropdownMenu {
                     menu = menu.child(el);
                 }
                 DropdownMenuEntry::Separator => {
-                    menu = menu.child(
-                        div().my(px(4.0)).mx(px(-4.0)).h(px(1.0)).bg(theme.border),
-                    );
+                    menu = menu.child(div().my(px(4.0)).mx(px(-4.0)).h(px(1.0)).bg(theme.border));
                 }
                 DropdownMenuEntry::Label(label) => {
                     menu = menu.child(
                         div()
                             .px(px(8.0))
                             .py(px(6.0))
-                            .font_size(px(12.0))
+                            .text_size(px(12.0))
                             .font_weight(gpui::FontWeight::SEMIBOLD)
                             .text_color(theme.foreground)
                             .child(label),
@@ -341,7 +335,7 @@ impl CommandItem {
             el = el.child(
                 div()
                     .w(px(16.0))
-                    .font_size(px(14.0))
+                    .text_size(px(14.0))
                     .text_color(theme.muted_foreground)
                     .child(icon),
             );
@@ -350,7 +344,7 @@ impl CommandItem {
         el = el.child(
             div()
                 .flex_1()
-                .font_size(px(14.0))
+                .text_size(px(14.0))
                 .text_color(theme.foreground)
                 .child(self.label),
         );
@@ -358,7 +352,7 @@ impl CommandItem {
         if let Some(shortcut) = self.shortcut {
             el = el.child(
                 div()
-                    .font_size(px(12.0))
+                    .text_size(px(12.0))
                     .text_color(theme.muted_foreground)
                     .child(shortcut),
             );
@@ -434,14 +428,14 @@ impl CommandPalette {
                 .border_color(theme.border)
                 .child(
                     div()
-                        .font_size(px(14.0))
+                        .text_size(px(14.0))
                         .text_color(theme.muted_foreground)
                         .child("🔍"),
                 )
                 .child(
                     div()
                         .flex_1()
-                        .font_size(px(14.0))
+                        .text_size(px(14.0))
                         .text_color(if self.search_value.is_empty() {
                             theme.muted_foreground
                         } else {
@@ -456,7 +450,7 @@ impl CommandPalette {
         );
 
         // Groups
-        let mut content = div().flex().flex_col().overflow_y_scroll().py(px(4.0));
+        let mut content = div().flex().flex_col().overflow_y_hidden().py(px(4.0));
 
         for group in self.items {
             // Group label
@@ -464,7 +458,7 @@ impl CommandPalette {
                 div()
                     .px(px(8.0))
                     .py(px(6.0))
-                    .font_size(px(12.0))
+                    .text_size(px(12.0))
                     .font_weight(gpui::FontWeight::MEDIUM)
                     .text_color(theme.muted_foreground)
                     .child(group.label),

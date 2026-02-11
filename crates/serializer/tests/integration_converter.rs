@@ -26,7 +26,10 @@ mod integration_tests {
         assert!(dx.contains("n:awesome-app"));
         let savings_pct =
             ((package_json.len() - dx.len()) as f64 / package_json.len() as f64) * 100.0;
-        assert!(savings_pct > 30.0, "Should be at least 30% smaller (got {savings_pct:.1}%)");
+        assert!(
+            savings_pct > 30.0,
+            "Should be at least 30% smaller (got {savings_pct:.1}%)"
+        );
         println!(
             "✅ package.json: {} → {} bytes ({:.1}% smaller)",
             package_json.len(),
@@ -59,7 +62,11 @@ port = 5432
 
         let dx = toml_to_dx(settings_toml).unwrap();
         assert!(dx.contains("n:settings"));
-        println!("✅ settings.toml: {} → {} bytes", settings_toml.len(), dx.len());
+        println!(
+            "✅ settings.toml: {} → {} bytes",
+            settings_toml.len(),
+            dx.len()
+        );
 
         // 4. Test auto-detection
         let formats = vec![
@@ -91,10 +98,22 @@ port = 5432
         // Verify ultra-optimizations are applied
         assert!(dx.contains("n:test"), "Should abbreviate 'name' to 'n'");
         assert!(dx.contains("v:1.0.0"), "Should abbreviate 'version' to 'v'");
-        assert!(dx.contains("d:Test app"), "Should abbreviate 'description' to 'd'");
-        assert!(dx.contains("a:John Doe"), "Should abbreviate 'author' to 'a'");
-        assert!(dx.contains("pm:npm"), "Should abbreviate 'packageManager' to 'pm'");
-        assert!(dx.contains("fw:react"), "Should abbreviate 'framework' to 'fw'");
+        assert!(
+            dx.contains("d:Test app"),
+            "Should abbreviate 'description' to 'd'"
+        );
+        assert!(
+            dx.contains("a:John Doe"),
+            "Should abbreviate 'author' to 'a'"
+        );
+        assert!(
+            dx.contains("pm:npm"),
+            "Should abbreviate 'packageManager' to 'pm'"
+        );
+        assert!(
+            dx.contains("fw:react"),
+            "Should abbreviate 'framework' to 'fw'"
+        );
 
         // Verify inlining (may use ^ operator if optimized)
         // Not all cases will inline, so this is optional

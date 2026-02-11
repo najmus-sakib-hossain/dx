@@ -3,7 +3,7 @@
 #![allow(clippy::too_many_lines)]
 
 /// Ultimate demonstration: All formats → DX ULTRA
-use serializer::{json_to_dx, yaml_to_dx, toml_to_dx};
+use serializer::{json_to_dx, toml_to_dx, yaml_to_dx};
 
 fn main() {
     println!("╔════════════════════════════════════════════════════════════╗");
@@ -105,7 +105,10 @@ where
             println!("   Input:   {} bytes", input.len());
             println!("   Output:  {} bytes", dx.len());
             println!("   Saved:   {savings} bytes ({percent:.1}% smaller)");
-            println!("   Ratio:   {:.2}x compression\n", input.len() as f64 / dx.len() as f64);
+            println!(
+                "   Ratio:   {:.2}x compression\n",
+                input.len() as f64 / dx.len() as f64
+            );
 
             println!("📝 DX ULTRA OUTPUT:");
             println!("─────────────────────────────────────────────────────────");

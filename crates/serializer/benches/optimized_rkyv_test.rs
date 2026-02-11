@@ -1,4 +1,4 @@
-use criterion::{Criterion, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use rkyv::{Archive, Deserialize, Serialize};
 
 #[derive(Archive, Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -77,14 +77,20 @@ fn bench_roundtrip(c: &mut Criterion) {
             unsafe {
                 let archived = rkyv::access_unchecked::<TestData::Archived>(&bytes);
                 let mut deserializer = rkyv::de::Pool::new();
-                let _: TestData =
-                    archived.deserialize(rkyv::rancor::Strategy::wrap(&mut deserializer)).unwrap();
+                let _: TestData = archived
+                    .deserialize(rkyv::rancor::Strategy::wrap(&mut deserializer))
+                    .unwrap();
             }
         });
     });
 }
 
-criterion_group!(benches, bench_plain_rkyv, bench_rkyv_with_prealloc, bench_roundtrip,);
+criterion_group!(
+    benches,
+    bench_plain_rkyv,
+    bench_rkyv_with_prealloc,
+    bench_roundtrip,
+);
 
 #[cfg(feature = "parallel")]
 criterion_group!(parallel_benches, bench_parallel_rkyv,);

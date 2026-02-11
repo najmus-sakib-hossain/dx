@@ -248,7 +248,7 @@ impl Symbols {
             step_active: "♦",
             step_cancel: "■",
             step_error: "▲",
-            step_submit: "♦",  // Diamond suit symbol
+            step_submit: "♦", // Diamond suit symbol
             bar_start: "┌",
             bar: "│",
             bar_end: "└",
@@ -373,7 +373,7 @@ fn term_write(line: impl Display) -> io::Result<()> {
 pub fn intro(title: impl Display) -> io::Result<()> {
     let theme = THEME.read().unwrap();
     let symbols = &*SYMBOLS;
-    
+
     // Intro line with all dim borders
     term_write(format!(
         "{}{}{}",
@@ -382,7 +382,7 @@ pub fn intro(title: impl Display) -> io::Result<()> {
         format!(" {}", title)
     ))?;
     term_write("\n")?;
-    
+
     // Add a blank line with dim bar after intro
     term_write(format!("{}\n", theme.dim.apply_to(symbols.bar)))
 }
@@ -394,12 +394,12 @@ fn section_with_width(title: impl Display, content_width: usize) -> io::Result<(
     let title_str = title.to_string();
     let title_with_spaces = format!("  {}  ", title_str);
     let title_len = title_with_spaces.chars().count();
-    
+
     // The total width should be: content_width (inside the box)
     // We need to fill: ◇ + title + horizontal_line + ╮
     // The horizontal line should fill the remaining space to match content_width
     let remaining = content_width.saturating_sub(title_len);
-    
+
     // Diamond symbol aligns with │ position
     term_write(format!(
         "{}{}{}{}",
@@ -421,45 +421,55 @@ pub fn section(title: impl Display) -> io::Result<()> {
 pub fn box_section(title: &str, lines: &[&str]) -> io::Result<()> {
     let theme = THEME.read().unwrap();
     let symbols = &*SYMBOLS;
-    let bar = theme.dim.apply_to(symbols.bar);  // Use dim color for bars
-    
+    let bar = theme.dim.apply_to(symbols.bar); // Use dim color for bars
+
     // Calculate the width needed for content (the space between the two │ bars)
     // This is the actual text content plus padding
-    let max_content_len = lines.iter()
+    let max_content_len = lines
+        .iter()
         .map(|line| {
             // Content format: "  {line}"
             let content = format!("  {}", line);
-            content.chars().count()  // Use char count for proper Unicode width
+            content.chars().count() // Use char count for proper Unicode width
         })
         .max()
         .unwrap_or(83);
-    
+
     // Top border with title
     // The line should be: ●  title  ─────────╮
     // Where the total width from ● to ╮ matches the content width + 2 (for the two │ bars)
     section_with_width(title, max_content_len)?;
-    
+
     // Empty line: │{spaces}│
     term_write(format!("{}{}{}\n", bar, " ".repeat(max_content_len), bar))?;
-    
+
     // Content lines: │  {line}{spaces}│
     for line in lines {
         let content = format!("  {}", line);
         let content_len = content.chars().count();
         let spaces_needed = max_content_len.saturating_sub(content_len);
-        term_write(format!("{}{}{}{}\n", bar, content, " ".repeat(spaces_needed), bar))?;
+        term_write(format!(
+            "{}{}{}{}\n",
+            bar,
+            content,
+            " ".repeat(spaces_needed),
+            bar
+        ))?;
     }
-    
+
     // Empty line: │{spaces}│
     term_write(format!("{}{}{}\n", bar, " ".repeat(max_content_len), bar))?;
-    
+
     // Bottom border: ├─────────╯
-    term_write(format!("{}{}{}\n",
+    term_write(format!(
+        "{}{}{}\n",
         theme.dim.apply_to(symbols.box_bottom_left),
-        theme.dim.apply_to(symbols.box_horizontal.repeat(max_content_len)),
+        theme
+            .dim
+            .apply_to(symbols.box_horizontal.repeat(max_content_len)),
         theme.dim.apply_to(symbols.box_bottom_right)
     ))?;
-    
+
     // Add ONE blank line with bar after box
     term_write(format!("{}\n", bar))
 }
@@ -468,7 +478,12 @@ pub fn box_section(title: &str, lines: &[&str]) -> io::Result<()> {
 pub fn outro(message: impl Display) -> io::Result<()> {
     let theme = THEME.read().unwrap();
     let symbols = &*SYMBOLS;
-    term_write(format!("{}{} {}\n", theme.dim.apply_to(symbols.bar), theme.success.apply_to(symbols.step_submit), message,))
+    term_write(format!(
+        "{}{} {}\n",
+        theme.dim.apply_to(symbols.bar),
+        theme.success.apply_to(symbols.step_submit),
+        message,
+    ))
 }
 #[allow(unused)]
 pub fn outro_cancel(message: impl Display) -> io::Result<()> {
@@ -532,10 +547,11 @@ pub fn draw_box(title: &str, content: &[&str], width: usize) -> Vec<String> {
     let theme = THEME.read().unwrap();
     let symbols = &*SYMBOLS;
     let mut lines = Vec::new();
-    
+
     // Top border with title
     let title_line = if title.is_empty() {
-        format!("{}{}{}", 
+        format!(
+            "{}{}{}",
             symbols.box_top_left,
             symbols.box_horizontal.repeat(width - 2),
             symbols.box_top_right
@@ -543,7 +559,8 @@ pub fn draw_box(title: &str, content: &[&str], width: usize) -> Vec<String> {
     } else {
         let title_with_spaces = format!("  {}  ", title);
         let remaining = width.saturating_sub(title_with_spaces.len() + 1);
-        format!("{}{}{}{}",
+        format!(
+            "{}{}{}{}",
             symbols.box_top_left,
             theme.dim.apply_to(symbols.box_horizontal.repeat(1)),
             title_with_spaces,
@@ -551,40 +568,44 @@ pub fn draw_box(title: &str, content: &[&str], width: usize) -> Vec<String> {
         ) + symbols.box_top_right
     };
     lines.push(theme.dim.apply_to(title_line).to_string());
-    
+
     // Empty line after title
-    lines.push(format!("{}{}{}",
+    lines.push(format!(
+        "{}{}{}",
         theme.dim.apply_to(symbols.box_vertical),
         " ".repeat(width - 2),
         theme.dim.apply_to(symbols.box_vertical)
     ));
-    
+
     // Content lines
     for line in content {
         let padded = format!("  {}", line);
         let padding = width.saturating_sub(padded.len() + 2);
-        lines.push(format!("{}{}{}{}",
+        lines.push(format!(
+            "{}{}{}{}",
             theme.dim.apply_to(symbols.box_vertical),
             padded,
             " ".repeat(padding),
             theme.dim.apply_to(symbols.box_vertical)
         ));
     }
-    
+
     // Empty line before bottom
-    lines.push(format!("{}{}{}",
+    lines.push(format!(
+        "{}{}{}",
         theme.dim.apply_to(symbols.box_vertical),
         " ".repeat(width - 2),
         theme.dim.apply_to(symbols.box_vertical)
     ));
-    
+
     // Bottom border
-    lines.push(format!("{}{}{}",
+    lines.push(format!(
+        "{}{}{}",
         theme.dim.apply_to(symbols.box_bottom_left),
         theme.dim.apply_to(symbols.box_horizontal.repeat(width - 2)),
         theme.dim.apply_to(symbols.box_bottom_right)
     ));
-    
+
     lines
 }
 
@@ -593,7 +614,8 @@ pub fn draw_box(title: &str, content: &[&str], width: usize) -> Vec<String> {
 pub fn draw_separator(width: usize) -> String {
     let theme = THEME.read().unwrap();
     let symbols = &*SYMBOLS;
-    format!("{}{}",
+    format!(
+        "{}{}",
         theme.dim.apply_to(symbols.box_vertical),
         theme.dim.apply_to(symbols.box_horizontal.repeat(width - 1))
     )

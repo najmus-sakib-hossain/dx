@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, IntoElement};
 
 // ─── Input ──────────────────────────────────────────────────────────────────
 // A shadcn-ui style Input field (display-only, since GPUI text editing
@@ -79,7 +79,11 @@ impl Input {
             theme.border
         };
 
-        let bg = if self.disabled { theme.muted } else { theme.background };
+        let bg = if self.disabled {
+            theme.muted
+        } else {
+            theme.background
+        };
         let text_color = if self.value.is_empty() {
             theme.muted_foreground
         } else {
@@ -104,7 +108,7 @@ impl Input {
             .bg(bg)
             .border_1()
             .border_color(border_color)
-            .font_size(px(14.0));
+            .text_size(px(14.0));
 
         if self.disabled {
             input = input.opacity(0.5);
@@ -120,19 +124,23 @@ impl Input {
         // Left icon
         if let Some(icon) = self.icon_left {
             input = input.child(
-                div().text_color(theme.muted_foreground).flex_shrink_0().child(icon),
+                div()
+                    .text_color(theme.muted_foreground)
+                    .flex_shrink_0()
+                    .child(icon),
             );
         }
 
         // Text value
-        input = input.child(
-            div().flex_1().text_color(text_color).child(display_text),
-        );
+        input = input.child(div().flex_1().text_color(text_color).child(display_text));
 
         // Right icon
         if let Some(icon) = self.icon_right {
             input = input.child(
-                div().text_color(theme.muted_foreground).flex_shrink_0().child(icon),
+                div()
+                    .text_color(theme.muted_foreground)
+                    .flex_shrink_0()
+                    .child(icon),
             );
         }
 
@@ -196,7 +204,11 @@ impl Textarea {
     }
 
     pub fn render(self, theme: &Theme) -> impl IntoElement {
-        let bg = if self.disabled { theme.muted } else { theme.background };
+        let bg = if self.disabled {
+            theme.muted
+        } else {
+            theme.background
+        };
         let text_color = if self.value.is_empty() {
             theme.muted_foreground
         } else {
@@ -218,7 +230,7 @@ impl Textarea {
             .bg(bg)
             .border_1()
             .border_color(theme.border)
-            .font_size(px(14.0))
+            .text_size(px(14.0))
             .text_color(text_color);
 
         if self.disabled {
@@ -270,7 +282,7 @@ impl InputArea {
             .child(
                 div()
                     .flex_1()
-                    .font_size(px(14.0))
+                    .text_size(px(14.0))
                     .text_color(self.theme.muted_foreground)
                     .child("Ask Codex anything, @ to add files, / for commands"),
             )
@@ -283,14 +295,8 @@ impl InputArea {
                     .items_center()
                     .justify_center()
                     .cursor_pointer()
-                    .hover(move |style| {
-                        style.opacity(0.9)
-                    })
-                    .child(
-                        div()
-                            .text_color(self.theme.primary_foreground)
-                            .child("▶"),
-                    ),
+                    .hover(move |style| style.opacity(0.9))
+                    .child(div().text_color(self.theme.primary_foreground).child("▶")),
             )
     }
 
@@ -304,7 +310,7 @@ impl InputArea {
                 div()
                     .flex()
                     .gap(px(8.0))
-                    .font_size(px(11.0))
+                    .text_size(px(11.0))
                     .text_color(self.theme.muted_foreground)
                     .child("GPT-5.2-Codex")
                     .child("High"),
@@ -313,7 +319,7 @@ impl InputArea {
                 div()
                     .flex()
                     .gap(px(8.0))
-                    .font_size(px(11.0))
+                    .text_size(px(11.0))
                     .text_color(self.theme.muted_foreground)
                     .child("Local")
                     .child("Worktree")
@@ -321,7 +327,7 @@ impl InputArea {
             )
             .child(
                 div()
-                    .font_size(px(11.0))
+                    .text_size(px(11.0))
                     .text_color(self.theme.muted_foreground)
                     .child("🔧 (neo)actual-redesign"),
             )

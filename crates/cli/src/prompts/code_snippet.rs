@@ -140,7 +140,7 @@ impl PromptInteraction for CodeSnippetPicker {
                     } else {
                         snippet.name.clone()
                     };
-                    
+
                     term.write_line(&format!(
                         "{}  {} {} {} {}",
                         bar,
@@ -192,13 +192,17 @@ impl PromptInteraction for CodeSnippetPicker {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("↑↓: navigate, Space/Tab: preview, Enter: select")
+                    theme
+                        .dim
+                        .apply_to("↑↓: navigate, Space/Tab: preview, Enter: select")
                 ))?;
                 lines += 1;
             }
             State::Submit => {
                 let checkmark = theme.success.apply_to("✓");
-                let selected = self.snippets.get(self.cursor)
+                let selected = self
+                    .snippets
+                    .get(self.cursor)
                     .map(|s| format!("{} ({})", s.name, s.language))
                     .unwrap_or_default();
                 term.write_line(&format!(
@@ -219,7 +223,8 @@ impl PromptInteraction for CodeSnippetPicker {
     }
 
     fn value(&self) -> CodeSnippet {
-        self.snippets.get(self.cursor)
+        self.snippets
+            .get(self.cursor)
             .cloned()
             .unwrap_or_else(|| CodeSnippet {
                 name: String::new(),

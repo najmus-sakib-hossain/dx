@@ -56,7 +56,10 @@ framework: react
         // Verify optimizations
         assert!(dx.contains("n:test-app"), "Should have optimized name");
         assert!(dx.contains("v:1.0.0"), "Should have optimized version");
-        assert!(dx.contains("pm:npm"), "Should have optimized packageManager");
+        assert!(
+            dx.contains("pm:npm"),
+            "Should have optimized packageManager"
+        );
 
         let compression = ((yaml.len() - dx.len()) as f64 / yaml.len() as f64) * 100.0;
         println!("Compression: {compression:.1}%");
@@ -112,7 +115,10 @@ react = "^18.0.0"
         println!("\nOutput ({} bytes):\n{}", dx.len(), dx);
 
         // Verify array handling
-        assert!(dx.contains('|') || dx.contains('>'), "Should have array separator");
+        assert!(
+            dx.contains('|') || dx.contains('>'),
+            "Should have array separator"
+        );
 
         // Verify language code optimization
         let has_lang_opt = dx.contains("js/ts") || dx.contains("py") || dx.contains("rs");
@@ -165,7 +171,11 @@ react = "^18.0.0"
             }
         }
 
-        println!("\nOptimizations applied: {}/{}", applied, optimizations.len());
+        println!(
+            "\nOptimizations applied: {}/{}",
+            applied,
+            optimizations.len()
+        );
         assert!(applied >= 8, "Should apply at least 8 optimizations");
 
         let compression = ((json.len() - dx.len()) as f64 / json.len() as f64) * 100.0;

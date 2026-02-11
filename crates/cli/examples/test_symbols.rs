@@ -9,10 +9,10 @@ fn main() -> io::Result<()> {
     println!("WT_SESSION: {:?}", std::env::var("WT_SESSION"));
     println!("ConEmuPID: {:?}", std::env::var("ConEmuPID"));
     println!("Windows: {}", cfg!(windows));
-    
+
     println!("\n=== Symbol Set ===");
     println!("Using Unicode symbols on all platforms");
-    
+
     println!("\n=== Symbol Preview ===");
     println!("Step Active: ◆");
     println!("Step Submit: ◇");
@@ -24,7 +24,7 @@ fn main() -> io::Result<()> {
     println!("Checkbox Active: ◻");
     println!("Checkbox Selected: ◼");
     println!("Password Mask: •");
-    
+
     println!("\n=== Example Prompt (OpenClaw Style) ===");
     println!("┌  OpenClaw onboarding");
     println!("│◇  Security ──────────────────────────────────────────────────────────────────────────────╮");
@@ -40,6 +40,6 @@ fn main() -> io::Result<()> {
     println!("│  ○ Google (Gemini) Fast and cost-effective");
     println!("│  ○ Ollama (Local models) Run models locally for privacy");
     println!("│◇  Selected 2 provider(s): google, ollama");
-    
+
     Ok(())
 }

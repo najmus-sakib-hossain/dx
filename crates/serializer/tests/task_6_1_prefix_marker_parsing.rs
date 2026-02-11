@@ -13,7 +13,11 @@ fn test_single_prefix_marker() {
     let result = LlmParser::parse(input);
 
     // Should parse successfully (prefix markers are parsed but not yet applied)
-    assert!(result.is_ok(), "Failed to parse single prefix marker: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Failed to parse single prefix marker: {:?}",
+        result.err()
+    );
 }
 
 #[test]
@@ -22,7 +26,11 @@ fn test_multiple_prefix_markers() {
     let input = "table:2(id name)@/api/ @v1/[1 Alice, 2 Bob]";
     let result = LlmParser::parse(input);
 
-    assert!(result.is_ok(), "Failed to parse multiple prefix markers: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Failed to parse multiple prefix markers: {:?}",
+        result.err()
+    );
 }
 
 #[test]
@@ -31,7 +39,11 @@ fn test_suffix_marker() {
     let input = "table:2(id email)@@example.com[1 alice, 2 bob]";
     let result = LlmParser::parse(input);
 
-    assert!(result.is_ok(), "Failed to parse suffix marker: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Failed to parse suffix marker: {:?}",
+        result.err()
+    );
 }
 
 #[test]
@@ -53,7 +65,11 @@ fn test_prefix_markers_with_spaces() {
     let input = "table:2(id name)@/api/  @v1/  [1 Alice, 2 Bob]";
     let result = LlmParser::parse(input);
 
-    assert!(result.is_ok(), "Failed to parse prefix markers with spaces: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Failed to parse prefix markers with spaces: {:?}",
+        result.err()
+    );
 }
 
 #[test]
@@ -91,7 +107,11 @@ fn test_empty_prefix_marker() {
     let result = LlmParser::parse(input);
 
     // Should parse - empty prefix is ignored
-    assert!(result.is_ok(), "Failed to parse empty prefix marker: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Failed to parse empty prefix marker: {:?}",
+        result.err()
+    );
 }
 
 #[test]
@@ -100,7 +120,11 @@ fn test_prefix_marker_with_special_chars() {
     let input = "table:2(id path)@/api/v1/users/[1 alice, 2 bob]";
     let result = LlmParser::parse(input);
 
-    assert!(result.is_ok(), "Failed to parse prefix with special chars: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Failed to parse prefix with special chars: {:?}",
+        result.err()
+    );
 }
 
 #[test]
@@ -109,5 +133,9 @@ fn test_suffix_marker_with_domain() {
     let input = "table:2(id email)@@.example.com[1 alice, 2 bob]";
     let result = LlmParser::parse(input);
 
-    assert!(result.is_ok(), "Failed to parse suffix with domain: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Failed to parse suffix with domain: {:?}",
+        result.err()
+    );
 }

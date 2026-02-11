@@ -9,7 +9,7 @@
 //!
 //! Run with: `cargo run --example json_conversion`
 
-use serializer::{DxDocument, DxLlmValue, deserialize, serialize};
+use serializer::{deserialize, serialize, DxDocument, DxLlmValue};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("=== DX Serializer: JSON to DX Conversion ===\n");
@@ -21,12 +21,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Create a document representing JSON-like data
     let mut doc = DxDocument::new();
-    doc.context.insert("name".to_string(), DxLlmValue::Str("my-app".to_string()));
-    doc.context.insert("version".to_string(), DxLlmValue::Str("1.0.0".to_string()));
     doc.context
-        .insert("description".to_string(), DxLlmValue::Str("A sample application".to_string()));
+        .insert("name".to_string(), DxLlmValue::Str("my-app".to_string()));
     doc.context
-        .insert("author".to_string(), DxLlmValue::Str("Developer".to_string()));
+        .insert("version".to_string(), DxLlmValue::Str("1.0.0".to_string()));
+    doc.context.insert(
+        "description".to_string(),
+        DxLlmValue::Str("A sample application".to_string()),
+    );
+    doc.context.insert(
+        "author".to_string(),
+        DxLlmValue::Str("Developer".to_string()),
+    );
 
     // Equivalent JSON would be:
     let json_equivalent = r#"{
@@ -53,11 +59,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("--- Example 2: Mixed Types ---\n");
 
     let mut doc = DxDocument::new();
-    doc.context.insert("name".to_string(), DxLlmValue::Str("test-app".to_string()));
-    doc.context.insert("count".to_string(), DxLlmValue::Num(42.0));
-    doc.context.insert("price".to_string(), DxLlmValue::Num(19.99));
-    doc.context.insert("active".to_string(), DxLlmValue::Bool(true));
-    doc.context.insert("deleted".to_string(), DxLlmValue::Bool(false));
+    doc.context
+        .insert("name".to_string(), DxLlmValue::Str("test-app".to_string()));
+    doc.context
+        .insert("count".to_string(), DxLlmValue::Num(42.0));
+    doc.context
+        .insert("price".to_string(), DxLlmValue::Num(19.99));
+    doc.context
+        .insert("active".to_string(), DxLlmValue::Bool(true));
+    doc.context
+        .insert("deleted".to_string(), DxLlmValue::Bool(false));
     doc.context.insert("metadata".to_string(), DxLlmValue::Null);
 
     let json_equivalent = r#"{
@@ -88,7 +99,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("--- Example 3: Arrays ---\n");
 
     let mut doc = DxDocument::new();
-    doc.context.insert("project".to_string(), DxLlmValue::Str("demo".to_string()));
+    doc.context
+        .insert("project".to_string(), DxLlmValue::Str("demo".to_string()));
     doc.context.insert(
         "tags".to_string(),
         DxLlmValue::Arr(vec![
@@ -124,8 +136,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     original
         .context
         .insert("version".to_string(), DxLlmValue::Str("2.0.0".to_string()));
-    original.context.insert("count".to_string(), DxLlmValue::Num(100.0));
-    original.context.insert("enabled".to_string(), DxLlmValue::Bool(true));
+    original
+        .context
+        .insert("count".to_string(), DxLlmValue::Num(100.0));
+    original
+        .context
+        .insert("enabled".to_string(), DxLlmValue::Bool(true));
 
     // Serialize
     let serialized = serialize(&original);
@@ -136,7 +152,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Parsed back: {} fields", parsed.context.len());
 
     // Verify
-    println!("Round-trip successful: {}\n", original.context.len() == parsed.context.len());
+    println!(
+        "Round-trip successful: {}\n",
+        original.context.len() == parsed.context.len()
+    );
 
     // =========================================================================
     // Example 5: Comparison summary
@@ -151,23 +170,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     large_doc
         .context
         .insert("version".to_string(), DxLlmValue::Str("3.0.0".to_string()));
-    large_doc
-        .context
-        .insert("description".to_string(), DxLlmValue::Str("A larger application".to_string()));
+    large_doc.context.insert(
+        "description".to_string(),
+        DxLlmValue::Str("A larger application".to_string()),
+    );
     large_doc
         .context
         .insert("author".to_string(), DxLlmValue::Str("Team".to_string()));
     large_doc
         .context
         .insert("license".to_string(), DxLlmValue::Str("MIT".to_string()));
+    large_doc.context.insert(
+        "repository".to_string(),
+        DxLlmValue::Str("github.com/example/app".to_string()),
+    );
+    large_doc.context.insert(
+        "homepage".to_string(),
+        DxLlmValue::Str("https://example.com".to_string()),
+    );
     large_doc
         .context
-        .insert("repository".to_string(), DxLlmValue::Str("github.com/example/app".to_string()));
+        .insert("private".to_string(), DxLlmValue::Bool(false));
     large_doc
         .context
-        .insert("homepage".to_string(), DxLlmValue::Str("https://example.com".to_string()));
-    large_doc.context.insert("private".to_string(), DxLlmValue::Bool(false));
-    large_doc.context.insert("stable".to_string(), DxLlmValue::Bool(true));
+        .insert("stable".to_string(), DxLlmValue::Bool(true));
 
     let large_json = r#"{
   "name": "large-app",

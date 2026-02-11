@@ -68,8 +68,8 @@ fn parse_expected_value(value_str: &str) -> DxLlmValue {
 
 /// Strategy to generate an inline object with nested arrays and simple fields
 /// Returns (section_name, nested_arrays, simple_fields)
-fn inline_object_with_nested_arrays()
--> impl Strategy<Value = (String, Vec<(String, Vec<String>)>, Vec<(String, String)>)> {
+fn inline_object_with_nested_arrays(
+) -> impl Strategy<Value = (String, Vec<(String, Vec<String>)>, Vec<(String, String)>)> {
     (
         valid_identifier(),
         prop::collection::vec(nested_array_field(), 1..=3),

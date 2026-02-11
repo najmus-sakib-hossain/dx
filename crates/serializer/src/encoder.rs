@@ -47,7 +47,7 @@ pub struct Encoder {
 }
 
 impl Encoder {
-    #[must_use] 
+    #[must_use]
     pub fn new(config: EncoderConfig) -> Self {
         Self {
             config,
@@ -57,7 +57,7 @@ impl Encoder {
         }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn with_defaults() -> Self {
         Self::new(EncoderConfig::default())
     }
@@ -71,7 +71,9 @@ impl Encoder {
 
     /// Encode to a writer
     pub fn encode_to_writer<W: Write>(&mut self, value: &DxValue, writer: &mut W) -> Result<()> {
-        if let DxValue::Object(obj) = value { self.encode_object(obj, writer, "") } else {
+        if let DxValue::Object(obj) = value {
+            self.encode_object(obj, writer, "")
+        } else {
             // Single value - wrap in object
             let mut obj = DxObject::new();
             obj.insert("value".to_string(), value.clone());
@@ -136,7 +138,8 @@ impl Encoder {
         let key_to_write = self
             .aliases
             .iter()
-            .find(|(_, v)| v.as_str() == key).map_or_else(|| key.to_string(), |(k, _)| format!("${k}"));
+            .find(|(_, v)| v.as_str() == key)
+            .map_or_else(|| key.to_string(), |(k, _)| format!("${k}"));
 
         match value {
             DxValue::Table(table) => {
@@ -368,7 +371,10 @@ mod tests {
         assert!(encoded_str.contains("age:30"));
         // active is aliased to $k0 because it's >= 6 chars
         // Check that either active! or $k0! is present (aliased form)
-        assert!(encoded_str.contains('!'), "Expected boolean true to be encoded with !");
+        assert!(
+            encoded_str.contains('!'),
+            "Expected boolean true to be encoded with !"
+        );
     }
 
     #[test]

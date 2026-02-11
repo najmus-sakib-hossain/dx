@@ -4,12 +4,12 @@
 //! advanced performance features through feature flags.
 
 // Re-export RKYV directly for zero-overhead performance
-pub use rkyv::Archive;
-pub use rkyv::Deserialize as RkyvDeserialize;
-pub use rkyv::Serialize as RkyvSerialize;
 pub use rkyv::access_unchecked;
 pub use rkyv::from_bytes;
 pub use rkyv::to_bytes;
+pub use rkyv::Archive;
+pub use rkyv::Deserialize as RkyvDeserialize;
+pub use rkyv::Serialize as RkyvSerialize;
 
 use crate::machine::DxMachineError;
 

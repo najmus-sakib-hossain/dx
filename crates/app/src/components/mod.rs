@@ -8,6 +8,9 @@
 //   - ui/ module: rich interactive components (Dialog, Tabs, Table, etc.)
 //   - All components accept &Theme for consistent theming
 
+// Components are a library — suppress dead_code until consumers are wired up.
+#![allow(dead_code)]
+
 // ── Core components ──
 pub mod avatar;
 pub mod badge;
@@ -31,12 +34,10 @@ pub mod ui;
 //   use crate::components::ui::{Dialog, Tabs, Table, ...};
 
 // Core primitives
-pub use avatar::{Avatar, AvatarGroup, AvatarSize};
+pub use avatar::{Avatar, AvatarSize};
 pub use badge::{Badge, BadgeVariant};
-pub use button::{Button, ButtonGroup, ButtonSize, ButtonVariant, IconButton};
-pub use card::{Card, CardHeader};
-pub use input::{Input, InputArea, Textarea};
-pub use label::{Kbd, Label};
-pub use separator::Separator;
-pub use sidebar::{Sidebar, SidebarItem, SidebarSection, SidebarThread};
-pub use titlebar::TitleBar;
+pub use button::{Button, ButtonSize};
+pub use card::Card;
+pub use input::InputArea;
+pub use label::Kbd;
+pub use sidebar::{Sidebar, SidebarItem, SidebarSection};

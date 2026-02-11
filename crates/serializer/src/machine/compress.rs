@@ -21,7 +21,7 @@ pub enum CompressionLevel {
 
 impl CompressionLevel {
     /// Convert to Zstd compression level (1-22)
-    #[must_use] 
+    #[must_use]
     pub fn to_zstd_level(self) -> i32 {
         match self {
             CompressionLevel::Fast => 1,    // Fastest
@@ -47,7 +47,7 @@ pub struct DxCompressed {
 
 impl DxCompressed {
     /// Create empty compressed buffer
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self {
             compressed: Vec::new(),
@@ -59,7 +59,7 @@ impl DxCompressed {
     /// Compress data using LZ4 (fast, pure Rust)
     ///
     /// LZ4 provides good compression with excellent speed (pure Rust, no C dependencies).
-    #[must_use] 
+    #[must_use]
     pub fn compress(data: &[u8]) -> Self {
         let original_size = data.len() as u32;
 
@@ -74,7 +74,7 @@ impl DxCompressed {
     }
 
     /// Compress with level hint
-    #[must_use] 
+    #[must_use]
     pub fn compress_level(data: &[u8], _level: CompressionLevel) -> Self {
         // LZ4 doesn't have compression levels in lz4_flex
         Self::compress(data)
@@ -82,21 +82,21 @@ impl DxCompressed {
 
     /// Get compressed size
     #[inline(always)]
-    #[must_use] 
+    #[must_use]
     pub fn compressed_size(&self) -> usize {
         self.compressed.len()
     }
 
     /// Get original (uncompressed) size
     #[inline(always)]
-    #[must_use] 
+    #[must_use]
     pub fn original_size(&self) -> usize {
         self.original_size as usize
     }
 
     /// Get compression ratio (compressed / original)
     #[inline(always)]
-    #[must_use] 
+    #[must_use]
     pub fn ratio(&self) -> f64 {
         if self.original_size == 0 {
             return 1.0;
@@ -106,14 +106,14 @@ impl DxCompressed {
 
     /// Get space savings (1.0 - ratio)
     #[inline(always)]
-    #[must_use] 
+    #[must_use]
     pub fn savings(&self) -> f64 {
         1.0 - self.ratio()
     }
 
     /// Get compressed bytes
     #[inline(always)]
-    #[must_use] 
+    #[must_use]
     pub fn as_compressed(&self) -> &[u8] {
         &self.compressed
     }
@@ -141,7 +141,7 @@ impl DxCompressed {
 
     /// Check if already decompressed (cached)
     #[inline(always)]
-    #[must_use] 
+    #[must_use]
     pub fn is_cached(&self) -> bool {
         self.decompressed.is_some()
     }
@@ -152,7 +152,7 @@ impl DxCompressed {
     }
 
     /// Create from pre-compressed data
-    #[must_use] 
+    #[must_use]
     pub fn from_compressed(compressed: Vec<u8>, original_size: u32) -> Self {
         Self {
             compressed,
@@ -162,7 +162,7 @@ impl DxCompressed {
     }
 
     /// Serialize to wire format: `[original_size: u32][compressed_data...]`
-    #[must_use] 
+    #[must_use]
     pub fn to_wire(&self) -> Vec<u8> {
         let mut wire = Vec::with_capacity(4 + self.compressed.len());
         wire.extend_from_slice(&self.original_size.to_le_bytes());
@@ -220,7 +220,9 @@ pub(crate) fn lz4_decompress_fast(input: &[u8]) -> Result<Vec<u8>> {
 fn lz4_decompress_fast(input: &[u8]) -> Result<Vec<u8>> {
     // Fallback to simple RLE decompression
     if input.len() < 4 {
-        return Err(DxMachineError::DecompressionFailed("Input too short".into()));
+        return Err(DxMachineError::DecompressionFailed(
+            "Input too short".into(),
+        ));
     }
     let size = u32::from_le_bytes([input[0], input[1], input[2], input[3]]) as usize;
     lz4_decompress(&input[4..], size)
@@ -253,7 +255,9 @@ fn zstd_decompress(input: &[u8]) -> Result<Vec<u8>> {
     // Fallback to LZ4 if zstd not enabled
     // Assume original size is stored in first 4 bytes
     if input.len() < 4 {
-        return Err(DxMachineError::DecompressionFailed("Input too short".into()));
+        return Err(DxMachineError::DecompressionFailed(
+            "Input too short".into(),
+        ));
     }
     let size = u32::from_le_bytes([input[0], input[1], input[2], input[3]]) as usize;
     lz4_decompress(&input[4..], size)
@@ -344,7 +348,9 @@ fn lz4_decompress(input: &[u8], expected_size: usize) -> Result<Vec<u8>> {
             // Literal sequence
             let lit_len = marker as usize;
             if i + lit_len > input.len() {
-                return Err(DxMachineError::InvalidData("Truncated literal sequence".into()));
+                return Err(DxMachineError::InvalidData(
+                    "Truncated literal sequence".into(),
+                ));
             }
             output.extend_from_slice(&input[i..i + lit_len]);
             i += lit_len;
@@ -369,7 +375,7 @@ impl StreamCompressor {
     ///
     /// # Arguments
     /// * `chunk_size` - Size of each chunk (default 64KB)
-    #[must_use] 
+    #[must_use]
     pub fn new(chunk_size: usize) -> Self {
         Self {
             chunk_size,
@@ -379,7 +385,7 @@ impl StreamCompressor {
     }
 
     /// Default chunk size (64KB)
-    #[must_use] 
+    #[must_use]
     pub fn default_chunk() -> Self {
         Self::new(64 * 1024)
     }
@@ -411,22 +417,26 @@ impl StreamCompressor {
     }
 
     /// Finish compression and get all chunks
-    #[must_use] 
+    #[must_use]
     pub fn finish(mut self) -> Vec<DxCompressed> {
         self.flush_chunk();
         self.chunks
     }
 
     /// Get current number of chunks
-    #[must_use] 
+    #[must_use]
     pub fn chunk_count(&self) -> usize {
         self.chunks.len()
     }
 
     /// Get total compressed size
-    #[must_use] 
+    #[must_use]
     pub fn total_compressed_size(&self) -> usize {
-        self.chunks.iter().map(DxCompressed::compressed_size).sum::<usize>() + self.buffer.len()
+        self.chunks
+            .iter()
+            .map(DxCompressed::compressed_size)
+            .sum::<usize>()
+            + self.buffer.len()
         // Current uncompressed buffer
     }
 }
@@ -440,7 +450,7 @@ pub struct StreamDecompressor {
 
 impl StreamDecompressor {
     /// Create from compressed chunks
-    #[must_use] 
+    #[must_use]
     pub fn new(chunks: Vec<DxCompressed>) -> Self {
         Self {
             chunks,

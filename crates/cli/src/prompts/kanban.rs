@@ -63,12 +63,12 @@ impl KanbanBoard {
                     None
                 }
             };
-            
+
             if let Some(task) = task {
                 if let Some((_, next_tasks)) = self.columns.get_mut(self.current_column + 1) {
                     next_tasks.push(task);
                 }
-                
+
                 if let Some((_, tasks)) = self.columns.get(self.current_column) {
                     if self.cursor >= tasks.len() && self.cursor > 0 {
                         self.cursor -= 1;
@@ -91,12 +91,12 @@ impl KanbanBoard {
                     None
                 }
             };
-            
+
             if let Some(task) = task {
                 if let Some((_, prev_tasks)) = self.columns.get_mut(self.current_column - 1) {
                     prev_tasks.push(task);
                 }
-                
+
                 if let Some((_, tasks)) = self.columns.get(self.current_column) {
                     if self.cursor >= tasks.len() && self.cursor > 0 {
                         self.cursor -= 1;
@@ -172,7 +172,9 @@ impl PromptInteraction for KanbanBoard {
                 term.write_line(&format!("{}", bar))?;
                 lines += 1;
 
-                let column_names: Vec<String> = self.columns.iter()
+                let column_names: Vec<String> = self
+                    .columns
+                    .iter()
                     .enumerate()
                     .map(|(i, (name, tasks))| {
                         let display = format!("{} ({})", name, tasks.len());
@@ -201,7 +203,7 @@ impl PromptInteraction for KanbanBoard {
                             } else {
                                 task.title.clone()
                             };
-                            
+
                             term.write_line(&format!("{}  {} 📋 {}", bar, marker, title))?;
                             lines += 1;
 
@@ -216,7 +218,11 @@ impl PromptInteraction for KanbanBoard {
                         }
 
                         if tasks.len() > 6 {
-                            term.write_line(&format!("{}  {}", bar, theme.dim.apply_to(format!("... {} more", tasks.len() - 6))))?;
+                            term.write_line(&format!(
+                                "{}  {}",
+                                bar,
+                                theme.dim.apply_to(format!("... {} more", tasks.len() - 6))
+                            ))?;
                             lines += 1;
                         }
                     }
@@ -228,7 +234,9 @@ impl PromptInteraction for KanbanBoard {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("Tab: column, ↑↓: task, ← →: move task, Enter: done")
+                    theme
+                        .dim
+                        .apply_to("Tab: column, ↑↓: task, ← →: move task, Enter: done")
                 ))?;
                 lines += 1;
             }
@@ -239,7 +247,11 @@ impl PromptInteraction for KanbanBoard {
                     "{} {}  {}",
                     checkmark,
                     self.message,
-                    theme.dim.apply_to(format!("{} tasks across {} columns", total_tasks, self.columns.len()))
+                    theme.dim.apply_to(format!(
+                        "{} tasks across {} columns",
+                        total_tasks,
+                        self.columns.len()
+                    ))
                 ))?;
                 lines += 1;
                 term.write_line(&format!("{}", theme.dim.apply_to(symbols.bar)))?;

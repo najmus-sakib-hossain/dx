@@ -27,7 +27,7 @@ pub struct ZeroCopyMachine {
 }
 
 impl ZeroCopyMachine {
-    #[must_use] 
+    #[must_use]
     pub fn from_document(doc: &DxDocument) -> Self {
         let mut data = Vec::new();
 
@@ -100,7 +100,7 @@ impl ZeroCopyMachine {
         Self { data }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn as_bytes(&self) -> &[u8] {
         &self.data
     }
@@ -323,6 +323,8 @@ fn read_value(
             Ok(DxLlmValue::Bool(b))
         }
         3 => Ok(DxLlmValue::Null),
-        _ => Err(ZeroCopyError::InvalidData(format!("Unknown type tag: {type_tag}"))),
+        _ => Err(ZeroCopyError::InvalidData(format!(
+            "Unknown type tag: {type_tag}"
+        ))),
     }
 }

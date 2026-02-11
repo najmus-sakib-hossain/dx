@@ -323,7 +323,10 @@ mod unit_tests {
 
         assert_eq!(doc.sections.len(), 1);
         let section = doc.sections.values().next().unwrap();
-        assert_eq!(section.schema, vec!["id", "name", "email", "age", "city", "country", "status"]);
+        assert_eq!(
+            section.schema,
+            vec!["id", "name", "email", "age", "city", "country", "status"]
+        );
         assert_eq!(section.rows.len(), 2);
     }
 

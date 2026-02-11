@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 
 // ─── Table ──────────────────────────────────────────────────────────────────
 // A shadcn-ui style Table component for displaying tabular data.
@@ -34,7 +34,8 @@ impl Table {
     }
 
     pub fn row(mut self, cells: Vec<impl Into<String>>) -> Self {
-        self.rows.push(cells.into_iter().map(|c| c.into()).collect());
+        self.rows
+            .push(cells.into_iter().map(|c| c.into()).collect());
         self
     }
 
@@ -62,11 +63,7 @@ impl Table {
 
         // Header
         if !self.headers.is_empty() {
-            let mut header_row = div()
-                .flex()
-                .items_center()
-                .w_full()
-                .bg(theme.muted);
+            let mut header_row = div().flex().items_center().w_full().bg(theme.muted);
 
             for header in &self.headers {
                 header_row = header_row.child(
@@ -74,7 +71,7 @@ impl Table {
                         .flex_1()
                         .px(px(16.0))
                         .py(px(12.0))
-                        .font_size(px(12.0))
+                        .text_size(px(12.0))
                         .font_weight(gpui::FontWeight::MEDIUM)
                         .text_color(theme.muted_foreground)
                         .child(header.clone()),
@@ -108,7 +105,7 @@ impl Table {
                         .flex_1()
                         .px(px(16.0))
                         .py(px(12.0))
-                        .font_size(px(14.0))
+                        .text_size(px(14.0))
                         .text_color(theme.foreground)
                         .child(cell.clone()),
                 );
@@ -124,7 +121,7 @@ impl Table {
         if let Some(caption) = self.caption {
             container = container.child(
                 div()
-                    .font_size(px(12.0))
+                    .text_size(px(12.0))
                     .text_color(theme.muted_foreground)
                     .text_center()
                     .child(caption),
@@ -167,7 +164,7 @@ impl DataTable {
                         div()
                             .w(px(140.0))
                             .flex_shrink_0()
-                            .font_size(px(14.0))
+                            .text_size(px(14.0))
                             .font_weight(gpui::FontWeight::MEDIUM)
                             .text_color(theme.muted_foreground)
                             .child(label),

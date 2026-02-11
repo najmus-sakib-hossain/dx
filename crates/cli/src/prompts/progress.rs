@@ -69,7 +69,8 @@ impl ProgressBar {
         let symbol = theme.success.apply_to(symbols.step_submit);
         let msg = message.into();
 
-        self.term.write_line(&format!("{} {}", symbol, msg.bold()))?;
+        self.term
+            .write_line(&format!("{} {}", symbol, msg.bold()))?;
         self.term.show_cursor()?;
         self.last_render_lines = 1;
         Ok(())
@@ -84,7 +85,8 @@ impl ProgressBar {
         let symbol = theme.error.apply_to(symbols.step_active);
         let msg = message.into();
 
-        self.term.write_line(&format!("{} {}", symbol, theme.error.apply_to(msg)))?;
+        self.term
+            .write_line(&format!("{} {}", symbol, theme.error.apply_to(msg)))?;
         self.term.show_cursor()?;
         self.last_render_lines = 1;
         Ok(())
@@ -109,7 +111,8 @@ impl ProgressBar {
 
         // Title line
         let symbol = theme.primary.apply_to(symbols.step_active);
-        self.term.write_line(&format!("{} {}", symbol, self.message.bold()))?;
+        self.term
+            .write_line(&format!("{} {}", symbol, self.message.bold()))?;
         lines += 1;
 
         // Progress bar line

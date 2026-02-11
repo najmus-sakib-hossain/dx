@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 
 // ─── Sheet ──────────────────────────────────────────────────────────────────
 // A shadcn-ui style Sheet (slide-over panel).
@@ -94,45 +94,40 @@ impl Sheet {
         }
 
         // Header
-        let mut header = div()
-            .flex()
-            .flex_col()
-            .gap(px(6.0))
-            .p(px(24.0))
-            .child(
-                div()
-                    .flex()
-                    .items_center()
-                    .justify_between()
-                    .child(
-                        div()
-                            .font_size(px(18.0))
-                            .font_weight(gpui::FontWeight::SEMIBOLD)
-                            .text_color(theme.foreground)
-                            .child(self.title),
-                    )
-                    .child(
-                        div()
-                            .flex()
-                            .items_center()
-                            .justify_center()
-                            .size(px(24.0))
-                            .rounded(Radius::SM)
-                            .cursor_pointer()
-                            .hover(move |style| style.bg(theme.accent))
-                            .child(
-                                div()
-                                    .font_size(px(14.0))
-                                    .text_color(theme.muted_foreground)
-                                    .child("×"),
-                            ),
-                    ),
-            );
+        let mut header = div().flex().flex_col().gap(px(6.0)).p(px(24.0)).child(
+            div()
+                .flex()
+                .items_center()
+                .justify_between()
+                .child(
+                    div()
+                        .text_size(px(18.0))
+                        .font_weight(gpui::FontWeight::SEMIBOLD)
+                        .text_color(theme.foreground)
+                        .child(self.title),
+                )
+                .child(
+                    div()
+                        .flex()
+                        .items_center()
+                        .justify_center()
+                        .size(px(24.0))
+                        .rounded(Radius::SM)
+                        .cursor_pointer()
+                        .hover(move |style| style.bg(theme.accent))
+                        .child(
+                            div()
+                                .text_size(px(14.0))
+                                .text_color(theme.muted_foreground)
+                                .child("×"),
+                        ),
+                ),
+        );
 
         if let Some(desc) = self.description {
             header = header.child(
                 div()
-                    .font_size(px(14.0))
+                    .text_size(px(14.0))
                     .text_color(theme.muted_foreground)
                     .child(desc),
             );
@@ -142,11 +137,7 @@ impl Sheet {
 
         // Content
         if !self.children.is_empty() {
-            let mut content = div()
-                .flex_1()
-                .p(px(24.0))
-                .pt(px(0.0))
-                .overflow_y_scroll();
+            let mut content = div().flex_1().p(px(24.0)).pt(px(0.0)).overflow_y_hidden();
 
             for child in self.children {
                 content = content.child(child);
@@ -210,14 +201,14 @@ impl ScrollArea {
     }
 
     pub fn render(self) -> impl IntoElement {
-        let mut container = div().flex().flex_col().overflow_y_scroll();
+        let mut container = div().flex().flex_col().overflow_y_hidden();
 
         if let Some(mh) = self.max_height {
             container = container.max_h(mh);
         }
 
         if self.horizontal {
-            container = container.overflow_x_scroll();
+            container = container.overflow_x_hidden();
         }
 
         for child in self.children {
@@ -285,20 +276,26 @@ impl Collapsible {
 
         if let Some(icon) = self.icon {
             left = left.child(
-                div().font_size(px(14.0)).text_color(theme.muted_foreground).child(icon),
+                div()
+                    .text_size(px(14.0))
+                    .text_color(theme.muted_foreground)
+                    .child(icon),
             );
         }
 
         left = left.child(
             div()
-                .font_size(px(14.0))
+                .text_size(px(14.0))
                 .font_weight(gpui::FontWeight::MEDIUM)
                 .text_color(theme.foreground)
                 .child(self.title),
         );
 
         trigger = trigger.child(left).child(
-            div().font_size(px(10.0)).text_color(theme.muted_foreground).child(chevron),
+            div()
+                .text_size(px(10.0))
+                .text_color(theme.muted_foreground)
+                .child(chevron),
         );
 
         container = container.child(trigger);

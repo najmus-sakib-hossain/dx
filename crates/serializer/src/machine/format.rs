@@ -17,7 +17,7 @@ pub enum DxFormat {
 
 /// Detect format from magic bytes
 #[inline]
-#[must_use] 
+#[must_use]
 pub fn detect_format(bytes: &[u8]) -> DxFormat {
     if bytes.len() < 2 {
         return DxFormat::Unknown;
@@ -64,7 +64,7 @@ pub enum FormatMode {
 
 impl FormatMode {
     /// Parse from string
-    #[must_use] 
+    #[must_use]
     pub fn from_str(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "zero" | "binary" => Some(Self::Zero),
@@ -75,7 +75,7 @@ impl FormatMode {
     }
 
     /// Get format name
-    #[must_use] 
+    #[must_use]
     pub fn name(&self) -> &'static str {
         match self {
             Self::Zero => "zero",

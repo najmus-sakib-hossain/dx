@@ -6,7 +6,7 @@
 ///
 /// Shows that DX can convert:
 /// Machine → Human → Machine (lossless)
-use serializer::{Mappings, format_machine};
+use serializer::{format_machine, Mappings};
 
 fn main() {
     println!("╔════════════════════════════════════════════════════════════╗");
@@ -47,7 +47,10 @@ python                 cpython  django
 "#;
 
     println!("{}", human_format);
-    println!("Display size: {} bytes (virtual, not saved)\n", human_format.len());
+    println!(
+        "Display size: {} bytes (virtual, not saved)\n",
+        human_format.len()
+    );
 
     // Convert back to machine format
     println!("🔄 STEP 3: Convert Back to Machine Format (On Save)");

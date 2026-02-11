@@ -40,10 +40,9 @@ impl JsonEditor {
     }
 
     fn format_json(&self) -> Result<String, String> {
-        let value: serde_json::Value = serde_json::from_str(&self.content)
-            .map_err(|e| format!("Parse error: {}", e))?;
-        serde_json::to_string_pretty(&value)
-            .map_err(|e| format!("Format error: {}", e))
+        let value: serde_json::Value =
+            serde_json::from_str(&self.content).map_err(|e| format!("Parse error: {}", e))?;
+        serde_json::to_string_pretty(&value).map_err(|e| format!("Format error: {}", e))
     }
 
     fn render_content(&self) -> Vec<String> {
@@ -65,12 +64,10 @@ impl PromptInteraction for JsonEditor {
     fn on(&mut self, event: Event) {
         match event {
             Event::Key(key) => match key {
-                console::Key::Enter if self.content.contains('\n') => {
-                    match self.validate_json() {
-                        Ok(_) => self.state = State::Submit,
-                        Err(msg) => self.error_message = Some(msg),
-                    }
-                }
+                console::Key::Enter if self.content.contains('\n') => match self.validate_json() {
+                    Ok(_) => self.state = State::Submit,
+                    Err(msg) => self.error_message = Some(msg),
+                },
                 console::Key::Enter => {
                     self.content.insert(self.cursor_pos, '\n');
                     self.cursor_pos += 1;
@@ -148,14 +145,20 @@ impl PromptInteraction for JsonEditor {
                     term.write_line(&format!("{}  {}", bar, theme.error.apply_to(error)))?;
                     lines += 1;
                 } else if let Ok(_) = self.validate_json() {
-                    term.write_line(&format!("{}  {}", bar, theme.success.apply_to("✓ Valid JSON")))?;
+                    term.write_line(&format!(
+                        "{}  {}",
+                        bar,
+                        theme.success.apply_to("✓ Valid JSON")
+                    ))?;
                     lines += 1;
                 }
 
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("Type to edit, Enter: submit (multi-line), Esc: cancel")
+                    theme
+                        .dim
+                        .apply_to("Type to edit, Enter: submit (multi-line), Esc: cancel")
                 ))?;
                 lines += 1;
             }

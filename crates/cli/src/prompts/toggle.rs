@@ -137,7 +137,9 @@ impl PromptInteraction for Toggle {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("Use Space/Tab to toggle, Enter to confirm")
+                    theme
+                        .dim
+                        .apply_to("Use Space/Tab to toggle, Enter to confirm")
                 ))?;
                 lines += 1;
             }

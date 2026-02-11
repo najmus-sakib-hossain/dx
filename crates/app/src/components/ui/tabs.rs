@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 
 // ─── Tabs ───────────────────────────────────────────────────────────────────
 // A shadcn-ui style Tabs component.
@@ -70,6 +70,7 @@ impl Tabs {
     pub fn render(self, theme: &Theme) -> impl IntoElement {
         let active = self
             .active_value
+            .clone()
             .or_else(|| self.tabs.first().map(|t| t.value.clone()));
 
         let mut container = div().flex().flex_col().gap(px(8.0));
@@ -123,7 +124,7 @@ impl Tabs {
             .px(px(12.0))
             .rounded(Radius::DEFAULT)
             .bg(bg)
-            .font_size(px(14.0))
+            .text_size(px(14.0))
             .font_weight(gpui::FontWeight::MEDIUM)
             .text_color(text_color)
             .cursor_pointer()
@@ -184,17 +185,17 @@ impl Accordion {
 
     pub fn render(self, theme: &Theme) -> impl IntoElement {
         let mut container = div().flex().flex_col().w_full();
+        let open_items = self.open_items.clone();
 
         for item in self.items {
-            let is_open = self.open_items.contains(&item.value);
-            container = container.child(self.render_accordion_item(&item, is_open, theme));
+            let is_open = open_items.contains(&item.value);
+            container = container.child(Self::render_accordion_item_static(&item, is_open, theme));
         }
 
         container
     }
 
-    fn render_accordion_item(
-        &self,
+    fn render_accordion_item_static(
         item: &AccordionItem,
         is_open: bool,
         theme: &Theme,
@@ -218,14 +219,14 @@ impl Accordion {
                 .hover(move |style| style.opacity(0.8))
                 .child(
                     div()
-                        .font_size(px(14.0))
+                        .text_size(px(14.0))
                         .font_weight(gpui::FontWeight::MEDIUM)
                         .text_color(theme.foreground)
                         .child(item.trigger.clone()),
                 )
                 .child(
                     div()
-                        .font_size(px(10.0))
+                        .text_size(px(10.0))
                         .text_color(theme.muted_foreground)
                         .child(chevron),
                 ),
@@ -236,7 +237,7 @@ impl Accordion {
             el = el.child(
                 div()
                     .pb(px(16.0))
-                    .font_size(px(14.0))
+                    .text_size(px(14.0))
                     .text_color(theme.muted_foreground)
                     .child(item.content.clone()),
             );

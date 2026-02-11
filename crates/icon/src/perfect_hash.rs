@@ -16,29 +16,29 @@ impl PerfectHashIndex {
     pub fn build(metadata: &[IconMetadata]) -> Self {
         let table_size = (metadata.len() as f64 * 1.3) as usize; // 30% overhead
         let mut hash_table = vec![None; table_size];
-        
+
         // Find seed that produces no collisions
         let seed = Self::find_perfect_seed(metadata, table_size);
-        
+
         // Build collision-free hash table
         for (idx, icon) in metadata.iter().enumerate() {
             let hash = Self::hash_name(&icon.name.to_lowercase(), seed, table_size);
             hash_table[hash] = Some(idx as u32);
         }
-        
+
         Self {
             hash_table,
             seed,
             table_size,
         }
     }
-    
+
     /// Find a seed that produces no collisions
     fn find_perfect_seed(metadata: &[IconMetadata], table_size: usize) -> u64 {
         for seed in 0..10000 {
             let mut used = vec![false; table_size];
             let mut collision = false;
-            
+
             for icon in metadata {
                 let hash = Self::hash_name(&icon.name.to_lowercase(), seed, table_size);
                 if used[hash] {
@@ -47,16 +47,16 @@ impl PerfectHashIndex {
                 }
                 used[hash] = true;
             }
-            
+
             if !collision {
                 return seed;
             }
         }
-        
+
         // Fallback: use larger table
         0
     }
-    
+
     /// Hash function (FNV-1a variant)
     #[inline(always)]
     fn hash_name(name: &str, seed: u64, table_size: usize) -> usize {
@@ -67,7 +67,7 @@ impl PerfectHashIndex {
         }
         (hash as usize) % table_size
     }
-    
+
     /// O(1) exact match lookup
     #[inline(always)]
     pub fn lookup_exact(&self, query: &str) -> Option<u32> {
@@ -89,10 +89,10 @@ impl LowercaseCache {
             .iter()
             .map(|icon| icon.name.to_lowercase())
             .collect();
-        
+
         Self { lowercase_names }
     }
-    
+
     /// Get pre-computed lowercase name (zero allocation)
     #[inline(always)]
     pub fn get(&self, idx: usize) -> &str {
@@ -103,7 +103,7 @@ impl LowercaseCache {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_perfect_hash() {
         let icons = vec![
@@ -124,9 +124,9 @@ mod tests {
                 popularity: 1.0,
             },
         ];
-        
+
         let index = PerfectHashIndex::build(&icons);
-        
+
         assert_eq!(index.lookup_exact("home"), Some(0));
         assert_eq!(index.lookup_exact("arrow"), Some(1));
         assert_eq!(index.lookup_exact("notfound"), None);

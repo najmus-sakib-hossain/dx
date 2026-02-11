@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, IntoElement};
 
 // ─── Progress ───────────────────────────────────────────────────────────────
 // A shadcn-ui style Progress bar.
@@ -81,7 +81,7 @@ impl Progress {
         if self.show_label {
             container = container.child(
                 div()
-                    .font_size(px(12.0))
+                    .text_size(px(12.0))
                     .text_color(theme.muted_foreground)
                     .min_w(px(36.0))
                     .text_right()
@@ -165,14 +165,12 @@ impl Skeleton {
                 }
                 el.into_any_element()
             }
-            SkeletonVariant::Circle(size) => {
-                div()
-                    .size(px(size))
-                    .rounded(Radius::FULL)
-                    .bg(theme.muted)
-                    .flex_shrink_0()
-                    .into_any_element()
-            }
+            SkeletonVariant::Circle(size) => div()
+                .size(px(size))
+                .rounded(Radius::FULL)
+                .bg(theme.muted)
+                .flex_shrink_0()
+                .into_any_element(),
             SkeletonVariant::TextLines(count) => {
                 let mut container = div().flex().flex_col().gap(px(8.0)).w_full();
                 for i in 0..count {

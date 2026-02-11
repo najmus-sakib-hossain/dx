@@ -1,7 +1,7 @@
-use criterion::{Criterion, black_box, criterion_group, criterion_main};
-use rkyv::{Archive, Deserialize, Serialize, rancor::Error};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use rkyv::{rancor::Error, Archive, Deserialize, Serialize};
 use serializer::llm::{
-    DxDocument, DxLlmValue, DxSection, ZeroCopyMachine, document_to_machine, machine_to_document,
+    document_to_machine, machine_to_document, DxDocument, DxLlmValue, DxSection, ZeroCopyMachine,
 };
 use std::collections::HashMap;
 
@@ -29,9 +29,12 @@ fn create_test_document() -> DxDocument {
     let mut doc = DxDocument::new();
 
     // Add context
-    doc.context.insert("name".to_string(), DxLlmValue::Str("dx".to_string()));
-    doc.context.insert("version".to_string(), DxLlmValue::Str("0.0.1".to_string()));
-    doc.context.insert("port".to_string(), DxLlmValue::Num(8080.0));
+    doc.context
+        .insert("name".to_string(), DxLlmValue::Str("dx".to_string()));
+    doc.context
+        .insert("version".to_string(), DxLlmValue::Str("0.0.1".to_string()));
+    doc.context
+        .insert("port".to_string(), DxLlmValue::Num(8080.0));
 
     // Add section with 10 rows instead of 100
     let mut section = DxSection::new(vec!["id".to_string(), "name".to_string()]);
@@ -187,7 +190,10 @@ fn bench_size(_c: &mut Criterion) {
 
     println!("\n=== Size Comparison ===");
     println!("DX Machine (original): {} bytes", dx_machine.data.len());
-    println!("DX Machine (zerocopy): {} bytes", dx_zerocopy.as_bytes().len());
+    println!(
+        "DX Machine (zerocopy): {} bytes",
+        dx_zerocopy.as_bytes().len()
+    );
     println!("rkyv format:           {} bytes", rkyv_bytes.len());
 
     let zerocopy_vs_original = ((dx_zerocopy.as_bytes().len() as f64
@@ -211,5 +217,11 @@ fn bench_size(_c: &mut Criterion) {
     println!("======================\n");
 }
 
-criterion_group!(benches, bench_serialize, bench_deserialize, bench_roundtrip, bench_size);
+criterion_group!(
+    benches,
+    bench_serialize,
+    bench_deserialize,
+    bench_roundtrip,
+    bench_size
+);
 criterion_main!(benches);

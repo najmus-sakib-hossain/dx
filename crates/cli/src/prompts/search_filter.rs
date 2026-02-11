@@ -53,25 +53,26 @@ impl<T: Clone> SearchFilter<T> {
         if self.query.is_empty() {
             return true;
         }
-        
+
         let query_lower = self.query.to_lowercase();
         let label_lower = label.to_lowercase();
-        
+
         if label_lower.contains(&query_lower) {
             return true;
         }
-        
-        tags.iter().any(|tag| tag.to_lowercase().contains(&query_lower))
+
+        tags.iter()
+            .any(|tag| tag.to_lowercase().contains(&query_lower))
     }
 
     fn matches_filters(&self, tags: &[String]) -> bool {
         if self.active_filters.is_empty() {
             return true;
         }
-        
-        self.active_filters.iter().all(|filter| {
-            tags.iter().any(|tag| tag.eq_ignore_ascii_case(filter))
-        })
+
+        self.active_filters
+            .iter()
+            .all(|filter| tags.iter().any(|tag| tag.eq_ignore_ascii_case(filter)))
     }
 
     fn get_filtered_items(&self) -> Vec<(usize, &String)> {
@@ -125,12 +126,16 @@ impl<T: Clone> PromptInteraction for SearchFilter<T> {
                     self.query.push(c);
                     self.cursor = 0;
                 }
-                console::Key::ArrowUp | console::Key::Char('k') if self.mode == SearchMode::Search => {
+                console::Key::ArrowUp | console::Key::Char('k')
+                    if self.mode == SearchMode::Search =>
+                {
                     if self.cursor > 0 {
                         self.cursor -= 1;
                     }
                 }
-                console::Key::ArrowDown | console::Key::Char('j') if self.mode == SearchMode::Search => {
+                console::Key::ArrowDown | console::Key::Char('j')
+                    if self.mode == SearchMode::Search =>
+                {
                     let filtered = self.get_filtered_items();
                     if self.cursor < filtered.len().saturating_sub(1) {
                         self.cursor += 1;
@@ -142,12 +147,16 @@ impl<T: Clone> PromptInteraction for SearchFilter<T> {
                         self.toggle_filter(&filter);
                     }
                 }
-                console::Key::ArrowUp | console::Key::Char('k') if self.mode == SearchMode::Filter => {
+                console::Key::ArrowUp | console::Key::Char('k')
+                    if self.mode == SearchMode::Filter =>
+                {
                     if self.cursor > 0 {
                         self.cursor -= 1;
                     }
                 }
-                console::Key::ArrowDown | console::Key::Char('j') if self.mode == SearchMode::Filter => {
+                console::Key::ArrowDown | console::Key::Char('j')
+                    if self.mode == SearchMode::Filter =>
+                {
                     if self.cursor < self.available_filters.len().saturating_sub(1) {
                         self.cursor += 1;
                     }
@@ -205,7 +214,13 @@ impl<T: Clone> PromptInteraction for SearchFilter<T> {
                     }
 
                     if filtered.len() > 5 {
-                        term.write_line(&format!("{}  {}", bar, theme.dim.apply_to(format!("... {} more", filtered.len() - 5))))?;
+                        term.write_line(&format!(
+                            "{}  {}",
+                            bar,
+                            theme
+                                .dim
+                                .apply_to(format!("... {} more", filtered.len() - 5))
+                        ))?;
                         lines += 1;
                     }
                 } else {
@@ -240,7 +255,10 @@ impl<T: Clone> PromptInteraction for SearchFilter<T> {
             State::Submit => {
                 let checkmark = theme.success.apply_to("✓");
                 let filtered = self.get_filtered_items();
-                let selected = filtered.get(self.cursor).map(|(_, label)| label.as_str()).unwrap_or("");
+                let selected = filtered
+                    .get(self.cursor)
+                    .map(|(_, label)| label.as_str())
+                    .unwrap_or("");
                 term.write_line(&format!(
                     "{} {}  {}",
                     checkmark,
@@ -260,7 +278,8 @@ impl<T: Clone> PromptInteraction for SearchFilter<T> {
 
     fn value(&self) -> T {
         let filtered = self.get_filtered_items();
-        filtered.get(self.cursor)
+        filtered
+            .get(self.cursor)
             .and_then(|(idx, _)| self.items.get(*idx))
             .map(|(value, _, _)| value.clone())
             .expect("No item selected")

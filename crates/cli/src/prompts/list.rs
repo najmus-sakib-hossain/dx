@@ -76,7 +76,9 @@ impl PromptInteraction for ListEditor {
                 console::Key::Char('a') if self.mode == EditMode::View => {
                     self.mode = EditMode::Add;
                 }
-                console::Key::Char('d') if self.mode == EditMode::View && !self.items.is_empty() => {
+                console::Key::Char('d')
+                    if self.mode == EditMode::View && !self.items.is_empty() =>
+                {
                     self.items.remove(self.cursor);
                     if self.cursor >= self.items.len() && self.cursor > 0 {
                         self.cursor -= 1;

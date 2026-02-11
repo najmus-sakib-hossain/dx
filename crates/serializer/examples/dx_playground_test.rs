@@ -36,7 +36,10 @@ fn test_dx_json() {
             let json_tokens = estimate_tokens(&json_content);
 
             println!("✅ Loaded: {}", json_path);
-            println!("   JSON size: {} bytes, ~{} tokens", json_bytes, json_tokens);
+            println!(
+                "   JSON size: {} bytes, ~{} tokens",
+                json_bytes, json_tokens
+            );
 
             // Convert to Dx Serializer
             match json_to_dx(&json_content) {
@@ -69,7 +72,10 @@ fn test_dx_json() {
                     // Demonstrate it's LLM-friendly
                     println!("\n🤖 For LLMs:");
                     println!("   ✅ Text-based - No binary encoding issues");
-                    println!("   ✅ Token-efficient - {:.1}× better than JSON", token_ratio);
+                    println!(
+                        "   ✅ Token-efficient - {:.1}× better than JSON",
+                        token_ratio
+                    );
                     println!("   ✅ Context-friendly - Fit {:.1}× more data", token_ratio);
                     println!("   ✅ Parseable - LLMs can understand this format");
 
@@ -117,7 +123,10 @@ fn test_synthetic_data() {
             let dx_tokens = estimate_tokens(&dsr);
 
             println!("Dx Serializer: {} bytes, ~{} tokens", dx_bytes, dx_tokens);
-            println!("Efficiency: {:.1}× better", json_tokens as f64 / dx_tokens as f64);
+            println!(
+                "Efficiency: {:.1}× better",
+                json_tokens as f64 / dx_tokens as f64
+            );
             println!("\nOutput:\n{}", dsr);
         }
         Err(e) => println!("Error: {}", e),
@@ -163,7 +172,10 @@ fn estimate_tokens(text: &str) -> usize {
     // Rough estimate: average 1.33 tokens per word
     // More accurate would be to use a real tokenizer
     let words = text.split_whitespace().count();
-    let symbols = text.chars().filter(|c| !c.is_alphanumeric() && !c.is_whitespace()).count();
+    let symbols = text
+        .chars()
+        .filter(|c| !c.is_alphanumeric() && !c.is_whitespace())
+        .count();
     (words as f64 * 1.33) as usize + (symbols / 2)
 }
 

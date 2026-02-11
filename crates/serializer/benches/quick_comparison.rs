@@ -1,4 +1,4 @@
-use criterion::{Criterion, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 // Simple test data - just use Vec<u64> to avoid rkyv version conflicts
 fn create_data() -> Vec<u64> {

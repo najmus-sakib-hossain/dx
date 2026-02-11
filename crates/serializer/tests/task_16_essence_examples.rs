@@ -53,7 +53,11 @@ fn task_16_1_parse_all_essence_examples() {
         let content = match fs::read_to_string(file_path) {
             Ok(c) => c,
             Err(e) => {
-                failures.push(format!("{}: Failed to read file: {}", file_path.display(), e));
+                failures.push(format!(
+                    "{}: Failed to read file: {}",
+                    file_path.display(),
+                    e
+                ));
                 continue;
             }
         };
@@ -76,7 +80,10 @@ fn task_16_1_parse_all_essence_examples() {
         panic!("Some essence examples failed to parse");
     }
 
-    println!("\n✓ Successfully parsed all {} essence examples", files.len());
+    println!(
+        "\n✓ Successfully parsed all {} essence examples",
+        files.len()
+    );
 }
 
 /// Task 16.2: Write test to round-trip all essence examples
@@ -93,7 +100,11 @@ fn task_16_2_roundtrip_all_essence_examples() {
         let content = match fs::read_to_string(file_path) {
             Ok(c) => c,
             Err(e) => {
-                failures.push(format!("{}: Failed to read file: {}", file_path.display(), e));
+                failures.push(format!(
+                    "{}: Failed to read file: {}",
+                    file_path.display(),
+                    e
+                ));
                 continue;
             }
         };
@@ -102,7 +113,11 @@ fn task_16_2_roundtrip_all_essence_examples() {
         let doc1 = match LlmParser::parse(&content) {
             Ok(d) => d,
             Err(e) => {
-                failures.push(format!("{}: Initial parse failed: {}", file_path.display(), e));
+                failures.push(format!(
+                    "{}: Initial parse failed: {}",
+                    file_path.display(),
+                    e
+                ));
                 continue;
             }
         };
@@ -125,8 +140,10 @@ fn task_16_2_roundtrip_all_essence_examples() {
         if doc1 == doc2 {
             println!("✓ Round-trip: {}", file_path.display());
         } else {
-            failures
-                .push(format!("{}: Round-trip produced different document", file_path.display()));
+            failures.push(format!(
+                "{}: Round-trip produced different document",
+                file_path.display()
+            ));
             eprintln!("\nOriginal document:");
             eprintln!("{doc1:#?}");
             eprintln!("\nRound-tripped document:");
@@ -144,5 +161,8 @@ fn task_16_2_roundtrip_all_essence_examples() {
         panic!("Some essence examples failed to round-trip");
     }
 
-    println!("\n✓ Successfully round-tripped all {} essence examples", files.len());
+    println!(
+        "\n✓ Successfully round-tripped all {} essence examples",
+        files.len()
+    );
 }

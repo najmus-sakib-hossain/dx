@@ -622,8 +622,10 @@ mod tests {
         let mut section = DxSection::new(vec!["id".to_string(), "name".to_string()]);
 
         // Valid row
-        let result =
-            section.add_row(vec![DxLlmValue::Num(1.0), DxLlmValue::Str("Test".to_string())]);
+        let result = section.add_row(vec![
+            DxLlmValue::Num(1.0),
+            DxLlmValue::Str("Test".to_string()),
+        ]);
         assert!(result.is_ok());
         assert_eq!(section.row_count(), 1);
 

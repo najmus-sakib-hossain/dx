@@ -348,7 +348,10 @@ mod property_tests {
         // Verify error message is descriptive
         let msg = err.to_string();
         assert!(msg.contains("1001"), "Error should include depth");
-        assert!(msg.contains(&MAX_RECURSION_DEPTH.to_string()), "Error should include max");
+        assert!(
+            msg.contains(&MAX_RECURSION_DEPTH.to_string()),
+            "Error should include max"
+        );
     }
 
     #[test]
@@ -402,7 +405,8 @@ mod property_tests {
 
         // Add context values that reference them
         for i in 0..100 {
-            doc.context.insert(format!("key{i}"), DxLlmValue::Ref(format!("ref{i}")));
+            doc.context
+                .insert(format!("key{i}"), DxLlmValue::Ref(format!("ref{i}")));
         }
 
         // This should succeed (100 expansions is well under the 10,000 limit)
@@ -452,7 +456,10 @@ mod property_tests {
 
         match result.unwrap_err() {
             ParseError::Utf8Error { offset } => {
-                assert_eq!(offset, 0, "Offset should point to first invalid byte at position 0");
+                assert_eq!(
+                    offset, 0,
+                    "Offset should point to first invalid byte at position 0"
+                );
             }
             other => panic!("Expected Utf8Error, got {other:?}"),
         }
@@ -468,7 +475,10 @@ mod property_tests {
         assert!(result.is_err(), "Invalid UTF-8 at position 0 should error");
 
         if let DxError::Utf8Error { offset } = result.unwrap_err() {
-            assert_eq!(offset, 0, "Offset should point to first invalid byte at position 0");
+            assert_eq!(
+                offset, 0,
+                "Offset should point to first invalid byte at position 0"
+            );
         } else {
             // Machine parser may handle this differently (e.g., as invalid syntax)
             // The key is that it doesn't succeed with corrupted data
@@ -489,7 +499,10 @@ mod property_tests {
 
         match result.unwrap_err() {
             ParseError::Utf8Error { offset } => {
-                assert_eq!(offset, 5, "Offset should point to first invalid byte at position 5");
+                assert_eq!(
+                    offset, 5,
+                    "Offset should point to first invalid byte at position 5"
+                );
             }
             other => panic!("Expected Utf8Error, got {other:?}"),
         }
@@ -507,7 +520,10 @@ mod property_tests {
 
         match result.unwrap_err() {
             ParseError::Utf8Error { offset } => {
-                assert_eq!(offset, 5, "Offset should point to first invalid byte at position 5");
+                assert_eq!(
+                    offset, 5,
+                    "Offset should point to first invalid byte at position 5"
+                );
             }
             other => panic!("Expected Utf8Error, got {other:?}"),
         }
@@ -605,7 +621,10 @@ mod property_tests {
         // Position:     0     1     2     3     4     5
 
         let result = LlmParser::parse_bytes(&input);
-        assert!(result.is_err(), "Invalid continuation in 2-byte sequence should error");
+        assert!(
+            result.is_err(),
+            "Invalid continuation in 2-byte sequence should error"
+        );
 
         match result.unwrap_err() {
             ParseError::Utf8Error { offset } => {
@@ -632,7 +651,10 @@ mod property_tests {
 
         match result.unwrap_err() {
             ParseError::Utf8Error { offset } => {
-                assert_eq!(offset, 2, "Offset should point to overlong sequence at position 2");
+                assert_eq!(
+                    offset, 2,
+                    "Offset should point to overlong sequence at position 2"
+                );
             }
             other => panic!("Expected Utf8Error, got {other:?}"),
         }
@@ -651,7 +673,10 @@ mod property_tests {
 
         match result.unwrap_err() {
             ParseError::Utf8Error { offset } => {
-                assert_eq!(offset, 3, "Offset should point to surrogate sequence at position 3");
+                assert_eq!(
+                    offset, 3,
+                    "Offset should point to surrogate sequence at position 3"
+                );
             }
             other => panic!("Expected Utf8Error, got {other:?}"),
         }
@@ -746,7 +771,10 @@ mod property_tests {
 
         assert!(result.is_err());
         if let Err(DxError::Utf8Error { offset }) = result {
-            assert_eq!(offset, 0, "validate_utf8 should return offset 0 for invalid byte at start");
+            assert_eq!(
+                offset, 0,
+                "validate_utf8 should return offset 0 for invalid byte at start"
+            );
         } else {
             panic!("Expected Utf8Error");
         }
@@ -782,7 +810,7 @@ mod property_tests {
         use crate::utf8::validate_utf8;
 
         let input = &[b'T', b'e', b's', b't', 0xC2]; // Incomplete 2-byte at end
-        // Position:  0     1     2     3     4
+                                                     // Position:  0     1     2     3     4
         let result = validate_utf8(input);
 
         assert!(result.is_err());

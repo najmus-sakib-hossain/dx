@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 
 // ─── Card ───────────────────────────────────────────────────────────────────
 // A shadcn-ui style Card with header, content, and footer sections.
@@ -34,17 +34,14 @@ impl Card {
     pub fn simple(icon: impl Into<String>, text: impl Into<String>) -> Self {
         let icon_str = icon.into();
         let text_str = text.into();
-        Self::new()
-            .hoverable(true)
-            .clickable(true)
-            .with_child(
-                div()
-                    .flex()
-                    .flex_col()
-                    .gap(px(12.0))
-                    .child(div().text_2xl().child(icon_str))
-                    .child(div().text_sm().child(text_str)),
-            )
+        Self::new().hoverable(true).clickable(true).with_child(
+            div()
+                .flex()
+                .flex_col()
+                .gap(px(12.0))
+                .child(div().text_2xl().child(icon_str))
+                .child(div().text_sm().child(text_str)),
+        )
     }
 
     pub fn header(mut self, header: impl IntoElement) -> Self {
@@ -92,9 +89,15 @@ impl Card {
         }
 
         // Header
+        let has_header = self.header.is_some();
         if let Some(header) = self.header {
             card = card.child(
-                div().flex().flex_col().p(px(24.0)).pb(px(0.0)).child(header),
+                div()
+                    .flex()
+                    .flex_col()
+                    .p(px(24.0))
+                    .pb(px(0.0))
+                    .child(header),
             );
         }
 
@@ -102,7 +105,7 @@ impl Card {
         if !self.children.is_empty() {
             let mut content = div().p(px(24.0)).pt(px(0.0));
             // Add top padding if there's a header
-            if self.header.is_none() {
+            if !has_header {
                 content = content.pt(px(24.0));
             } else {
                 content = content.pt(px(8.0));
@@ -155,14 +158,14 @@ impl CardHeader {
                 .text_base()
                 .font_weight(gpui::FontWeight::SEMIBOLD)
                 .text_color(theme.card_foreground)
-                .leading(px(28.0))
+                .line_height(px(28.0))
                 .child(self.title),
         );
 
         if let Some(desc) = self.description {
             header = header.child(
                 div()
-                    .font_size(px(14.0))
+                    .text_size(px(14.0))
                     .text_color(theme.muted_foreground)
                     .child(desc),
             );

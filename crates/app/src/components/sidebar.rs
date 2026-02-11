@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, AnyElement, IntoElement};
 
 // ─── Sidebar ────────────────────────────────────────────────────────────────
 // A shadcn-ui style Sidebar with header, sections, items, and footer.
@@ -97,7 +97,7 @@ impl Sidebar {
             .flex()
             .flex_col()
             .flex_1()
-            .overflow_y_scroll()
+            .overflow_y_hidden()
             .py(px(4.0));
 
         for section in self.sections {
@@ -182,7 +182,7 @@ impl SidebarItem {
         // Icon
         item = item.child(
             div()
-                .font_size(px(14.0))
+                .text_size(px(14.0))
                 .text_color(text_color)
                 .flex_shrink_0()
                 .child(self.icon),
@@ -192,7 +192,7 @@ impl SidebarItem {
             item = item.child(
                 div()
                     .flex_1()
-                    .font_size(px(14.0))
+                    .text_size(px(14.0))
                     .text_color(text_color)
                     .child(self.text),
             );
@@ -204,7 +204,7 @@ impl SidebarItem {
                         .py(px(1.0))
                         .rounded(Radius::FULL)
                         .bg(theme.sidebar_primary)
-                        .font_size(px(10.0))
+                        .text_size(px(10.0))
                         .text_color(theme.sidebar_primary_foreground)
                         .child(badge),
                 );
@@ -253,9 +253,8 @@ impl SidebarSection {
     /// Backwards-compatible: add multiple threads at once
     pub fn threads(mut self, threads: Vec<(&str, &str)>) -> Self {
         for (text, time) in threads {
-            self.items.push(SidebarSectionEntry::Thread(
-                SidebarThread::new(text, time),
-            ));
+            self.items
+                .push(SidebarSectionEntry::Thread(SidebarThread::new(text, time)));
         }
         self
     }
@@ -275,7 +274,7 @@ impl SidebarSection {
                         .py(px(4.0))
                         .child(
                             div()
-                                .font_size(px(11.0))
+                                .text_size(px(11.0))
                                 .font_weight(gpui::FontWeight::MEDIUM)
                                 .text_color(theme.muted_foreground)
                                 .child(title.clone()),
@@ -290,13 +289,11 @@ impl SidebarSection {
         for entry in self.items {
             match entry {
                 SidebarSectionEntry::Item(item) => {
-                    items_container =
-                        items_container.child(item.render(theme, collapsed));
+                    items_container = items_container.child(item.render(theme, collapsed));
                 }
                 SidebarSectionEntry::Thread(thread) => {
                     if !collapsed {
-                        items_container =
-                            items_container.child(thread.render(theme));
+                        items_container = items_container.child(thread.render(theme));
                     }
                 }
             }
@@ -337,14 +334,14 @@ impl SidebarThread {
             .child(
                 div()
                     .flex_1()
-                    .font_size(px(13.0))
+                    .text_size(px(13.0))
                     .text_color(theme.sidebar_foreground)
                     .overflow_x_hidden()
                     .child(self.text),
             )
             .child(
                 div()
-                    .font_size(px(11.0))
+                    .text_size(px(11.0))
                     .text_color(theme.muted_foreground)
                     .flex_shrink_0()
                     .ml(px(8.0))

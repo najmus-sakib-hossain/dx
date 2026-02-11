@@ -23,10 +23,8 @@ impl SvgIcon {
                 if let Ok(r) = u8::from_str_radix(&color_hex[0..2], 16) {
                     if let Ok(g) = u8::from_str_radix(&color_hex[2..4], 16) {
                         if let Ok(b) = u8::from_str_radix(&color_hex[4..6], 16) {
-                            return gpui::rgb(
-                                ((r as u32) << 16) | ((g as u32) << 8) | (b as u32),
-                            )
-                            .into();
+                            return gpui::rgb(((r as u32) << 16) | ((g as u32) << 8) | (b as u32))
+                                .into();
                         }
                     }
                 }
@@ -39,7 +37,7 @@ impl SvgIcon {
 
     pub fn render(self) -> impl IntoElement {
         let color = self.extract_color();
-        
+
         // For now, render a colored circle that represents the icon
         // This is a limitation of GPUI - it doesn't support dynamic SVG rendering
         div()

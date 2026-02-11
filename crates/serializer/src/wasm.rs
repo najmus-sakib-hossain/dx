@@ -83,21 +83,21 @@ pub struct TransformResult {
 impl TransformResult {
     /// Whether the transformation succeeded
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn success(&self) -> bool {
         self.success
     }
 
     /// The transformed content (empty if failed)
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn content(&self) -> String {
         self.content.clone()
     }
 
     /// Error message if transformation failed
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn error(&self) -> Option<String> {
         self.error.clone()
     }
@@ -105,7 +105,7 @@ impl TransformResult {
 
 impl TransformResult {
     /// Create a successful result
-    #[must_use] 
+    #[must_use]
     pub fn ok(content: String) -> Self {
         Self {
             success: true,
@@ -115,7 +115,7 @@ impl TransformResult {
     }
 
     /// Create a failed result
-    #[must_use] 
+    #[must_use]
     pub fn err(error: String) -> Self {
         Self {
             success: false,
@@ -140,35 +140,35 @@ pub struct ValidationResult {
 impl ValidationResult {
     /// Whether the content is valid
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn success(&self) -> bool {
         self.success
     }
 
     /// Error message if validation failed
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn error(&self) -> Option<String> {
         self.error.clone()
     }
 
     /// Line number where error occurred (1-indexed)
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn line(&self) -> Option<u32> {
         self.line
     }
 
     /// Column number where error occurred (1-indexed)
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn column(&self) -> Option<u32> {
         self.column
     }
 
     /// Actionable hint for fixing the error
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn hint(&self) -> Option<String> {
         self.hint.clone()
     }
@@ -176,7 +176,7 @@ impl ValidationResult {
 
 impl ValidationResult {
     /// Create a successful validation result
-    #[must_use] 
+    #[must_use]
     pub fn valid() -> Self {
         Self {
             success: true,
@@ -188,7 +188,7 @@ impl ValidationResult {
     }
 
     /// Create a failed validation result
-    #[must_use] 
+    #[must_use]
     pub fn invalid(error: String, line: u32, column: u32, hint: String) -> Self {
         Self {
             success: false,
@@ -216,7 +216,7 @@ pub struct SerializerConfig {
 impl SerializerConfig {
     /// Create a new configuration with defaults
     #[cfg_attr(feature = "wasm", wasm_bindgen(constructor))]
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self {
             indent_size: 2,
@@ -270,7 +270,7 @@ pub struct DxSerializer {
 impl DxSerializer {
     /// Create a new `DxSerializer` with default configuration
     #[cfg_attr(feature = "wasm", wasm_bindgen(constructor))]
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         let config = SerializerConfig::new();
         Self { config }
@@ -278,7 +278,7 @@ impl DxSerializer {
 
     /// Create a `DxSerializer` with custom configuration
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = withConfig))]
-    #[must_use] 
+    #[must_use]
     pub fn with_config(config: SerializerConfig) -> Self {
         Self { config }
     }
@@ -289,7 +289,7 @@ impl DxSerializer {
     /// Converts sigil-based LLM format (`#c`, `#:`, `#<letter>`) to beautiful
     /// human-readable format with Unicode tables and expanded keys.
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = toHuman))]
-    #[must_use] 
+    #[must_use]
     pub fn to_human(&self, llm_input: &str) -> TransformResult {
         // Handle empty input
         if llm_input.trim().is_empty() {
@@ -307,7 +307,7 @@ impl DxSerializer {
     /// This is called when saving a .dx file in the editor.
     /// Converts human-readable format back to token-optimized LLM format.
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = toDense))]
-    #[must_use] 
+    #[must_use]
     pub fn to_dense(&self, human_input: &str) -> TransformResult {
         // Handle empty input
         if human_input.trim().is_empty() {
@@ -324,7 +324,7 @@ impl DxSerializer {
     ///
     /// Returns detailed error information including line, column, and hints.
     #[cfg_attr(feature = "wasm", wasm_bindgen)]
-    #[must_use] 
+    #[must_use]
     pub fn validate(&self, content: &str) -> ValidationResult {
         // Track bracket/quote state for validation
         let mut bracket_stack: Vec<(char, u32, u32)> = Vec::new();
@@ -430,7 +430,11 @@ impl DxSerializer {
                 format!("Unclosed bracket '{ch}'"),
                 line,
                 col,
-                format!("Add a closing '{}' to match the opening '{}'", matching_close(ch), ch),
+                format!(
+                    "Add a closing '{}' to match the opening '{}'",
+                    matching_close(ch),
+                    ch
+                ),
             );
         }
 
@@ -441,7 +445,7 @@ impl DxSerializer {
     ///
     /// Returns true if the content has no unclosed brackets or strings.
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = isSaveable))]
-    #[must_use] 
+    #[must_use]
     pub fn is_saveable(&self, content: &str) -> bool {
         self.validate(content).success
     }
@@ -450,7 +454,7 @@ impl DxSerializer {
     ///
     /// Files larger than this will be rejected to prevent memory exhaustion.
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = maxInputSize))]
-    #[must_use] 
+    #[must_use]
     pub fn max_input_size(&self) -> usize {
         MAX_INPUT_SIZE
     }
@@ -459,7 +463,7 @@ impl DxSerializer {
     ///
     /// Structures nested deeper than this will be rejected to prevent stack overflow.
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = maxRecursionDepth))]
-    #[must_use] 
+    #[must_use]
     pub fn max_recursion_depth(&self) -> usize {
         MAX_RECURSION_DEPTH
     }
@@ -468,7 +472,7 @@ impl DxSerializer {
     ///
     /// Tables with more rows than this will be rejected to prevent memory exhaustion.
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = maxTableRows))]
-    #[must_use] 
+    #[must_use]
     pub fn max_table_rows(&self) -> usize {
         MAX_TABLE_ROWS
     }
@@ -494,7 +498,7 @@ fn matching_close(open: char) -> char {
 ///
 /// - If string contains apostrophe ('), wrap in double quotes
 /// - If string contains both ' and ", use double quotes with escaped "
-#[must_use] 
+#[must_use]
 pub fn smart_quote(value: &str) -> String {
     let has_single = value.contains('\'');
     let has_double = value.contains('"');
@@ -539,7 +543,7 @@ pub fn init_wasm() {
 /// Get version information
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = "serializerVersion")]
-#[must_use] 
+#[must_use]
 pub fn serializer_version() -> String {
     format!(
         "dx-serializer v{} ({})",
@@ -568,14 +572,14 @@ pub struct TokenCountResult {
 impl TokenCountResult {
     /// Get the token count
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn count(&self) -> usize {
         self.count
     }
 
     /// Get the model name
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn model(&self) -> String {
         self.model.clone()
     }
@@ -595,28 +599,28 @@ pub struct AllTokenCountsResult {
 impl AllTokenCountsResult {
     /// Get GPT-4o token count
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn gpt4o(&self) -> usize {
         self.gpt4o
     }
 
     /// Get Claude Sonnet 4 token count
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn claude(&self) -> usize {
         self.claude
     }
 
     /// Get Gemini 3 token count
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn gemini(&self) -> usize {
         self.gemini
     }
 
     /// Get Other model token count
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    #[must_use] 
+    #[must_use]
     pub fn other(&self) -> usize {
         self.other
     }
@@ -629,7 +633,7 @@ impl AllTokenCountsResult {
 /// @returns `TokenCountResult` with count and model name
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
-#[must_use] 
+#[must_use]
 pub fn count_tokens(text: &str, model: &str) -> TokenCountResult {
     let counter = TokenCounter::new();
     let model_type = match model.to_lowercase().as_str() {
@@ -652,7 +656,7 @@ pub fn count_tokens(text: &str, model: &str) -> TokenCountResult {
 /// @returns `AllTokenCountsResult` with counts for all 4 models
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
-#[must_use] 
+#[must_use]
 pub fn count_tokens_all(text: &str) -> AllTokenCountsResult {
     let counter = TokenCounter::new();
     let counts = counter.count_primary_models(text);
@@ -762,8 +766,7 @@ use crate::types::DxValue;
 #[cfg(any(feature = "wasm", feature = "converters", test))]
 fn dx_value_to_json(value: &DxValue) -> Result<String, String> {
     let json_value = dx_value_to_serde_json(value)?;
-    serde_json::to_string_pretty(&json_value)
-        .map_err(|e| format!("JSON serialization error: {e}"))
+    serde_json::to_string_pretty(&json_value).map_err(|e| format!("JSON serialization error: {e}"))
 }
 
 /// Convert `DxValue` to `serde_json::Value`
@@ -837,7 +840,11 @@ fn dx_value_to_yaml_impl(
                 || s.ends_with(' ')
             {
                 output.push('"');
-                output.push_str(&s.replace('\\', "\\\\").replace('"', "\\\"").replace('\n', "\\n"));
+                output.push_str(
+                    &s.replace('\\', "\\\\")
+                        .replace('"', "\\\"")
+                        .replace('\n', "\\n"),
+                );
                 output.push('"');
             } else {
                 output.push_str(s);
@@ -909,7 +916,10 @@ fn dx_value_to_toml(value: &DxValue) -> Result<String, String> {
         DxValue::Object(obj) => {
             // First pass: simple key-value pairs
             for (k, v) in obj.iter() {
-                if !matches!(v, DxValue::Object(_) | DxValue::Array(_) | DxValue::Table(_)) {
+                if !matches!(
+                    v,
+                    DxValue::Object(_) | DxValue::Array(_) | DxValue::Table(_)
+                ) {
                     output.push_str(k);
                     output.push_str(" = ");
                     dx_value_to_toml_value(v, &mut output)?;
@@ -1108,7 +1118,10 @@ mod tests {
     #[test]
     fn test_smart_quote_both() {
         // Strings with both should escape double quotes
-        assert_eq!(smart_quote("don't say \"hello\""), "\"don't say \\\"hello\\\"\"");
+        assert_eq!(
+            smart_quote("don't say \"hello\""),
+            "\"don't say \\\"hello\\\"\""
+        );
     }
 
     #[test]
@@ -1230,7 +1243,9 @@ mod property_tests {
             prop::collection::vec(valid_abbrev_key(), 2..4), // schema columns
             prop::collection::vec(simple_value(), 2..4),  // row values
         )
-            .prop_filter("schema and row same length", |(_, schema, row)| schema.len() == row.len())
+            .prop_filter("schema and row same length", |(_, schema, row)| {
+                schema.len() == row.len()
+            })
             .prop_map(|(id, schema, row)| {
                 let schema_str = schema.join("|");
                 let row_str = row.join("|");

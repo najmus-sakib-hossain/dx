@@ -182,7 +182,7 @@ impl<'a> DxMachineBuilder<'a> {
 
     /// Finalize and return the serialized length
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub fn finish(self) -> usize {
         // Write header at beginning
         self.header.write_to(&mut self.buffer[0..4]);
@@ -195,7 +195,7 @@ impl<'a> DxMachineBuilder<'a> {
 
     /// Get current heap cursor position
     #[inline]
-    #[must_use] 
+    #[must_use]
     pub fn heap_position(&self) -> usize {
         self.heap_cursor
     }

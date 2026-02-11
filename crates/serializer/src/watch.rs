@@ -21,7 +21,7 @@ use notify::{
 #[cfg(feature = "watch")]
 use std::path::Path;
 #[cfg(feature = "watch")]
-use std::sync::mpsc::{Receiver, Sender, channel};
+use std::sync::mpsc::{channel, Receiver, Sender};
 #[cfg(feature = "watch")]
 use std::time::Duration;
 
@@ -156,13 +156,13 @@ impl DxWatcher {
     }
 
     /// Try to receive a change without blocking
-    #[must_use] 
+    #[must_use]
     pub fn try_recv(&self) -> Option<FileChange> {
         self.receiver.try_recv().ok()
     }
 
     /// Get all currently watched paths
-    #[must_use] 
+    #[must_use]
     pub fn watched_paths(&self) -> &[PathBuf] {
         &self.watched_paths
     }
@@ -246,7 +246,10 @@ mod tests {
         let dxs_files = find_dxs_files(&rules_dir).unwrap();
         assert_eq!(dxs_files.len(), 2);
 
-        let names: Vec<_> = dxs_files.iter().filter_map(|p| p.file_name()?.to_str()).collect();
+        let names: Vec<_> = dxs_files
+            .iter()
+            .filter_map(|p| p.file_name()?.to_str())
+            .collect();
         assert!(names.contains(&"js-rules.dxs"));
         assert!(names.contains(&"py-rules.dxs"));
     }

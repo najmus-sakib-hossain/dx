@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, IntoElement};
 
 // ─── Select ─────────────────────────────────────────────────────────────────
 // A shadcn-ui style Select dropdown (display component).
@@ -87,7 +87,11 @@ impl Select {
         } else {
             theme.muted_foreground
         };
-        let bg = if self.disabled { theme.muted } else { theme.background };
+        let bg = if self.disabled {
+            theme.muted
+        } else {
+            theme.background
+        };
 
         let mut container = div().flex().flex_col().gap(px(2.0));
 
@@ -108,13 +112,13 @@ impl Select {
             .child(
                 div()
                     .flex_1()
-                    .font_size(px(14.0))
+                    .text_size(px(14.0))
                     .text_color(text_color)
                     .child(display_text),
             )
             .child(
                 div()
-                    .font_size(px(10.0))
+                    .text_size(px(10.0))
                     .text_color(theme.muted_foreground)
                     .child("▼"),
             );
@@ -140,7 +144,7 @@ impl Select {
                 .border_1()
                 .border_color(theme.border)
                 .py(px(4.0))
-                .overflow_y_scroll()
+                .overflow_y_hidden()
                 .max_h(px(200.0));
 
             for option in self.options {
@@ -216,7 +220,7 @@ impl SelectOption {
         if selected {
             el = el.child(
                 div()
-                    .font_size(px(12.0))
+                    .text_size(px(12.0))
                     .text_color(theme.foreground)
                     .w(px(16.0))
                     .child("✓"),
@@ -227,7 +231,7 @@ impl SelectOption {
 
         el = el.child(
             div()
-                .font_size(px(14.0))
+                .text_size(px(14.0))
                 .text_color(text_color)
                 .child(self.label),
         );

@@ -44,7 +44,10 @@ mod tests {
         // Verify optimizations
         assert!(dx.contains("n:test-app"), "Should abbreviate 'name' to 'n'");
         assert!(dx.contains("v:1.0.0"), "Should abbreviate 'version' to 'v'");
-        assert!(dx.contains("d:A test application"), "Should abbreviate 'description' to 'd'");
+        assert!(
+            dx.contains("d:A test application"),
+            "Should abbreviate 'description' to 'd'"
+        );
         assert!(dx.len() < TEST_JSON.len(), "DX should be smaller than JSON");
     }
 

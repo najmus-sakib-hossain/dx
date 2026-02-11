@@ -1,4 +1,4 @@
-use gpui::{rgb, Hsla, Pixels, px};
+use gpui::{px, rgb, Hsla, Pixels};
 
 // ─── Design Token Constants ─────────────────────────────────────────────────
 
@@ -148,8 +148,18 @@ impl Theme {
             sidebar_border: rgb(0xE5E5E5).into(),
             sidebar_ring: rgb(0x171717).into(),
 
-            overlay: Hsla { h: 0.0, s: 0.0, l: 0.0, a: 0.5 },
-            ghost_hover: Hsla { h: 0.0, s: 0.0, l: 0.96, a: 1.0 },
+            overlay: Hsla {
+                h: 0.0,
+                s: 0.0,
+                l: 0.0,
+                a: 0.5,
+            },
+            ghost_hover: Hsla {
+                h: 0.0,
+                s: 0.0,
+                l: 0.96,
+                a: 1.0,
+            },
         }
     }
 
@@ -198,8 +208,18 @@ impl Theme {
             sidebar_border: rgb(0x27272A).into(),
             sidebar_ring: rgb(0xD4D4D8).into(),
 
-            overlay: Hsla { h: 0.0, s: 0.0, l: 0.0, a: 0.8 },
-            ghost_hover: Hsla { h: 0.0, s: 0.0, l: 0.15, a: 1.0 },
+            overlay: Hsla {
+                h: 0.0,
+                s: 0.0,
+                l: 0.0,
+                a: 0.8,
+            },
+            ghost_hover: Hsla {
+                h: 0.0,
+                s: 0.0,
+                l: 0.15,
+                a: 1.0,
+            },
         }
     }
 }

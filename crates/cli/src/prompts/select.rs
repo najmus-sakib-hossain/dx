@@ -183,12 +183,13 @@ impl<T: Clone> PromptInteraction for Select<T> {
                 // Title line - diamond aligns with │ position
                 let bar = theme.dim.apply_to(symbols.bar);
                 let title_with_spaces = format!("  {}  ", self.message);
-                term.write_line(&format!("{}{}", 
+                term.write_line(&format!(
+                    "{}{}",
                     theme.primary.apply_to(symbols.step_submit),
                     title_with_spaces.bold()
                 ))?;
                 lines += 1;
-                
+
                 // ONE blank line after title (with bar)
                 term.write_line(&format!("{}", bar))?;
                 lines += 1;
@@ -244,8 +245,10 @@ impl<T: Clone> PromptInteraction for Select<T> {
             }
             State::Submit => {
                 let checkmark = theme.success.apply_to("✓");
-                let selected =
-                    self.selected_index().map(|i| self.items[i].label.clone()).unwrap_or_default();
+                let selected = self
+                    .selected_index()
+                    .map(|i| self.items[i].label.clone())
+                    .unwrap_or_default();
                 let display = theme.dim.apply_to(&selected);
                 term.write_line(&format!("{} {}  {}", checkmark, self.message, display))?;
                 lines += 1;

@@ -39,7 +39,7 @@ impl PhoneInput {
 
     fn format_phone(&self) -> String {
         let digits: String = self.value.chars().filter(|c| c.is_ascii_digit()).collect();
-        
+
         if digits.len() <= 3 {
             digits
         } else if digits.len() <= 6 {
@@ -53,19 +53,19 @@ impl PhoneInput {
 
     fn validate_phone(&self) -> Result<(), String> {
         let digits: String = self.value.chars().filter(|c| c.is_ascii_digit()).collect();
-        
+
         if digits.is_empty() {
             return Err("Phone number cannot be empty".to_string());
         }
-        
+
         if digits.len() < 10 {
             return Err("Phone number must be at least 10 digits".to_string());
         }
-        
+
         if digits.len() > 15 {
             return Err("Phone number is too long".to_string());
         }
-        
+
         Ok(())
     }
 }
@@ -80,18 +80,23 @@ impl PromptInteraction for PhoneInput {
     fn on(&mut self, event: Event) {
         match event {
             Event::Key(key) => match key {
-                console::Key::Enter => {
-                    match self.validate_phone() {
-                        Ok(_) => self.state = State::Submit,
-                        Err(msg) => self.error_message = Some(msg),
-                    }
-                }
+                console::Key::Enter => match self.validate_phone() {
+                    Ok(_) => self.state = State::Submit,
+                    Err(msg) => self.error_message = Some(msg),
+                },
                 console::Key::Escape => self.state = State::Cancel,
                 console::Key::Backspace => {
                     self.value.pop();
                     self.error_message = None;
                 }
-                console::Key::Char(c) if c.is_ascii_digit() || c == '+' || c == '-' || c == ' ' || c == '(' || c == ')' => {
+                console::Key::Char(c)
+                    if c.is_ascii_digit()
+                        || c == '+'
+                        || c == '-'
+                        || c == ' '
+                        || c == '('
+                        || c == ')' =>
+                {
                     self.value.push(c);
                     self.error_message = None;
                 }

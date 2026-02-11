@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, IntoElement};
 
 // ─── Avatar ─────────────────────────────────────────────────────────────────
 // A shadcn-ui style Avatar component with fallback support.
@@ -58,7 +58,7 @@ impl Avatar {
             .flex_shrink_0()
             .child(
                 div()
-                    .font_size(font)
+                    .text_size(font)
                     .font_weight(gpui::FontWeight::MEDIUM)
                     .text_color(theme.muted_foreground)
                     .child(self.fallback_text),

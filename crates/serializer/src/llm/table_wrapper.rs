@@ -43,20 +43,20 @@ impl Default for TableWrapperConfig {
 
 impl TableWrapperConfig {
     /// Create a new config with default settings
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Set the max width
-    #[must_use] 
+    #[must_use]
     pub fn with_max_width(mut self, width: usize) -> Self {
         self.max_width = width;
         self
     }
 
     /// Set the minimum column width
-    #[must_use] 
+    #[must_use]
     pub fn with_min_col_width(mut self, width: usize) -> Self {
         self.min_col_width = width;
         self
@@ -70,7 +70,7 @@ pub struct TableWrapper {
 
 impl TableWrapper {
     /// Create a new table wrapper with default config
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self {
             config: TableWrapperConfig::default(),
@@ -78,13 +78,13 @@ impl TableWrapper {
     }
 
     /// Create a table wrapper with custom config
-    #[must_use] 
+    #[must_use]
     pub fn with_config(config: TableWrapperConfig) -> Self {
         Self { config }
     }
 
     /// Check if a table needs wrapping based on column widths
-    #[must_use] 
+    #[must_use]
     pub fn needs_wrapping(&self, col_widths: &[usize]) -> bool {
         let total_width = self.calculate_table_width(col_widths);
         total_width > self.config.max_width
@@ -103,7 +103,7 @@ impl TableWrapper {
     }
 
     /// Calculate optimal column widths that fit within `max_width`
-    #[must_use] 
+    #[must_use]
     pub fn calculate_widths(
         &self,
         _section: &DxSection,
@@ -164,7 +164,7 @@ impl TableWrapper {
     }
 
     /// Wrap a cell value to fit within the specified width
-    #[must_use] 
+    #[must_use]
     pub fn wrap_cell(&self, content: &str, max_width: usize) -> Vec<String> {
         if content.chars().count() <= max_width {
             return vec![content.to_string()];
@@ -207,13 +207,20 @@ impl TableWrapper {
             .iter()
             .enumerate()
             .map(|(i, content)| {
-                let max_width = col_widths.get(i).copied().unwrap_or(self.config.min_col_width);
+                let max_width = col_widths
+                    .get(i)
+                    .copied()
+                    .unwrap_or(self.config.min_col_width);
                 self.wrap_cell(content, max_width)
             })
             .collect();
 
         // Find max number of lines needed
-        let max_lines = wrapped_cells.iter().map(std::vec::Vec::len).max().unwrap_or(1);
+        let max_lines = wrapped_cells
+            .iter()
+            .map(std::vec::Vec::len)
+            .max()
+            .unwrap_or(1);
 
         // Build output lines
         let mut result = Vec::new();
@@ -221,7 +228,10 @@ impl TableWrapper {
             let mut line_cells = Vec::new();
             for (col_idx, wrapped) in wrapped_cells.iter().enumerate() {
                 let cell_content = wrapped.get(line_idx).cloned().unwrap_or_default();
-                let width = col_widths.get(col_idx).copied().unwrap_or(self.config.min_col_width);
+                let width = col_widths
+                    .get(col_idx)
+                    .copied()
+                    .unwrap_or(self.config.min_col_width);
 
                 // Pad to width
                 let padding = width.saturating_sub(cell_content.chars().count());
@@ -235,7 +245,7 @@ impl TableWrapper {
     }
 
     /// Get the config
-    #[must_use] 
+    #[must_use]
     pub fn config(&self) -> &TableWrapperConfig {
         &self.config
     }
@@ -316,7 +326,9 @@ mod tests {
 
     #[test]
     fn test_calculate_widths_with_shrink() {
-        let config = TableWrapperConfig::new().with_max_width(50).with_min_col_width(3);
+        let config = TableWrapperConfig::new()
+            .with_max_width(50)
+            .with_min_col_width(3);
         let wrapper = TableWrapper::with_config(config);
 
         let section = DxSection::new(vec!["col1".to_string(), "col2".to_string()]);

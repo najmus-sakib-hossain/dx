@@ -33,26 +33,26 @@ impl Integration for WhatsAppIntegration {
     fn name(&self) -> &str {
         "whatsapp"
     }
-    
+
     fn integration_type(&self) -> &str {
         "messaging"
     }
-    
+
     fn is_authenticated(&self) -> bool {
         self.api_token.is_some()
     }
-    
+
     async fn authenticate(&mut self, token: &str) -> Result<()> {
         self.api_token = Some(token.to_string());
         info!("WhatsApp authenticated");
         Ok(())
     }
-    
+
     async fn disconnect(&mut self) -> Result<()> {
         self.api_token = None;
         Ok(())
     }
-    
+
     fn capabilities_dx(&self) -> String {
         "capabilities:3[send_message receive_message send_media]".to_string()
     }
@@ -61,11 +61,13 @@ impl Integration for WhatsAppIntegration {
 #[async_trait]
 impl MessagingIntegration for WhatsAppIntegration {
     async fn send_message(&self, recipient: &str, content: &str) -> Result<Message> {
-        let _token = self.api_token.as_ref()
+        let _token = self
+            .api_token
+            .as_ref()
             .ok_or_else(|| IntegrationError::NotAuthenticated("whatsapp".to_string()))?;
-        
+
         info!("Sending WhatsApp message to {}", recipient);
-        
+
         // In production, call WhatsApp Business API
         Ok(Message {
             id: uuid::Uuid::new_v4().to_string(),
@@ -75,12 +77,12 @@ impl MessagingIntegration for WhatsAppIntegration {
             platform: "whatsapp".to_string(),
         })
     }
-    
+
     async fn poll_messages(&self) -> Result<Vec<Message>> {
         // In production, use webhook or poll API
         Ok(vec![])
     }
-    
+
     async fn mark_read(&self, message_id: &str) -> Result<()> {
         info!("Marking WhatsApp message {} as read", message_id);
         Ok(())
@@ -113,42 +115,45 @@ impl Integration for TelegramIntegration {
     fn name(&self) -> &str {
         "telegram"
     }
-    
+
     fn integration_type(&self) -> &str {
         "messaging"
     }
-    
+
     fn is_authenticated(&self) -> bool {
         self.bot_token.is_some()
     }
-    
+
     async fn authenticate(&mut self, token: &str) -> Result<()> {
         self.bot_token = Some(token.to_string());
         info!("Telegram bot authenticated");
         Ok(())
     }
-    
+
     async fn disconnect(&mut self) -> Result<()> {
         self.bot_token = None;
         Ok(())
     }
-    
+
     fn capabilities_dx(&self) -> String {
-        "capabilities:5[send_message receive_message send_file send_photo inline_keyboard]".to_string()
+        "capabilities:5[send_message receive_message send_file send_photo inline_keyboard]"
+            .to_string()
     }
 }
 
 #[async_trait]
 impl MessagingIntegration for TelegramIntegration {
     async fn send_message(&self, recipient: &str, content: &str) -> Result<Message> {
-        let _token = self.bot_token.as_ref()
+        let _token = self
+            .bot_token
+            .as_ref()
             .ok_or_else(|| IntegrationError::NotAuthenticated("telegram".to_string()))?;
-        
+
         info!("Sending Telegram message to {}", recipient);
-        
+
         // In production, call Telegram Bot API
         // POST https://api.telegram.org/bot{token}/sendMessage
-        
+
         Ok(Message {
             id: uuid::Uuid::new_v4().to_string(),
             sender: "bot".to_string(),
@@ -157,12 +162,12 @@ impl MessagingIntegration for TelegramIntegration {
             platform: "telegram".to_string(),
         })
     }
-    
+
     async fn poll_messages(&self) -> Result<Vec<Message>> {
         // In production, use getUpdates or webhook
         Ok(vec![])
     }
-    
+
     async fn mark_read(&self, _message_id: &str) -> Result<()> {
         // Telegram doesn't have read receipts for bots
         Ok(())
@@ -195,26 +200,26 @@ impl Integration for DiscordIntegration {
     fn name(&self) -> &str {
         "discord"
     }
-    
+
     fn integration_type(&self) -> &str {
         "messaging"
     }
-    
+
     fn is_authenticated(&self) -> bool {
         self.bot_token.is_some()
     }
-    
+
     async fn authenticate(&mut self, token: &str) -> Result<()> {
         self.bot_token = Some(token.to_string());
         info!("Discord bot authenticated");
         Ok(())
     }
-    
+
     async fn disconnect(&mut self) -> Result<()> {
         self.bot_token = None;
         Ok(())
     }
-    
+
     fn capabilities_dx(&self) -> String {
         "capabilities:6[send_message receive_message manage_channels create_thread send_embed reactions]".to_string()
     }
@@ -223,11 +228,13 @@ impl Integration for DiscordIntegration {
 #[async_trait]
 impl MessagingIntegration for DiscordIntegration {
     async fn send_message(&self, channel_id: &str, content: &str) -> Result<Message> {
-        let _token = self.bot_token.as_ref()
+        let _token = self
+            .bot_token
+            .as_ref()
             .ok_or_else(|| IntegrationError::NotAuthenticated("discord".to_string()))?;
-        
+
         info!("Sending Discord message to channel {}", channel_id);
-        
+
         Ok(Message {
             id: uuid::Uuid::new_v4().to_string(),
             sender: "bot".to_string(),
@@ -236,11 +243,11 @@ impl MessagingIntegration for DiscordIntegration {
             platform: "discord".to_string(),
         })
     }
-    
+
     async fn poll_messages(&self) -> Result<Vec<Message>> {
         Ok(vec![])
     }
-    
+
     async fn mark_read(&self, _message_id: &str) -> Result<()> {
         Ok(())
     }
@@ -273,39 +280,42 @@ impl Integration for SlackIntegration {
     fn name(&self) -> &str {
         "slack"
     }
-    
+
     fn integration_type(&self) -> &str {
         "messaging"
     }
-    
+
     fn is_authenticated(&self) -> bool {
         self.bot_token.is_some()
     }
-    
+
     async fn authenticate(&mut self, token: &str) -> Result<()> {
         self.bot_token = Some(token.to_string());
         info!("Slack bot authenticated");
         Ok(())
     }
-    
+
     async fn disconnect(&mut self) -> Result<()> {
         self.bot_token = None;
         Ok(())
     }
-    
+
     fn capabilities_dx(&self) -> String {
-        "capabilities:5[send_message receive_message create_channel send_block reactions]".to_string()
+        "capabilities:5[send_message receive_message create_channel send_block reactions]"
+            .to_string()
     }
 }
 
 #[async_trait]
 impl MessagingIntegration for SlackIntegration {
     async fn send_message(&self, channel: &str, content: &str) -> Result<Message> {
-        let _token = self.bot_token.as_ref()
+        let _token = self
+            .bot_token
+            .as_ref()
             .ok_or_else(|| IntegrationError::NotAuthenticated("slack".to_string()))?;
-        
+
         info!("Sending Slack message to {}", channel);
-        
+
         Ok(Message {
             id: uuid::Uuid::new_v4().to_string(),
             sender: "bot".to_string(),
@@ -314,11 +324,11 @@ impl MessagingIntegration for SlackIntegration {
             platform: "slack".to_string(),
         })
     }
-    
+
     async fn poll_messages(&self) -> Result<Vec<Message>> {
         Ok(vec![])
     }
-    
+
     async fn mark_read(&self, _message_id: &str) -> Result<()> {
         Ok(())
     }

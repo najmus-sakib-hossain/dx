@@ -210,7 +210,9 @@ impl<T: Clone> PromptInteraction for TreeSelect<T> {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("↑↓: navigate, →: expand, ←: collapse, Enter: select")
+                    theme
+                        .dim
+                        .apply_to("↑↓: navigate, →: expand, ←: collapse, Enter: select")
                 ))?;
                 lines += 1;
             }

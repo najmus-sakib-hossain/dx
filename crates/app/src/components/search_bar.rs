@@ -1,6 +1,6 @@
-use gpui::{div, prelude::*, px, IntoElement};
-use crate::theme::{colors::Radius, Theme};
 use crate::components::label::Kbd;
+use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, IntoElement};
 
 // ─── SearchBar ──────────────────────────────────────────────────────────────
 // A shadcn-ui style SearchBar with pack chips.
@@ -63,7 +63,7 @@ impl SearchBar {
                     // Search icon
                     .child(
                         div()
-                            .font_size(px(14.0))
+                            .text_size(px(14.0))
                             .text_color(theme.muted_foreground)
                             .child("🔍"),
                     )
@@ -71,7 +71,7 @@ impl SearchBar {
                     .child(
                         div()
                             .flex_1()
-                            .font_size(px(14.0))
+                            .text_size(px(14.0))
                             .text_color(if self.query.is_empty() {
                                 theme.muted_foreground
                             } else {
@@ -138,7 +138,11 @@ impl PackChip {
         } else {
             theme.secondary_foreground
         };
-        let hover_bg = if self.active { theme.primary } else { theme.accent };
+        let hover_bg = if self.active {
+            theme.primary
+        } else {
+            theme.accent
+        };
 
         div()
             .flex()
@@ -152,7 +156,7 @@ impl PackChip {
             .hover(move |style| style.bg(hover_bg))
             .child(
                 div()
-                    .font_size(px(12.0))
+                    .text_size(px(12.0))
                     .font_weight(gpui::FontWeight::MEDIUM)
                     .text_color(fg)
                     .child(self.label),

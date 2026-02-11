@@ -288,28 +288,44 @@ mod property_tests {
     fn test_json_unicode_values() {
         let json = r#"{"emoji": "🎉", "chinese": "中文", "arabic": "العربية"}"#;
         let result = json_to_dx(json);
-        assert!(result.is_ok(), "Unicode should be handled: {:?}", result.err());
+        assert!(
+            result.is_ok(),
+            "Unicode should be handled: {:?}",
+            result.err()
+        );
     }
 
     #[test]
     fn test_json_special_characters() {
         let json = r#"{"path": "C:\\Users\\test", "url": "https://example.com?a=1&b=2"}"#;
         let result = json_to_dx(json);
-        assert!(result.is_ok(), "Special characters should be handled: {:?}", result.err());
+        assert!(
+            result.is_ok(),
+            "Special characters should be handled: {:?}",
+            result.err()
+        );
     }
 
     #[test]
     fn test_json_large_numbers() {
         let json = r#"{"big": 9007199254740991, "negative": -9007199254740991}"#;
         let result = json_to_dx(json);
-        assert!(result.is_ok(), "Large numbers should be handled: {:?}", result.err());
+        assert!(
+            result.is_ok(),
+            "Large numbers should be handled: {:?}",
+            result.err()
+        );
     }
 
     #[test]
     fn test_json_scientific_notation() {
         let json = r#"{"sci": 1.23e10, "neg_sci": -4.56e-7}"#;
         let result = json_to_dx(json);
-        assert!(result.is_ok(), "Scientific notation should be handled: {:?}", result.err());
+        assert!(
+            result.is_ok(),
+            "Scientific notation should be handled: {:?}",
+            result.err()
+        );
     }
 
     #[test]
@@ -323,14 +339,22 @@ mod property_tests {
     fn test_toon_simple_key_value() {
         let toon = r#"name "test""#;
         let result = toon_to_dx(toon);
-        assert!(result.is_ok(), "Simple TOON should be handled: {:?}", result.err());
+        assert!(
+            result.is_ok(),
+            "Simple TOON should be handled: {:?}",
+            result.err()
+        );
     }
 
     #[test]
     fn test_dx_to_toon_simple() {
         let dx = "name:test\ncount:42";
         let result = dx_to_toon(dx);
-        assert!(result.is_ok(), "DX to TOON should succeed: {:?}", result.err());
+        assert!(
+            result.is_ok(),
+            "DX to TOON should succeed: {:?}",
+            result.err()
+        );
         let toon = result.unwrap();
         assert!(toon.contains("name"), "TOON should contain key");
         assert!(toon.contains("test"), "TOON should contain string value");
@@ -341,7 +365,11 @@ mod property_tests {
     fn test_dx_to_toon_booleans() {
         let dx = "active:+\ndisabled:-";
         let result = dx_to_toon(dx);
-        assert!(result.is_ok(), "DX to TOON with booleans should succeed: {:?}", result.err());
+        assert!(
+            result.is_ok(),
+            "DX to TOON with booleans should succeed: {:?}",
+            result.err()
+        );
         let toon = result.unwrap();
         assert!(toon.contains("true"), "TOON should contain true");
         assert!(toon.contains("false"), "TOON should contain false");

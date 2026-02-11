@@ -60,13 +60,13 @@ pub struct Tokenizer<'a> {
 
 impl<'a> Tokenizer<'a> {
     /// Create new tokenizer from bytes
-    #[must_use] 
+    #[must_use]
     pub fn new(input: &'a [u8]) -> Self {
         Self { input, pos: 0 }
     }
 
     /// Get current position
-    #[must_use] 
+    #[must_use]
     pub fn pos(&self) -> usize {
         self.pos
     }
@@ -77,19 +77,19 @@ impl<'a> Tokenizer<'a> {
     }
 
     /// Check if at end
-    #[must_use] 
+    #[must_use]
     pub fn is_eof(&self) -> bool {
         self.pos >= self.input.len()
     }
 
     /// Peek current byte without advancing
-    #[must_use] 
+    #[must_use]
     pub fn peek(&self) -> Option<u8> {
         self.input.get(self.pos).copied()
     }
 
     /// Peek n bytes ahead
-    #[must_use] 
+    #[must_use]
     pub fn peek_n(&self, n: usize) -> Option<u8> {
         self.input.get(self.pos + n).copied()
     }

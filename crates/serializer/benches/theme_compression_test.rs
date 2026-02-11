@@ -1,4 +1,4 @@
-use criterion::{BenchmarkId, Criterion, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use serializer::llm::convert::{document_to_machine, llm_to_machine, machine_to_document};
 use serializer::llm::parser::LlmParser;
 
@@ -122,7 +122,10 @@ fn bench_compression_ratios(c: &mut Criterion) {
             uncompressed.data.len(),
             compressed.data.len()
         );
-        println!("  Compression ratio: {:.1}% | Space savings: {:.1}%", ratio, savings);
+        println!(
+            "  Compression ratio: {:.1}% | Space savings: {:.1}%",
+            ratio, savings
+        );
     }
     println!("==============================\n");
 }

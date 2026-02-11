@@ -34,45 +34,105 @@ fn main() {
             "Space sep (BROKEN - 8 fields!)",
         ),
         // Solution 1: Double quotes (traditional)
-        ("1 \"James Smith\" james@ex.com Engineering 95000 12 true", "Quotes \"...\""),
+        (
+            "1 \"James Smith\" james@ex.com Engineering 95000 12 true",
+            "Quotes \"...\"",
+        ),
         // Solution 2: Single quotes
-        ("1 'James Smith' james@ex.com Engineering 95000 12 true", "Single quotes '...'"),
+        (
+            "1 'James Smith' james@ex.com Engineering 95000 12 true",
+            "Single quotes '...'",
+        ),
         // Solution 3: Underscore replacement
-        ("1 James_Smith james@ex.com Engineering 95000 12 true", "Underscore James_Smith"),
+        (
+            "1 James_Smith james@ex.com Engineering 95000 12 true",
+            "Underscore James_Smith",
+        ),
         // Solution 4: Dot replacement
-        ("1 James.Smith james@ex.com Engineering 95000 12 true", "Dot James.Smith"),
+        (
+            "1 James.Smith james@ex.com Engineering 95000 12 true",
+            "Dot James.Smith",
+        ),
         // Solution 5: CamelCase
-        ("1 JamesSmith james@ex.com Engineering 95000 12 true", "CamelCase JamesSmith"),
+        (
+            "1 JamesSmith james@ex.com Engineering 95000 12 true",
+            "CamelCase JamesSmith",
+        ),
         // Solution 6: Backtick (like markdown code)
-        ("1 `James Smith` james@ex.com Engineering 95000 12 true", "Backtick `...`"),
+        (
+            "1 `James Smith` james@ex.com Engineering 95000 12 true",
+            "Backtick `...`",
+        ),
         // Solution 7: Parentheses
-        ("1 (James Smith) james@ex.com Engineering 95000 12 true", "Parens (...)"),
+        (
+            "1 (James Smith) james@ex.com Engineering 95000 12 true",
+            "Parens (...)",
+        ),
         // Solution 8: Square brackets
-        ("1 [James Smith] james@ex.com Engineering 95000 12 true", "Brackets [...]"),
+        (
+            "1 [James Smith] james@ex.com Engineering 95000 12 true",
+            "Brackets [...]",
+        ),
         // Solution 9: Angle brackets
-        ("1 <James Smith> james@ex.com Engineering 95000 12 true", "Angle <...>"),
+        (
+            "1 <James Smith> james@ex.com Engineering 95000 12 true",
+            "Angle <...>",
+        ),
         // Solution 10: Pipe wrapper
-        ("1 |James Smith| james@ex.com Engineering 95000 12 true", "Pipe |...|"),
+        (
+            "1 |James Smith| james@ex.com Engineering 95000 12 true",
+            "Pipe |...|",
+        ),
         // Solution 11: Tilde wrapper
-        ("1 ~James Smith~ james@ex.com Engineering 95000 12 true", "Tilde ~...~"),
+        (
+            "1 ~James Smith~ james@ex.com Engineering 95000 12 true",
+            "Tilde ~...~",
+        ),
         // Solution 12: Hash wrapper
-        ("1 #James Smith# james@ex.com Engineering 95000 12 true", "Hash #...#"),
+        (
+            "1 #James Smith# james@ex.com Engineering 95000 12 true",
+            "Hash #...#",
+        ),
         // Solution 13: At wrapper
-        ("1 @James Smith@ james@ex.com Engineering 95000 12 true", "At @...@"),
+        (
+            "1 @James Smith@ james@ex.com Engineering 95000 12 true",
+            "At @...@",
+        ),
         // Solution 14: Caret wrapper
-        ("1 ^James Smith^ james@ex.com Engineering 95000 12 true", "Caret ^...^"),
+        (
+            "1 ^James Smith^ james@ex.com Engineering 95000 12 true",
+            "Caret ^...^",
+        ),
         // Solution 15: Non-breaking space (Unicode \u00A0)
-        ("1 James\u{00A0}Smith james@ex.com Engineering 95000 12 true", "NBSP (\\u00A0)"),
+        (
+            "1 James\u{00A0}Smith james@ex.com Engineering 95000 12 true",
+            "NBSP (\\u00A0)",
+        ),
         // Solution 16: Tab as field separator
-        ("1\tJames Smith\tjames@ex.com\tEngineering\t95000\t12\ttrue", "Tab separator"),
+        (
+            "1\tJames Smith\tjames@ex.com\tEngineering\t95000\t12\ttrue",
+            "Tab separator",
+        ),
         // Solution 17: Double space as separator, single space in text
-        ("1  James Smith  james@ex.com  Engineering  95000  12  true", "Double space sep"),
+        (
+            "1  James Smith  james@ex.com  Engineering  95000  12  true",
+            "Double space sep",
+        ),
         // Solution 18: Colon wrapper (like your :: leaf inline idea!)
-        ("1 :James Smith: james@ex.com Engineering 95000 12 true", "Colon :...:"),
+        (
+            "1 :James Smith: james@ex.com Engineering 95000 12 true",
+            "Colon :...:",
+        ),
         // Solution 19: Plus prefix for multi-word
-        ("1 +James Smith james@ex.com Engineering 95000 12 true", "Plus prefix +..."),
+        (
+            "1 +James Smith james@ex.com Engineering 95000 12 true",
+            "Plus prefix +...",
+        ),
         // Solution 20: Count prefix (like your array count!)
-        ("1 2:James Smith james@ex.com Engineering 95000 12 true", "Count 2:James Smith"),
+        (
+            "1 2:James Smith james@ex.com Engineering 95000 12 true",
+            "Count 2:James Smith",
+        ),
     ];
 
     println!("  {:50} {:>8}", "Solution", "Tokens");
@@ -103,19 +163,40 @@ fn main() {
 
     let multi_text = [
         // Comma baseline
-        ("James Smith,Senior Engineer,Research and Development", "Comma (baseline)"),
+        (
+            "James Smith,Senior Engineer,Research and Development",
+            "Comma (baseline)",
+        ),
         // Quotes
-        ("\"James Smith\" \"Senior Engineer\" \"Research and Development\"", "Quotes"),
+        (
+            "\"James Smith\" \"Senior Engineer\" \"Research and Development\"",
+            "Quotes",
+        ),
         // Underscore
-        ("James_Smith Senior_Engineer Research_and_Development", "Underscore"),
+        (
+            "James_Smith Senior_Engineer Research_and_Development",
+            "Underscore",
+        ),
         // Backtick
-        ("`James Smith` `Senior Engineer` `Research and Development`", "Backtick"),
+        (
+            "`James Smith` `Senior Engineer` `Research and Development`",
+            "Backtick",
+        ),
         // Colon wrapper
-        (":James Smith: :Senior Engineer: :Research and Development:", "Colon :...:"),
+        (
+            ":James Smith: :Senior Engineer: :Research and Development:",
+            "Colon :...:",
+        ),
         // Tab
-        ("James Smith\tSenior Engineer\tResearch and Development", "Tab"),
+        (
+            "James Smith\tSenior Engineer\tResearch and Development",
+            "Tab",
+        ),
         // Double space
-        ("James Smith  Senior Engineer  Research and Development", "Double space"),
+        (
+            "James Smith  Senior Engineer  Research and Development",
+            "Double space",
+        ),
     ];
 
     println!("  {:60} {:>8}", "Solution", "Tokens");

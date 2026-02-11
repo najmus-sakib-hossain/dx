@@ -5,7 +5,7 @@
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{Data, DeriveInput, Fields, LitStr, Type, parse_macro_input};
+use syn::{parse_macro_input, Data, DeriveInput, Fields, LitStr, Type};
 
 /// Derive macro for QuantumLayout
 ///
@@ -60,8 +60,10 @@ pub fn derive_quantum_layout(input: TokenStream) -> TokenStream {
 
     // Generate offset constants for fixed fields
     let fixed_offset_consts = fixed_fields.iter().map(|(name, _ty, offset, _size)| {
-        let const_name =
-            syn::Ident::new(&format!("{}_OFFSET", name.to_string().to_uppercase()), name.span());
+        let const_name = syn::Ident::new(
+            &format!("{}_OFFSET", name.to_string().to_uppercase()),
+            name.span(),
+        );
         let absolute_offset = header_size + offset;
         quote! {
             pub const #const_name: usize = #absolute_offset;
@@ -70,8 +72,10 @@ pub fn derive_quantum_layout(input: TokenStream) -> TokenStream {
 
     // Generate slot index constants for variable fields
     let slot_index_consts = slot_fields.iter().enumerate().map(|(idx, (name, _ty))| {
-        let const_name =
-            syn::Ident::new(&format!("{}_SLOT", name.to_string().to_uppercase()), name.span());
+        let const_name = syn::Ident::new(
+            &format!("{}_SLOT", name.to_string().to_uppercase()),
+            name.span(),
+        );
         let slot_offset = header_size + fixed_size + (idx * 16);
         quote! {
             pub const #const_name: usize = #slot_offset;

@@ -59,7 +59,11 @@ fn main() {
         match serializer.process_file(source) {
             Ok(result) => {
                 println!("Generated outputs for {}:", source.display());
-                println!("  LLM:     {} ({} bytes)", result.paths.llm.display(), result.llm_size);
+                println!(
+                    "  LLM:     {} ({} bytes)",
+                    result.paths.llm.display(),
+                    result.llm_size
+                );
                 println!(
                     "  Machine: {} ({} bytes)",
                     result.paths.machine.display(),

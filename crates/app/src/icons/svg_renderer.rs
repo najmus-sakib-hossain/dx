@@ -8,13 +8,13 @@ use tiny_skia::Pixmap;
 use usvg::{Options, Tree};
 
 /// Cache for rendered SVG images to avoid re-rendering
-/// 
+///
 /// Performance optimizations:
 /// 1. **Caching**: Rendered SVGs are cached by ID and size to avoid redundant rendering
 /// 2. **Lazy rendering**: Only visible icons (current page) are rendered, not all icons
 /// 3. **Efficient SVG parsing**: Uses resvg + tiny-skia for fast rendering to PNG
 /// 4. **Memory management**: Cache can be cleared when needed to free memory
-/// 
+///
 /// This approach eliminates lag by:
 /// - Not rendering thousands of icons at once
 /// - Reusing previously rendered icons when navigating
@@ -37,12 +37,7 @@ impl SvgCache {
     }
 
     /// Render an SVG string to a PNG file with caching, returns the file path
-    pub fn render_svg(
-        &self,
-        svg_id: &str,
-        svg_string: &str,
-        target_size: u32,
-    ) -> Result<PathBuf> {
+    pub fn render_svg(&self, svg_id: &str, svg_string: &str, target_size: u32) -> Result<PathBuf> {
         let cache_key = format!("{}:{}", svg_id, target_size);
 
         // Check cache first
@@ -82,7 +77,11 @@ impl SvgCache {
         // Calculate scaling to fit target size
         let svg_size = tree.size();
         if svg_size.width() == 0.0 || svg_size.height() == 0.0 {
-            return Err(anyhow::anyhow!("Invalid SVG size: {}x{}", svg_size.width(), svg_size.height()));
+            return Err(anyhow::anyhow!(
+                "Invalid SVG size: {}x{}",
+                svg_size.width(),
+                svg_size.height()
+            ));
         }
 
         let scale = (target_size as f32 / svg_size.width().max(svg_size.height())).min(4.0);
@@ -94,16 +93,18 @@ impl SvgCache {
         }
 
         // Create pixmap and render
-        let mut pixmap = Pixmap::new(width, height)
-            .ok_or_else(|| anyhow::anyhow!("Failed to create pixmap"))?;
+        let mut pixmap =
+            Pixmap::new(width, height).ok_or_else(|| anyhow::anyhow!("Failed to create pixmap"))?;
 
         let transform = tiny_skia::Transform::from_scale(scale, scale);
         resvg::render(&tree, transform, &mut pixmap.as_mut());
 
         // Save to PNG file
         let safe_id = svg_id.replace([':', '/', '\\', '<', '>', '|', '?', '*'], "_");
-        let png_path = self.temp_dir.join(format!("{}_{}.png", safe_id, target_size));
-        
+        let png_path = self
+            .temp_dir
+            .join(format!("{}_{}.png", safe_id, target_size));
+
         pixmap.save_png(&png_path)?;
 
         Ok(png_path)
@@ -114,7 +115,7 @@ impl SvgCache {
     pub fn clear(&self) {
         let mut cache = self.cache.lock().unwrap();
         cache.clear();
-        
+
         // Optionally delete temp files
         let _ = std::fs::remove_dir_all(&self.temp_dir);
         let _ = std::fs::create_dir_all(&self.temp_dir);
@@ -133,5 +134,3 @@ impl Default for SvgCache {
         Self::new()
     }
 }
-
-

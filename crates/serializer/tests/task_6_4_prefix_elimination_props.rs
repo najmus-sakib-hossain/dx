@@ -80,8 +80,11 @@ mod property_25_multiple_prefix_support {
     // Strategy to generate table with multiple prefix markers
     fn arb_table_with_multiple_prefixes() -> impl Strategy<Value = (String, Vec<String>)> {
         prop::collection::vec(arb_prefix(), 2..=4).prop_map(|prefixes| {
-            let prefix_markers =
-                prefixes.iter().map(|p| format!("@{}", p)).collect::<Vec<_>>().join(" ");
+            let prefix_markers = prefixes
+                .iter()
+                .map(|p| format!("@{}", p))
+                .collect::<Vec<_>>()
+                .join(" ");
 
             let input = format!("table:2(id name){}[1 Alice, 2 Bob]", prefix_markers);
 

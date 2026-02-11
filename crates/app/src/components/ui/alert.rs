@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, AnyElement, Hsla, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, AnyElement, Hsla, IntoElement};
 
 // ─── Alert ──────────────────────────────────────────────────────────────────
 // A shadcn-ui style Alert component for displaying important messages.
@@ -76,7 +76,7 @@ impl Alert {
         alert = alert.child(
             div()
                 .text_color(icon_color)
-                .font_size(px(16.0))
+                .text_size(px(16.0))
                 .mt(px(1.0))
                 .flex_shrink_0()
                 .child(icon),
@@ -86,17 +86,17 @@ impl Alert {
         let mut content = div().flex().flex_col().gap(px(4.0)).flex_1();
         content = content.child(
             div()
-                .font_size(px(14.0))
+                .text_size(px(14.0))
                 .font_weight(gpui::FontWeight::MEDIUM)
                 .text_color(title_color)
-                .leading(px(20.0))
+                .line_height(px(20.0))
                 .child(self.title),
         );
 
         if let Some(desc) = self.description {
             content = content.child(
                 div()
-                    .font_size(px(14.0))
+                    .text_size(px(14.0))
                     .text_color(theme.muted_foreground)
                     .child(desc),
             );
@@ -108,21 +108,46 @@ impl Alert {
 
     fn variant_colors(&self, theme: &Theme) -> (Hsla, Hsla, Hsla, Hsla) {
         match self.variant {
-            AlertVariant::Default => (theme.background, theme.border, theme.foreground, theme.foreground),
+            AlertVariant::Default => (
+                theme.background,
+                theme.border,
+                theme.foreground,
+                theme.foreground,
+            ),
             AlertVariant::Destructive => {
-                let bg = Hsla { h: theme.destructive.h, s: theme.destructive.s, l: theme.destructive.l, a: 0.1 };
+                let bg = Hsla {
+                    h: theme.destructive.h,
+                    s: theme.destructive.s,
+                    l: theme.destructive.l,
+                    a: 0.1,
+                };
                 (bg, theme.destructive, theme.destructive, theme.destructive)
             }
             AlertVariant::Success => {
-                let bg = Hsla { h: theme.success.h, s: theme.success.s, l: theme.success.l, a: 0.1 };
+                let bg = Hsla {
+                    h: theme.success.h,
+                    s: theme.success.s,
+                    l: theme.success.l,
+                    a: 0.1,
+                };
                 (bg, theme.success, theme.success, theme.success)
             }
             AlertVariant::Warning => {
-                let bg = Hsla { h: theme.warning.h, s: theme.warning.s, l: theme.warning.l, a: 0.1 };
+                let bg = Hsla {
+                    h: theme.warning.h,
+                    s: theme.warning.s,
+                    l: theme.warning.l,
+                    a: 0.1,
+                };
                 (bg, theme.warning, theme.warning, theme.warning)
             }
             AlertVariant::Info => {
-                let bg = Hsla { h: theme.info.h, s: theme.info.s, l: theme.info.l, a: 0.1 };
+                let bg = Hsla {
+                    h: theme.info.h,
+                    s: theme.info.s,
+                    l: theme.info.l,
+                    a: 0.1,
+                };
                 (bg, theme.info, theme.info, theme.info)
             }
         }
@@ -181,7 +206,11 @@ impl Toast {
     pub fn render(self, theme: &Theme) -> impl IntoElement {
         let (bg, border, title_color) = match self.variant {
             ToastVariant::Default => (theme.background, theme.border, theme.foreground),
-            ToastVariant::Destructive => (theme.destructive, theme.destructive, theme.destructive_foreground),
+            ToastVariant::Destructive => (
+                theme.destructive,
+                theme.destructive,
+                theme.destructive_foreground,
+            ),
             ToastVariant::Success => (theme.background, theme.success, theme.foreground),
         };
 
@@ -201,7 +230,7 @@ impl Toast {
         let mut content = div().flex().flex_col().gap(px(2.0)).flex_1();
         content = content.child(
             div()
-                .font_size(px(14.0))
+                .text_size(px(14.0))
                 .font_weight(gpui::FontWeight::MEDIUM)
                 .text_color(title_color)
                 .child(self.title),
@@ -210,7 +239,7 @@ impl Toast {
         if let Some(desc) = self.description {
             content = content.child(
                 div()
-                    .font_size(px(13.0))
+                    .text_size(px(13.0))
                     .text_color(theme.muted_foreground)
                     .child(desc),
             );
@@ -232,7 +261,7 @@ impl Toast {
                             .rounded(Radius::DEFAULT)
                             .border_1()
                             .border_color(theme.border)
-                            .font_size(px(12.0))
+                            .text_size(px(12.0))
                             .text_color(theme.foreground)
                             .cursor_pointer()
                             .hover(move |style| style.bg(theme.accent))
@@ -240,7 +269,7 @@ impl Toast {
                     )
                     .child(
                         div()
-                            .font_size(px(14.0))
+                            .text_size(px(14.0))
                             .text_color(theme.muted_foreground)
                             .cursor_pointer()
                             .child("×"),
@@ -249,7 +278,7 @@ impl Toast {
         } else {
             toast = toast.child(
                 div()
-                    .font_size(px(14.0))
+                    .text_size(px(14.0))
                     .text_color(theme.muted_foreground)
                     .cursor_pointer()
                     .child("×"),
@@ -343,7 +372,7 @@ impl AlertDialog {
                     // Title
                     .child(
                         div()
-                            .font_size(px(18.0))
+                            .text_size(px(18.0))
                             .font_weight(gpui::FontWeight::SEMIBOLD)
                             .text_color(theme.foreground)
                             .child(self.title),
@@ -352,7 +381,7 @@ impl AlertDialog {
                     .when_some(self.description, |this, desc| {
                         this.child(
                             div()
-                                .font_size(px(14.0))
+                                .text_size(px(14.0))
                                 .text_color(theme.muted_foreground)
                                 .child(desc),
                         )
@@ -372,7 +401,7 @@ impl AlertDialog {
                                     .py(px(8.0))
                                     .rounded(Radius::DEFAULT)
                                     .bg(theme.secondary)
-                                    .font_size(px(14.0))
+                                    .text_size(px(14.0))
                                     .font_weight(gpui::FontWeight::MEDIUM)
                                     .text_color(theme.secondary_foreground)
                                     .cursor_pointer()
@@ -386,7 +415,7 @@ impl AlertDialog {
                                     .py(px(8.0))
                                     .rounded(Radius::DEFAULT)
                                     .bg(confirm_bg)
-                                    .font_size(px(14.0))
+                                    .text_size(px(14.0))
                                     .font_weight(gpui::FontWeight::MEDIUM)
                                     .text_color(confirm_fg)
                                     .cursor_pointer()
@@ -469,12 +498,7 @@ impl Dialog {
                     .overflow_hidden();
 
                 // Header
-                let mut header = div()
-                    .flex()
-                    .flex_col()
-                    .gap(px(6.0))
-                    .p(px(24.0))
-                    .pb(px(0.0));
+                let mut header = div().flex().flex_col().gap(px(6.0)).p(px(24.0)).pb(px(0.0));
 
                 // Close button
                 header = header.child(
@@ -484,7 +508,7 @@ impl Dialog {
                         .justify_between()
                         .child(
                             div()
-                                .font_size(px(18.0))
+                                .text_size(px(18.0))
                                 .font_weight(gpui::FontWeight::SEMIBOLD)
                                 .text_color(theme.foreground)
                                 .child(self.title),
@@ -500,7 +524,7 @@ impl Dialog {
                                 .hover(move |style| style.bg(theme.accent))
                                 .child(
                                     div()
-                                        .font_size(px(14.0))
+                                        .text_size(px(14.0))
                                         .text_color(theme.muted_foreground)
                                         .child("×"),
                                 ),
@@ -510,7 +534,7 @@ impl Dialog {
                 if let Some(desc) = self.description {
                     header = header.child(
                         div()
-                            .font_size(px(14.0))
+                            .text_size(px(14.0))
                             .text_color(theme.muted_foreground)
                             .child(desc),
                     );
@@ -520,7 +544,7 @@ impl Dialog {
 
                 // Content
                 if !self.children.is_empty() {
-                    let mut content = div().p(px(24.0)).overflow_y_scroll();
+                    let mut content = div().p(px(24.0)).overflow_y_hidden();
                     for child in self.children {
                         content = content.child(child);
                     }

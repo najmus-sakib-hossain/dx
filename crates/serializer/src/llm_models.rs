@@ -195,26 +195,26 @@ pub static LLM_MODELS: &[LlmModel] = &[
 
 impl LlmModel {
     /// Estimate token count for given text
-    #[must_use] 
+    #[must_use]
     pub fn estimate_tokens(&self, text: &str) -> usize {
         let char_count = text.chars().count();
         ((char_count as f64) / self.chars_per_token).ceil() as usize
     }
 
     /// Calculate input cost for given token count
-    #[must_use] 
+    #[must_use]
     pub fn calculate_input_cost(&self, tokens: usize) -> f64 {
         (tokens as f64 / 1_000_000.0) * self.input_per_1m
     }
 
     /// Calculate cached input cost for given token count
-    #[must_use] 
+    #[must_use]
     pub fn calculate_cached_cost(&self, tokens: usize) -> f64 {
         (tokens as f64 / 1_000_000.0) * self.input_cached_per_1m
     }
 
     /// Calculate output cost for given token count
-    #[must_use] 
+    #[must_use]
     pub fn calculate_output_cost(&self, tokens: usize) -> f64 {
         (tokens as f64 / 1_000_000.0) * self.output_per_1m
     }
@@ -233,7 +233,7 @@ pub struct TokenAnalysis {
 }
 
 /// Analyze text for all LLM models
-#[must_use] 
+#[must_use]
 pub fn analyze_all_models(text: &str) -> Vec<TokenAnalysis> {
     LLM_MODELS
         .iter()
@@ -253,7 +253,7 @@ pub fn analyze_all_models(text: &str) -> Vec<TokenAnalysis> {
 }
 
 /// Format cost as string
-#[must_use] 
+#[must_use]
 pub fn format_cost(cost: f64) -> String {
     if cost == 0.0 {
         "$0.0000".to_string()
@@ -268,7 +268,7 @@ pub fn format_cost(cost: f64) -> String {
 }
 
 /// Format token count
-#[must_use] 
+#[must_use]
 pub fn format_tokens(tokens: usize) -> String {
     if tokens >= 1_000_000 {
         format!("{:.2}M", tokens as f64 / 1_000_000.0)
@@ -280,7 +280,7 @@ pub fn format_tokens(tokens: usize) -> String {
 }
 
 /// Get models grouped by provider
-#[must_use] 
+#[must_use]
 pub fn models_by_provider() -> Vec<(Provider, Vec<&'static LlmModel>)> {
     let mut openai = Vec::new();
     let mut anthropic = Vec::new();

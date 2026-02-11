@@ -32,7 +32,11 @@ fn main() {
 
     println!("TOON:        {toon_t} tokens");
     println!("DX current:  {dx_curr_t} tokens");
-    println!("DX abbrev:   {} tokens (saved {})", dx_abbrev_t, dx_curr_t - dx_abbrev_t);
+    println!(
+        "DX abbrev:   {} tokens (saved {})",
+        dx_abbrev_t,
+        dx_curr_t - dx_abbrev_t
+    );
     println!();
 
     println!("=== IDEA 2: Omit null values with ~ ===");
@@ -40,7 +44,11 @@ fn main() {
     let logs_dx_tilde = r"logs:24(ts lv ep sc rt er)[2025-01-15T10:23:45Z info /api/users 200 45 ~, 2025-01-15T10:24:12Z error /api/orders 500 120 Database_timeout, 2025-01-15T10:25:03Z info /api/products 200 32 ~, 2025-01-15T10:26:47Z warn /api/payment 429 5 Rate_limit_exceeded]";
 
     let dx_tilde_t = counter.count(logs_dx_tilde, ModelType::Gpt4o).count;
-    println!("DX with ~:   {} tokens (saved {})", dx_tilde_t, dx_abbrev_t - dx_tilde_t);
+    println!(
+        "DX with ~:   {} tokens (saved {})",
+        dx_tilde_t,
+        dx_abbrev_t - dx_tilde_t
+    );
     println!();
 
     println!("=== IDEA 3: Single char level codes ===");
@@ -48,7 +56,11 @@ fn main() {
     let logs_dx_codes = r"logs:24(ts lv ep sc rt er)[2025-01-15T10:23:45Z i /api/users 200 45 ~, 2025-01-15T10:24:12Z e /api/orders 500 120 Database_timeout, 2025-01-15T10:25:03Z i /api/products 200 32 ~, 2025-01-15T10:26:47Z w /api/payment 429 5 Rate_limit_exceeded]";
 
     let dx_codes_t = counter.count(logs_dx_codes, ModelType::Gpt4o).count;
-    println!("DX codes:    {} tokens (saved {})", dx_codes_t, dx_tilde_t - dx_codes_t);
+    println!(
+        "DX codes:    {} tokens (saved {})",
+        dx_codes_t,
+        dx_tilde_t - dx_codes_t
+    );
     println!();
 
     println!("=== IDEA 4: Omit /api/ prefix (common prefix elimination) ===");
@@ -56,7 +68,11 @@ fn main() {
     let logs_dx_prefix = r"logs:24(ts lv ep sc rt er)@/api/[2025-01-15T10:23:45Z i users 200 45 ~, 2025-01-15T10:24:12Z e orders 500 120 Database_timeout, 2025-01-15T10:25:03Z i products 200 32 ~, 2025-01-15T10:26:47Z w payment 429 5 Rate_limit_exceeded]";
 
     let dx_prefix_t = counter.count(logs_dx_prefix, ModelType::Gpt4o).count;
-    println!("DX prefix:   {} tokens (saved {})", dx_prefix_t, dx_codes_t - dx_prefix_t);
+    println!(
+        "DX prefix:   {} tokens (saved {})",
+        dx_prefix_t,
+        dx_codes_t - dx_prefix_t
+    );
     println!();
 
     println!("=== IDEA 5: Date prefix elimination ===");
@@ -64,7 +80,11 @@ fn main() {
     let logs_dx_date = r"logs:24(ts lv ep sc rt er)@/api/@2025-01-15T[10:23:45Z i users 200 45 ~, 10:24:12Z e orders 500 120 Database_timeout, 10:25:03Z i products 200 32 ~, 10:26:47Z w payment 429 5 Rate_limit_exceeded]";
 
     let dx_date_t = counter.count(logs_dx_date, ModelType::Gpt4o).count;
-    println!("DX date:     {} tokens (saved {})", dx_date_t, dx_prefix_t - dx_date_t);
+    println!(
+        "DX date:     {} tokens (saved {})",
+        dx_date_t,
+        dx_prefix_t - dx_date_t
+    );
     println!();
 
     println!("=== IDEA 6: Semicolon row separator (fewer tokens than comma-space) ===");

@@ -47,11 +47,11 @@ struct Cli {
     /// Enable verbose logging
     #[arg(short, long, global = true)]
     verbose: bool,
-    
+
     /// Use JSON output
     #[arg(long, global = true)]
     json: bool,
-    
+
     #[command(subcommand)]
     command: Option<Commands>,
 }
@@ -63,66 +63,66 @@ enum Commands {
         #[command(subcommand)]
         action: AgentCommands,
     },
-    
+
     /// Connect to an integration (github, telegram, notion, etc.)
     Connect {
         /// Integration name
         integration: String,
-        
+
         /// API token (optional, will prompt if not provided)
         #[arg(short, long)]
         token: Option<String>,
     },
-    
+
     /// Disconnect from an integration
     Disconnect {
         /// Integration name
         integration: String,
     },
-    
+
     /// Create new integrations, skills, or plugins
     Create {
         #[command(subcommand)]
         what: CreateCommands,
     },
-    
+
     /// List integrations, skills, or tasks
     List {
         #[command(subcommand)]
         what: ListCommands,
     },
-    
+
     /// Manage skills
     Skills {
         #[command(subcommand)]
         action: SkillsCommands,
     },
-    
+
     /// Run a natural language command
     Run {
         /// The command to run (natural language)
         #[arg(trailing_var_arg = true)]
         command: Vec<String>,
     },
-    
+
     /// Schedule tasks
     Schedule {
         #[command(subcommand)]
         action: ScheduleCommands,
     },
-    
+
     /// Serializer commands (convert to/from DX format)
     Serializer {
         #[command(subcommand)]
         action: SerializerCommands,
     },
-    
+
     /// Chat with Google AI Studio models (Gemini, Gemma)
     Chat(commands::chat::ChatCommand),
-    
+
     /// Show status of the agent and integrations
     Status,
-    
+
     /// Initialize DX in the current directory
     Init,
 }
@@ -146,7 +146,7 @@ pub enum AgentCommands {
         /// Number of lines to show
         #[arg(short, long, default_value = "50")]
         lines: usize,
-        
+
         /// Follow the log output
         #[arg(short, long)]
         follow: bool,
@@ -159,11 +159,11 @@ pub enum CreateCommands {
     Integration {
         /// Integration name
         name: String,
-        
+
         /// Programming language (python, javascript, go, rust)
         #[arg(short, long, default_value = "python")]
         language: String,
-        
+
         /// Source file (optional, will use template if not provided)
         #[arg(short, long)]
         source: Option<String>,
@@ -172,7 +172,7 @@ pub enum CreateCommands {
     Skill {
         /// Skill name
         name: String,
-        
+
         /// Skill description
         #[arg(short, long)]
         description: Option<String>,
@@ -223,15 +223,15 @@ pub enum ScheduleCommands {
     Add {
         /// Task name
         name: String,
-        
+
         /// Cron expression
         #[arg(short, long)]
         cron: String,
-        
+
         /// Skill to execute
         #[arg(short, long)]
         skill: String,
-        
+
         /// Skill context
         #[arg(long)]
         context: Option<String>,
@@ -251,7 +251,7 @@ pub enum SerializerCommands {
     FromJson {
         /// Input file or stdin
         input: Option<String>,
-        
+
         /// Output file (default: stdout)
         #[arg(short, long)]
         output: Option<String>,
@@ -260,7 +260,7 @@ pub enum SerializerCommands {
     ToJson {
         /// Input file or stdin
         input: Option<String>,
-        
+
         /// Output file (default: stdout)
         #[arg(short, long)]
         output: Option<String>,
@@ -269,7 +269,7 @@ pub enum SerializerCommands {
     Process {
         /// Input file or directory
         path: String,
-        
+
         /// Recursive processing
         #[arg(short, long)]
         recursive: bool,
@@ -279,20 +279,24 @@ pub enum SerializerCommands {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
-    
+
     // Set up logging
-    let level = if cli.verbose { Level::DEBUG } else { Level::INFO };
+    let level = if cli.verbose {
+        Level::DEBUG
+    } else {
+        Level::INFO
+    };
     FmtSubscriber::builder()
         .with_max_level(level)
         .with_target(false)
         .compact()
         .init();
-    
+
     // Print banner
     if !cli.json {
         print_banner();
     }
-    
+
     match cli.command {
         Some(Commands::Agent { action }) => commands::agent::run(action).await?,
         Some(Commands::Connect { integration, token }) => {
@@ -315,17 +319,17 @@ async fn main() -> anyhow::Result<()> {
         Some(Commands::Init) => commands::init::run().await?,
         None => run_onboarding().await?,
     }
-    
+
     Ok(())
 }
 
 async fn run_onboarding() -> anyhow::Result<()> {
     use prompts::{
         autocomplete, box_section, calendar, code_snippet, confirm, date_picker, email,
-        emoji_picker, file_browser, intro, json_editor, kanban, list_editor, log,
-        markdown_editor, matrix_select, multiselect, number, outro, phone_input, range_slider,
-        rating, search_filter, select, slider, table_editor, tags, text, time_picker, toggle,
-        tree_select, url, CodeSnippet, KanbanTask, PromptInteraction, TreeNode, Validate,
+        emoji_picker, file_browser, intro, json_editor, kanban, list_editor, log, markdown_editor,
+        matrix_select, multiselect, number, outro, phone_input, range_slider, rating,
+        search_filter, select, slider, table_editor, tags, text, time_picker, toggle, tree_select,
+        url, CodeSnippet, KanbanTask, PromptInteraction, TreeNode, Validate,
     };
 
     intro("Welcome to DX - Your AGI-like AI Agent")?;
@@ -373,7 +377,9 @@ async fn run_onboarding() -> anyhow::Result<()> {
     log::info("Great choices! Now let's configure your team settings.")?;
 
     // Number Input Demo
-    let mut team_size_prompt = number("How many team members will use DX?").min(1).max(1000);
+    let mut team_size_prompt = number("How many team members will use DX?")
+        .min(1)
+        .max(1000);
     let team_size = team_size_prompt.interact()?;
 
     if team_size > 10 {
@@ -381,8 +387,8 @@ async fn run_onboarding() -> anyhow::Result<()> {
     }
 
     // Tags Demo
-    let mut skills_prompt = tags("Enter your team's skills")
-        .placeholder("Type a skill and press Enter or comma");
+    let mut skills_prompt =
+        tags("Enter your team's skills").placeholder("Type a skill and press Enter or comma");
     let _skills = skills_prompt.interact()?;
 
     // List Editor Demo
@@ -394,7 +400,11 @@ async fn run_onboarding() -> anyhow::Result<()> {
     let mut framework_prompt = autocomplete("Select your primary development framework:")
         .item_with_description("react", "React", "A JavaScript library for building UIs")
         .item_with_description("vue", "Vue.js", "The Progressive JavaScript Framework")
-        .item_with_description("angular", "Angular", "Platform for building mobile and desktop apps")
+        .item_with_description(
+            "angular",
+            "Angular",
+            "Platform for building mobile and desktop apps",
+        )
         .item_with_description("svelte", "Svelte", "Cybernetically enhanced web apps")
         .item_with_description("nextjs", "Next.js", "The React Framework for Production")
         .item_with_description("nuxt", "Nuxt", "The Intuitive Vue Framework")
@@ -414,13 +424,12 @@ async fn run_onboarding() -> anyhow::Result<()> {
     let _user_email = email_prompt.interact()?;
 
     // URL Input Demo
-    let mut url_prompt = url("Enter your project repository URL:")
-        .require_https(false);
+    let mut url_prompt = url("Enter your project repository URL:").require_https(false);
     let _repo_url = url_prompt.interact()?;
 
     // Range Slider Demo
-    let mut price_range_prompt = range_slider("Select your budget range (USD):", 0, 10000)
-        .initial_range(1000, 5000);
+    let mut price_range_prompt =
+        range_slider("Select your budget range (USD):", 0, 10000).initial_range(1000, 5000);
     let _price_range = price_range_prompt.interact()?;
 
     // Tree Select Demo
@@ -429,55 +438,60 @@ async fn run_onboarding() -> anyhow::Result<()> {
             TreeNode::new("frontend", "Frontend")
                 .child(TreeNode::new("react", "React Components"))
                 .child(TreeNode::new("styles", "Styles & Themes"))
-                .child(TreeNode::new("assets", "Assets & Media"))
+                .child(TreeNode::new("assets", "Assets & Media")),
         )
         .node(
             TreeNode::new("backend", "Backend")
                 .child(TreeNode::new("api", "API Routes"))
                 .child(TreeNode::new("db", "Database Models"))
-                .child(TreeNode::new("auth", "Authentication"))
+                .child(TreeNode::new("auth", "Authentication")),
         )
         .node(
             TreeNode::new("infra", "Infrastructure")
                 .child(TreeNode::new("docker", "Docker Config"))
-                .child(TreeNode::new("ci", "CI/CD Pipelines"))
+                .child(TreeNode::new("ci", "CI/CD Pipelines")),
         );
     let _selected_component = project_structure_prompt.interact()?;
 
     // File Browser Demo
-    let mut config_file_prompt = file_browser("Select a configuration file:")
-        .allow_directories(false);
+    let mut config_file_prompt =
+        file_browser("Select a configuration file:").allow_directories(false);
     let _config_file = config_file_prompt.interact()?;
 
     log::success("Advanced inputs completed! Now let's try some more specialized prompts.")?;
 
-    box_section(
-        "Specialized Prompts",
-        &["Date/Time and Tables!"],
-    )?;
+    box_section("Specialized Prompts", &["Date/Time and Tables!"])?;
 
     // Date Picker Demo
     let mut date_prompt = date_picker("Select a project deadline:");
     let _deadline = date_prompt.interact()?;
 
     // Time Picker Demo
-    let mut time_prompt = time_picker("Select meeting time:")
-        .format_24h(false);
+    let mut time_prompt = time_picker("Select meeting time:").format_24h(false);
     let _meeting_time = time_prompt.interact()?;
 
     // Table Editor Demo
     let mut table_prompt = table_editor("Edit team members:")
-        .headers(vec!["Name".to_string(), "Role".to_string(), "Email".to_string()])
-        .add_row(vec!["Alice".to_string(), "Developer".to_string(), "alice@example.com".to_string()])
-        .add_row(vec!["Bob".to_string(), "Designer".to_string(), "bob@example.com".to_string()]);
+        .headers(vec![
+            "Name".to_string(),
+            "Role".to_string(),
+            "Email".to_string(),
+        ])
+        .add_row(vec![
+            "Alice".to_string(),
+            "Developer".to_string(),
+            "alice@example.com".to_string(),
+        ])
+        .add_row(vec![
+            "Bob".to_string(),
+            "Designer".to_string(),
+            "bob@example.com".to_string(),
+        ]);
     let _team_data = table_prompt.interact()?;
 
     log::success("All specialized prompts completed! Let's try data entry prompts.")?;
 
-    box_section(
-        "Data Entry & Search",
-        &["Phone, JSON, Matrix, and Search!"],
-    )?;
+    box_section("Data Entry & Search", &["Phone, JSON, Matrix, and Search!"])?;
 
     // Phone Input Demo with country selection
     let mut country_prompt = select("Select your country:")
@@ -655,8 +669,7 @@ async fn run_onboarding() -> anyhow::Result<()> {
         .item("+263", "Zimbabwe", "Africa");
     let country_code = country_prompt.interact()?;
 
-    let mut phone_prompt = phone_input("Enter your phone number:")
-        .country_code(country_code);
+    let mut phone_prompt = phone_input("Enter your phone number:").country_code(country_code);
     let _phone = phone_prompt.interact()?;
 
     // JSON Editor Demo
@@ -685,12 +698,32 @@ async fn run_onboarding() -> anyhow::Result<()> {
 
     // Search with Filters Demo
     let mut search_prompt = search_filter("Search for a package:")
-        .item("react", "React", vec!["frontend".to_string(), "ui".to_string()])
-        .item("vue", "Vue.js", vec!["frontend".to_string(), "ui".to_string()])
-        .item("express", "Express", vec!["backend".to_string(), "api".to_string()])
-        .item("fastify", "Fastify", vec!["backend".to_string(), "api".to_string()])
+        .item(
+            "react",
+            "React",
+            vec!["frontend".to_string(), "ui".to_string()],
+        )
+        .item(
+            "vue",
+            "Vue.js",
+            vec!["frontend".to_string(), "ui".to_string()],
+        )
+        .item(
+            "express",
+            "Express",
+            vec!["backend".to_string(), "api".to_string()],
+        )
+        .item(
+            "fastify",
+            "Fastify",
+            vec!["backend".to_string(), "api".to_string()],
+        )
         .item("postgres", "PostgreSQL", vec!["database".to_string()])
-        .item("redis", "Redis", vec!["database".to_string(), "cache".to_string()])
+        .item(
+            "redis",
+            "Redis",
+            vec!["database".to_string(), "cache".to_string()],
+        )
         .filter("frontend")
         .filter("backend")
         .filter("database")
@@ -743,26 +776,38 @@ async fn run_onboarding() -> anyhow::Result<()> {
 
     // Kanban Board Demo
     let mut kanban_prompt = kanban("Manage your tasks:")
-        .task(0, KanbanTask {
-            id: "1".to_string(),
-            title: "Setup project".to_string(),
-            description: "Initialize repository and dependencies".to_string(),
-        })
-        .task(0, KanbanTask {
-            id: "2".to_string(),
-            title: "Design UI".to_string(),
-            description: "Create mockups and wireframes".to_string(),
-        })
-        .task(1, KanbanTask {
-            id: "3".to_string(),
-            title: "Implement auth".to_string(),
-            description: "Add authentication system".to_string(),
-        })
-        .task(2, KanbanTask {
-            id: "4".to_string(),
-            title: "Write tests".to_string(),
-            description: "Unit and integration tests".to_string(),
-        });
+        .task(
+            0,
+            KanbanTask {
+                id: "1".to_string(),
+                title: "Setup project".to_string(),
+                description: "Initialize repository and dependencies".to_string(),
+            },
+        )
+        .task(
+            0,
+            KanbanTask {
+                id: "2".to_string(),
+                title: "Design UI".to_string(),
+                description: "Create mockups and wireframes".to_string(),
+            },
+        )
+        .task(
+            1,
+            KanbanTask {
+                id: "3".to_string(),
+                title: "Implement auth".to_string(),
+                description: "Add authentication system".to_string(),
+            },
+        )
+        .task(
+            2,
+            KanbanTask {
+                id: "4".to_string(),
+                title: "Write tests".to_string(),
+                description: "Unit and integration tests".to_string(),
+            },
+        );
     let _kanban_state = kanban_prompt.interact()?;
 
     log::success("All content creation prompts completed! Now let's configure your AI.")?;
@@ -774,15 +819,33 @@ async fn run_onboarding() -> anyhow::Result<()> {
 
     // Choose AI providers
     let mut providers_prompt = multiselect("Select AI providers to configure:")
-        .item("openai", "OpenAI (GPT-4, GPT-3.5)", "Most popular, great for general tasks")
-        .item("anthropic", "Anthropic (Claude)", "Excellent for analysis and writing")
+        .item(
+            "openai",
+            "OpenAI (GPT-4, GPT-3.5)",
+            "Most popular, great for general tasks",
+        )
+        .item(
+            "anthropic",
+            "Anthropic (Claude)",
+            "Excellent for analysis and writing",
+        )
         .item("google", "Google (Gemini)", "Fast and cost-effective")
-        .item("ollama", "Ollama (Local models)", "Run models locally for privacy")
-        .item("custom", "Custom API endpoint", "Connect to any OpenAI-compatible API");
+        .item(
+            "ollama",
+            "Ollama (Local models)",
+            "Run models locally for privacy",
+        )
+        .item(
+            "custom",
+            "Custom API endpoint",
+            "Connect to any OpenAI-compatible API",
+        );
     let providers = providers_prompt.interact()?;
 
     if providers.is_empty() {
-        log::warning("No providers selected. You can configure them later with 'dx connect <provider>'")?;
+        log::warning(
+            "No providers selected. You can configure them later with 'dx connect <provider>'",
+        )?;
     }
 
     // Choose integrations
@@ -800,20 +863,46 @@ async fn run_onboarding() -> anyhow::Result<()> {
     let integrations = integrations_prompt.interact()?;
 
     if integrations.is_empty() {
-        log::info("No integrations selected. You can add them later with 'dx connect <integration>'")?;
+        log::info(
+            "No integrations selected. You can add them later with 'dx connect <integration>'",
+        )?;
     }
 
     // Choose tools/capabilities
     let mut tools_prompt = multiselect("Select AI tools and capabilities:")
-        .item("code_generation", "Code Generation", "Generate, refactor, and explain code")
-        .item("data_analysis", "Data Analysis", "Process and analyze datasets")
-        .item("web_search", "Web Search", "Search and summarize web content")
-        .item("image_generation", "Image Generation", "Create images with AI")
-        .item("speech_recognition", "Speech Recognition", "Transcribe audio to text")
+        .item(
+            "code_generation",
+            "Code Generation",
+            "Generate, refactor, and explain code",
+        )
+        .item(
+            "data_analysis",
+            "Data Analysis",
+            "Process and analyze datasets",
+        )
+        .item(
+            "web_search",
+            "Web Search",
+            "Search and summarize web content",
+        )
+        .item(
+            "image_generation",
+            "Image Generation",
+            "Create images with AI",
+        )
+        .item(
+            "speech_recognition",
+            "Speech Recognition",
+            "Transcribe audio to text",
+        )
         .item("translation", "Translation", "Translate between languages")
         .item("summarization", "Summarization", "Condense long texts")
         .item("automation", "Task Automation", "Automate repetitive tasks")
-        .item("research", "Research Assistant", "Help with research and analysis");
+        .item(
+            "research",
+            "Research Assistant",
+            "Help with research and analysis",
+        );
     let tools = tools_prompt.interact()?;
 
     if tools.is_empty() {
@@ -825,13 +914,17 @@ async fn run_onboarding() -> anyhow::Result<()> {
         .item("gpt-4", "GPT-4", "Most capable, best for complex tasks")
         .item("claude-3", "Claude 3", "Excellent for analysis and writing")
         .item("gemini-pro", "Gemini Pro", "Fast and cost-effective")
-        .item("llama-3", "Llama 3 (Local)", "Privacy-focused, runs locally")
+        .item(
+            "llama-3",
+            "Llama 3 (Local)",
+            "Privacy-focused, runs locally",
+        )
         .item("custom", "Custom model", "Specify your own model");
     let _default_model = default_model_prompt.interact()?;
 
     // Ask about daemon mode
-    let mut start_daemon_prompt = confirm("Would you like to start the DX agent daemon now?")
-        .initial_value(true);
+    let mut start_daemon_prompt =
+        confirm("Would you like to start the DX agent daemon now?").initial_value(true);
     let start_daemon = start_daemon_prompt.interact()?;
 
     if start_daemon {
@@ -842,8 +935,9 @@ async fn run_onboarding() -> anyhow::Result<()> {
     }
 
     // Final setup confirmation
-    let mut proceed_prompt = confirm("Setup complete! Would you like to start chatting with your AI agent?")
-        .initial_value(true);
+    let mut proceed_prompt =
+        confirm("Setup complete! Would you like to start chatting with your AI agent?")
+            .initial_value(true);
     let proceed = proceed_prompt.interact()?;
 
     if proceed {
@@ -872,7 +966,11 @@ fn print_banner() {
         "",
     ];
 
-    let max_width = lines.iter().map(|s| UnicodeWidthStr::width(*s)).max().unwrap_or(0);
+    let max_width = lines
+        .iter()
+        .map(|s| UnicodeWidthStr::width(*s))
+        .max()
+        .unwrap_or(0);
     let top = format!("╔{}╗", "═".repeat(max_width));
     let bottom = format!("╚{}╝", "═".repeat(max_width));
 

@@ -88,12 +88,13 @@ impl PromptInteraction for Confirm {
                 // Title line - diamond aligns with │ position
                 let bar = theme.dim.apply_to(symbols.bar);
                 let title_with_spaces = format!("  {}  ", self.message);
-                term.write_line(&format!("{}{}", 
+                term.write_line(&format!(
+                    "{}{}",
                     theme.primary.apply_to(symbols.step_submit),
                     title_with_spaces.bold()
                 ))?;
                 lines += 1;
-                
+
                 // ONE blank line after title (with bar)
                 term.write_line(&format!("{}", bar))?;
                 lines += 1;

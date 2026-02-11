@@ -122,22 +122,18 @@ impl PromptInteraction for ColorPickerAdvanced {
                         self.active_channel += 1;
                     }
                 }
-                console::Key::ArrowRight | console::Key::Char('l') => {
-                    match self.active_channel {
-                        0 => self.r = self.r.saturating_add(5),
-                        1 => self.g = self.g.saturating_add(5),
-                        2 => self.b = self.b.saturating_add(5),
-                        _ => {}
-                    }
-                }
-                console::Key::ArrowLeft | console::Key::Char('h') => {
-                    match self.active_channel {
-                        0 => self.r = self.r.saturating_sub(5),
-                        1 => self.g = self.g.saturating_sub(5),
-                        2 => self.b = self.b.saturating_sub(5),
-                        _ => {}
-                    }
-                }
+                console::Key::ArrowRight | console::Key::Char('l') => match self.active_channel {
+                    0 => self.r = self.r.saturating_add(5),
+                    1 => self.g = self.g.saturating_add(5),
+                    2 => self.b = self.b.saturating_add(5),
+                    _ => {}
+                },
+                console::Key::ArrowLeft | console::Key::Char('h') => match self.active_channel {
+                    0 => self.r = self.r.saturating_sub(5),
+                    1 => self.g = self.g.saturating_sub(5),
+                    2 => self.b = self.b.saturating_sub(5),
+                    _ => {}
+                },
                 _ => {}
             },
             Event::Error => self.state = State::Error,
@@ -186,19 +182,31 @@ impl PromptInteraction for ColorPickerAdvanced {
                 let b_marker = if self.active_channel == 2 { "▸" } else { " " };
 
                 let r_display = if self.active_channel == 0 {
-                    theme.primary.apply_to(format!("{:3}", self.r)).bold().to_string()
+                    theme
+                        .primary
+                        .apply_to(format!("{:3}", self.r))
+                        .bold()
+                        .to_string()
                 } else {
                     format!("{:3}", self.r)
                 };
 
                 let g_display = if self.active_channel == 1 {
-                    theme.primary.apply_to(format!("{:3}", self.g)).bold().to_string()
+                    theme
+                        .primary
+                        .apply_to(format!("{:3}", self.g))
+                        .bold()
+                        .to_string()
                 } else {
                     format!("{:3}", self.g)
                 };
 
                 let b_display = if self.active_channel == 2 {
-                    theme.primary.apply_to(format!("{:3}", self.b)).bold().to_string()
+                    theme
+                        .primary
+                        .apply_to(format!("{:3}", self.b))
+                        .bold()
+                        .to_string()
                 } else {
                     format!("{:3}", self.b)
                 };
@@ -237,7 +245,9 @@ impl PromptInteraction for ColorPickerAdvanced {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("↑↓: select channel, ← →: adjust, Tab: mode, Enter: confirm")
+                    theme
+                        .dim
+                        .apply_to("↑↓: select channel, ← →: adjust, Tab: mode, Enter: confirm")
                 ))?;
                 lines += 1;
             }

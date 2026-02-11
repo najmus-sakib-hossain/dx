@@ -1,5 +1,8 @@
-use gpui::{div, prelude::*, px, AnyElement, Hsla, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, AnyElement, ClickEvent, Hsla, IntoElement};
+
+/// Type alias for click handler to reduce complexity.
+type ClickHandler = Box<dyn Fn(&ClickEvent, &mut gpui::Window, &mut gpui::App) + 'static>;
 
 // ─── Button ─────────────────────────────────────────────────────────────────
 // A shadcn-ui style Button with variants, sizes, and full interactivity.
@@ -39,7 +42,7 @@ pub struct Button {
     full_width: bool,
     icon_left: Option<String>,
     icon_right: Option<String>,
-    on_click: Option<Box<dyn FnOnce() + 'static>>,
+    on_click: Option<ClickHandler>,
 }
 
 impl Button {
@@ -83,7 +86,10 @@ impl Button {
 
     /// Icon-only button
     pub fn icon(icon: impl Into<String>) -> Self {
-        Self::new("").variant(ButtonVariant::Outline).size(ButtonSize::Icon).with_icon_left(icon)
+        Self::new("")
+            .variant(ButtonVariant::Outline)
+            .size(ButtonSize::Icon)
+            .with_icon_left(icon)
     }
 
     // ── Builder methods ──
@@ -118,7 +124,10 @@ impl Button {
         self
     }
 
-    pub fn on_click(mut self, handler: impl FnOnce() + 'static) -> Self {
+    pub fn on_click(
+        mut self,
+        handler: impl Fn(&ClickEvent, &mut gpui::Window, &mut gpui::App) + 'static,
+    ) -> Self {
         self.on_click = Some(Box::new(handler));
         self
     }
@@ -151,7 +160,7 @@ impl Button {
             .bg(bg)
             .text_color(fg)
             .min_h(min_h)
-            .font_size(font_size);
+            .text_size(font_size);
 
         // Size-specific styling
         if is_icon {
@@ -205,6 +214,11 @@ impl Button {
             el = el.child(div().text_color(fg).child(icon));
         }
 
+        // On click handler
+        if let Some(handler) = self.on_click {
+            el = el.on_click(handler);
+        }
+
         el
     }
 
@@ -256,7 +270,7 @@ pub struct IconButton;
 
 #[allow(dead_code)]
 impl IconButton {
-    pub fn new(icon: impl Into<String>) -> Button {
+    pub fn create(icon: impl Into<String>) -> Button {
         Button::icon(icon)
     }
 

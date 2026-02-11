@@ -33,7 +33,11 @@ struct Section {
 
 fn doc_to_test_data(doc: &DxDocument) -> TestData {
     TestData {
-        context: doc.context.iter().map(|(k, v)| (k.clone(), format!("{v:?}"))).collect(),
+        context: doc
+            .context
+            .iter()
+            .map(|(k, v)| (k.clone(), format!("{v:?}")))
+            .collect(),
         sections: doc
             .sections
             .iter()

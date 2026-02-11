@@ -1,5 +1,5 @@
-use gpui::{div, prelude::*, px, Hsla, IntoElement};
 use crate::theme::{colors::Radius, Theme};
+use gpui::{div, prelude::*, px, Hsla, IntoElement};
 
 // ─── Badge ──────────────────────────────────────────────────────────────────
 // A shadcn-ui style Badge for displaying status, labels, or counts.
@@ -69,7 +69,7 @@ impl Badge {
             .rounded(Radius::FULL)
             .bg(bg)
             .text_color(fg)
-            .font_size(px(12.0))
+            .text_size(px(12.0))
             .font_weight(gpui::FontWeight::MEDIUM)
             .line_height(px(16.0));
 
@@ -83,8 +83,14 @@ impl Badge {
     fn variant_colors(&self, theme: &Theme) -> (Hsla, Hsla, Hsla) {
         match self.variant {
             BadgeVariant::Default => (theme.primary, theme.primary_foreground, theme.primary),
-            BadgeVariant::Secondary => (theme.secondary, theme.secondary_foreground, theme.secondary),
-            BadgeVariant::Destructive => (theme.destructive, theme.destructive_foreground, theme.destructive),
+            BadgeVariant::Secondary => {
+                (theme.secondary, theme.secondary_foreground, theme.secondary)
+            }
+            BadgeVariant::Destructive => (
+                theme.destructive,
+                theme.destructive_foreground,
+                theme.destructive,
+            ),
             BadgeVariant::Outline => (gpui::transparent_black(), theme.foreground, theme.border),
             BadgeVariant::Success => (theme.success, theme.success_foreground, theme.success),
             BadgeVariant::Warning => (theme.warning, theme.warning_foreground, theme.warning),

@@ -115,7 +115,7 @@ impl LlmParser {
     }
 
     /// Parse a single value string
-    #[must_use] 
+    #[must_use]
     pub fn parse_value(s: &str) -> DxLlmValue {
         let s = s.trim();
 
@@ -360,10 +360,16 @@ impl<'a> DsrParser<'a> {
                         // Auto-detect separator: comma (legacy) or space (new format)
                         let items: Vec<DxLlmValue> = if items_str.contains(',') {
                             // Comma-separated (legacy format)
-                            items_str.split(',').map(|s| LlmParser::parse_value(s.trim())).collect()
+                            items_str
+                                .split(',')
+                                .map(|s| LlmParser::parse_value(s.trim()))
+                                .collect()
                         } else {
                             // Space-separated (new format)
-                            items_str.split_whitespace().map(LlmParser::parse_value).collect()
+                            items_str
+                                .split_whitespace()
+                                .map(LlmParser::parse_value)
+                                .collect()
                         };
                         doc.context.insert(name, DxLlmValue::Arr(items));
                     } else {
@@ -520,10 +526,16 @@ impl<'a> DsrParser<'a> {
                     // Auto-detect separator: comma (legacy) or space (new format)
                     let items: Vec<DxLlmValue> = if items_str.contains(',') {
                         // Comma-separated (legacy format)
-                        items_str.split(',').map(|s| LlmParser::parse_value(s.trim())).collect()
+                        items_str
+                            .split(',')
+                            .map(|s| LlmParser::parse_value(s.trim()))
+                            .collect()
                     } else {
                         // Space-separated (new format)
-                        items_str.split_whitespace().map(LlmParser::parse_value).collect()
+                        items_str
+                            .split_whitespace()
+                            .map(LlmParser::parse_value)
+                            .collect()
                     };
                     fields.insert(key, DxLlmValue::Arr(items));
                 } else {
@@ -846,7 +858,10 @@ impl<'a> DsrParser<'a> {
         // Pair up tokens as key-value pairs
         if tokens.len() % 2 != 0 {
             return Err(ParseError::InvalidTable {
-                msg: format!("Compact syntax requires even number of tokens, got {}", tokens.len()),
+                msg: format!(
+                    "Compact syntax requires even number of tokens, got {}",
+                    tokens.len()
+                ),
             });
         }
 
@@ -879,7 +894,10 @@ impl<'a> DsrParser<'a> {
                 .filter(|s| !s.is_empty())
                 .collect()
         } else {
-            schema_str.split_whitespace().map(std::string::ToString::to_string).collect()
+            schema_str
+                .split_whitespace()
+                .map(std::string::ToString::to_string)
+                .collect()
         };
 
         if schema.is_empty() {
@@ -1471,7 +1489,11 @@ impl<'a> DsrParser<'a> {
         let mut arr = Vec::new();
         for row in &section.rows {
             // Convert row to string representation
-            let row_str = row.iter().map(Self::value_to_string).collect::<Vec<_>>().join(",");
+            let row_str = row
+                .iter()
+                .map(Self::value_to_string)
+                .collect::<Vec<_>>()
+                .join(",");
             arr.push(DxLlmValue::Str(row_str));
         }
         DxLlmValue::Arr(arr)
@@ -1521,7 +1543,10 @@ mod tests {
         let doc = LlmParser::parse(input).unwrap();
 
         assert_eq!(doc.context.len(), 2);
-        assert_eq!(doc.context.get("environment").unwrap().as_str(), Some("development"));
+        assert_eq!(
+            doc.context.get("environment").unwrap().as_str(),
+            Some("development")
+        );
         assert_eq!(doc.context.get("version").unwrap().as_str(), Some("2.2.16"));
     }
 
@@ -1536,7 +1561,10 @@ mod tests {
             doc.context.get("forge.repository").unwrap().as_str(),
             Some("https://dx.vercel.app/user/repo")
         );
-        assert_eq!(doc.context.get("style.path").unwrap().as_str(), Some("@/style"));
+        assert_eq!(
+            doc.context.get("style.path").unwrap().as_str(),
+            Some("@/style")
+        );
     }
 
     #[test]
@@ -1551,7 +1579,10 @@ mod tests {
             doc.context.get("forge.repository").unwrap().as_str(),
             Some("https://example.com")
         );
-        assert_eq!(doc.context.get("editors.default").unwrap().as_str(), Some("neovim"));
+        assert_eq!(
+            doc.context.get("editors.default").unwrap().as_str(),
+            Some("neovim")
+        );
     }
 
     #[test]
@@ -1756,8 +1787,17 @@ mod tests {
         let input = "js.dependencies.react:: 19.0.1\npython.dependencies.django:: latest";
         let doc = LlmParser::parse(input).unwrap();
 
-        assert_eq!(doc.context.get("js.dependencies.react").unwrap().as_str(), Some("19.0.1"));
-        assert_eq!(doc.context.get("python.dependencies.django").unwrap().as_str(), Some("latest"));
+        assert_eq!(
+            doc.context.get("js.dependencies.react").unwrap().as_str(),
+            Some("19.0.1")
+        );
+        assert_eq!(
+            doc.context
+                .get("python.dependencies.django")
+                .unwrap()
+                .as_str(),
+            Some("latest")
+        );
     }
 
     #[test]

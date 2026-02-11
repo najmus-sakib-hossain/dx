@@ -1,4 +1,4 @@
-use criterion::{Criterion, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use rkyv::{Archive, Deserialize, Serialize};
 use serializer::machine::optimized_rkyv::OptimizedRkyv;
 use std::path::PathBuf;
@@ -119,7 +119,8 @@ fn bench_file_io(c: &mut Criterion) {
 
     group.bench_function("dx_adaptive_small", |b| {
         b.iter(|| {
-            opt.serialize_to_file(black_box(&small_data), black_box(&small_path)).unwrap();
+            opt.serialize_to_file(black_box(&small_data), black_box(&small_path))
+                .unwrap();
         });
     });
 
@@ -136,7 +137,8 @@ fn bench_file_io(c: &mut Criterion) {
 
     group.bench_function("dx_adaptive_large", |b| {
         b.iter(|| {
-            opt.serialize_to_file(black_box(&large_data), black_box(&large_path)).unwrap();
+            opt.serialize_to_file(black_box(&large_data), black_box(&large_path))
+                .unwrap();
         });
     });
 
@@ -245,7 +247,10 @@ fn bench_batch_file_operations(c: &mut Criterion) {
 
     group.bench_function("dx_adaptive", |b| {
         b.iter(|| {
-            let items_ref: Vec<_> = items.iter().map(|(d, p)| (d.clone(), p.as_path())).collect();
+            let items_ref: Vec<_> = items
+                .iter()
+                .map(|(d, p)| (d.clone(), p.as_path()))
+                .collect();
             opt.serialize_batch_to_files(black_box(&items_ref)).unwrap();
         });
     });

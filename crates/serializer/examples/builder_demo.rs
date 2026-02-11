@@ -75,10 +75,14 @@ fn create_sample_document() -> DxDocument {
     let mut doc = DxDocument::new();
 
     // Add context (configuration)
-    doc.context.insert("nm".to_string(), DxLlmValue::Str("MyApp".to_string()));
-    doc.context.insert("v".to_string(), DxLlmValue::Str("1.0.0".to_string()));
     doc.context
-        .insert("tt".to_string(), DxLlmValue::Str("Sample Application".to_string()));
+        .insert("nm".to_string(), DxLlmValue::Str("MyApp".to_string()));
+    doc.context
+        .insert("v".to_string(), DxLlmValue::Str("1.0.0".to_string()));
+    doc.context.insert(
+        "tt".to_string(),
+        DxLlmValue::Str("Sample Application".to_string()),
+    );
     doc.context.insert("ac".to_string(), DxLlmValue::Bool(true));
     doc.context.insert("ct".to_string(), DxLlmValue::Num(42.0));
 

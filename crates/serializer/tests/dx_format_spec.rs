@@ -9,8 +9,8 @@
 
 use serializer::zero::DxZeroBuilder;
 use serializer::{
-    DxDocument, DxLlmValue, DxSection, document_to_llm, document_to_machine, human_to_llm,
-    llm_to_document, llm_to_human, machine_to_document,
+    document_to_llm, document_to_machine, human_to_llm, llm_to_document, llm_to_human,
+    machine_to_document, DxDocument, DxLlmValue, DxSection,
 };
 
 // ============================================================================
@@ -33,8 +33,10 @@ mod llm_format {
     fn spec_string_values() {
         let mut doc = DxDocument::new();
         // Use abbreviated keys that the serializer uses
-        doc.context.insert("nm".into(), DxLlmValue::Str("Test".into()));
-        doc.context.insert("desc".into(), DxLlmValue::Str("Hello".into()));
+        doc.context
+            .insert("nm".into(), DxLlmValue::Str("Test".into()));
+        doc.context
+            .insert("desc".into(), DxLlmValue::Str("Hello".into()));
 
         let llm = document_to_llm(&doc);
         let parsed = llm_to_document(&llm).unwrap();
@@ -144,7 +146,10 @@ mod llm_format {
         let parsed = llm_to_document(&llm).unwrap();
 
         // Sections get auto-assigned IDs when parsed, so just check we have one
-        assert!(!parsed.sections.is_empty(), "Should have at least one section");
+        assert!(
+            !parsed.sections.is_empty(),
+            "Should have at least one section"
+        );
         let section = parsed.sections.values().next().unwrap();
         assert_eq!(section.schema.len(), 3);
         assert_eq!(section.rows.len(), 2);
@@ -153,7 +158,8 @@ mod llm_format {
     #[test]
     fn spec_round_trip_consistency() {
         let mut doc = DxDocument::new();
-        doc.context.insert("nm".into(), DxLlmValue::Str("Test".into()));
+        doc.context
+            .insert("nm".into(), DxLlmValue::Str("Test".into()));
         doc.context.insert("ct".into(), DxLlmValue::Num(42.0));
         doc.context.insert("ac".into(), DxLlmValue::Bool(true));
 
@@ -200,7 +206,8 @@ mod machine_format {
     #[test]
     fn spec_all_value_types() {
         let mut doc = DxDocument::new();
-        doc.context.insert("str".into(), DxLlmValue::Str("Hello".into()));
+        doc.context
+            .insert("str".into(), DxLlmValue::Str("Hello".into()));
         doc.context.insert("num".into(), DxLlmValue::Num(42.0));
         doc.context.insert("bool".into(), DxLlmValue::Bool(true));
         doc.context.insert("null".into(), DxLlmValue::Null);
@@ -231,7 +238,8 @@ mod machine_format {
     #[test]
     fn spec_round_trip_consistency() {
         let mut doc = DxDocument::new();
-        doc.context.insert("name".into(), DxLlmValue::Str("Test".into()));
+        doc.context
+            .insert("name".into(), DxLlmValue::Str("Test".into()));
         doc.context.insert("count".into(), DxLlmValue::Num(42.0));
 
         let machine1 = document_to_machine(&doc);
@@ -246,8 +254,12 @@ mod machine_format {
     fn spec_table_section() {
         let mut doc = DxDocument::new();
         let mut section = DxSection::new(vec!["id".into(), "value".into()]);
-        section.rows.push(vec![DxLlmValue::Num(1.0), DxLlmValue::Str("A".into())]);
-        section.rows.push(vec![DxLlmValue::Num(2.0), DxLlmValue::Str("B".into())]);
+        section
+            .rows
+            .push(vec![DxLlmValue::Num(1.0), DxLlmValue::Str("A".into())]);
+        section
+            .rows
+            .push(vec![DxLlmValue::Num(2.0), DxLlmValue::Str("B".into())]);
         doc.sections.insert('t', section);
 
         let machine = document_to_machine(&doc);
@@ -260,13 +272,18 @@ mod machine_format {
     #[test]
     fn spec_unicode_strings() {
         let mut doc = DxDocument::new();
-        doc.context.insert("cjk".into(), DxLlmValue::Str("你好世界".into()));
-        doc.context.insert("emoji".into(), DxLlmValue::Str("🚀🎉".into()));
+        doc.context
+            .insert("cjk".into(), DxLlmValue::Str("你好世界".into()));
+        doc.context
+            .insert("emoji".into(), DxLlmValue::Str("🚀🎉".into()));
 
         let machine = document_to_machine(&doc);
         let parsed = machine_to_document(&machine).unwrap();
 
-        assert_eq!(parsed.context.get("cjk").unwrap().as_str(), Some("你好世界"));
+        assert_eq!(
+            parsed.context.get("cjk").unwrap().as_str(),
+            Some("你好世界")
+        );
         assert_eq!(parsed.context.get("emoji").unwrap().as_str(), Some("🚀🎉"));
     }
 }
@@ -396,7 +413,8 @@ mod cross_format {
     #[test]
     fn spec_llm_to_machine_to_llm() {
         let mut doc = DxDocument::new();
-        doc.context.insert("nm".into(), DxLlmValue::Str("Test".into()));
+        doc.context
+            .insert("nm".into(), DxLlmValue::Str("Test".into()));
         doc.context.insert("ct".into(), DxLlmValue::Num(42.0));
 
         let llm1 = document_to_llm(&doc);
@@ -413,16 +431,23 @@ mod cross_format {
     #[test]
     fn spec_all_formats_preserve_data() {
         let mut doc = DxDocument::new();
-        doc.context.insert("str".into(), DxLlmValue::Str("Hello".into()));
+        doc.context
+            .insert("str".into(), DxLlmValue::Str("Hello".into()));
         doc.context.insert("num".into(), DxLlmValue::Num(42.0));
         doc.context.insert("bool".into(), DxLlmValue::Bool(true));
 
         // Test Machine format
         let machine = document_to_machine(&doc);
         let machine_doc = machine_to_document(&machine).unwrap();
-        assert_eq!(machine_doc.context.get("str").unwrap().as_str(), Some("Hello"));
+        assert_eq!(
+            machine_doc.context.get("str").unwrap().as_str(),
+            Some("Hello")
+        );
         assert_eq!(machine_doc.context.get("num").unwrap().as_num(), Some(42.0));
-        assert_eq!(machine_doc.context.get("bool").unwrap().as_bool(), Some(true));
+        assert_eq!(
+            machine_doc.context.get("bool").unwrap().as_bool(),
+            Some(true)
+        );
     }
 }
 
@@ -436,7 +461,8 @@ mod edge_cases {
     #[test]
     fn spec_empty_string() {
         let mut doc = DxDocument::new();
-        doc.context.insert("empty".into(), DxLlmValue::Str("".into()));
+        doc.context
+            .insert("empty".into(), DxLlmValue::Str("".into()));
 
         let machine = document_to_machine(&doc);
         let parsed = machine_to_document(&machine).unwrap();
@@ -447,8 +473,10 @@ mod edge_cases {
     #[test]
     fn spec_large_numbers() {
         let mut doc = DxDocument::new();
-        doc.context.insert("big".into(), DxLlmValue::Num(f64::MAX / 2.0));
-        doc.context.insert("small".into(), DxLlmValue::Num(f64::MIN / 2.0));
+        doc.context
+            .insert("big".into(), DxLlmValue::Num(f64::MAX / 2.0));
+        doc.context
+            .insert("small".into(), DxLlmValue::Num(f64::MIN / 2.0));
 
         let machine = document_to_machine(&doc);
         let parsed = machine_to_document(&machine).unwrap();
@@ -460,7 +488,8 @@ mod edge_cases {
     fn spec_many_fields() {
         let mut doc = DxDocument::new();
         for i in 0..100 {
-            doc.context.insert(format!("f{}", i), DxLlmValue::Num(i as f64));
+            doc.context
+                .insert(format!("f{}", i), DxLlmValue::Num(i as f64));
         }
 
         let machine = document_to_machine(&doc);
@@ -551,15 +580,22 @@ mod platform_compat {
     fn spec_utf8_encoding() {
         let mut doc = DxDocument::new();
 
-        doc.context.insert("ascii".into(), DxLlmValue::Str("Hello".into()));
-        doc.context.insert("cjk".into(), DxLlmValue::Str("你好世界".into()));
-        doc.context.insert("emoji".into(), DxLlmValue::Str("👋🌍".into()));
-        doc.context.insert("mixed".into(), DxLlmValue::Str("Hello 世界 🌍".into()));
+        doc.context
+            .insert("ascii".into(), DxLlmValue::Str("Hello".into()));
+        doc.context
+            .insert("cjk".into(), DxLlmValue::Str("你好世界".into()));
+        doc.context
+            .insert("emoji".into(), DxLlmValue::Str("👋🌍".into()));
+        doc.context
+            .insert("mixed".into(), DxLlmValue::Str("Hello 世界 🌍".into()));
 
         let machine = document_to_machine(&doc);
         let parsed = machine_to_document(&machine).unwrap();
 
-        assert_eq!(parsed.context.get("cjk").unwrap().as_str(), Some("你好世界"));
+        assert_eq!(
+            parsed.context.get("cjk").unwrap().as_str(),
+            Some("你好世界")
+        );
         assert_eq!(parsed.context.get("emoji").unwrap().as_str(), Some("👋🌍"));
     }
 }
@@ -576,7 +612,8 @@ mod performance {
     fn spec_llm_serialization_speed() {
         let mut doc = DxDocument::new();
         for i in 0..100 {
-            doc.context.insert(format!("k{}", i), DxLlmValue::Num(i as f64));
+            doc.context
+                .insert(format!("k{}", i), DxLlmValue::Num(i as f64));
         }
 
         let start = Instant::now();
@@ -586,14 +623,19 @@ mod performance {
         let elapsed = start.elapsed();
 
         // Should complete 1000 iterations in under 1 second
-        assert!(elapsed.as_secs() < 1, "LLM serialization too slow: {:?}", elapsed);
+        assert!(
+            elapsed.as_secs() < 1,
+            "LLM serialization too slow: {:?}",
+            elapsed
+        );
     }
 
     #[test]
     fn spec_machine_serialization_speed() {
         let mut doc = DxDocument::new();
         for i in 0..100 {
-            doc.context.insert(format!("k{}", i), DxLlmValue::Num(i as f64));
+            doc.context
+                .insert(format!("k{}", i), DxLlmValue::Num(i as f64));
         }
 
         let start = Instant::now();
@@ -603,7 +645,11 @@ mod performance {
         let elapsed = start.elapsed();
 
         // Should complete 1000 iterations in under 1 second
-        assert!(elapsed.as_secs() < 1, "Machine serialization too slow: {:?}", elapsed);
+        assert!(
+            elapsed.as_secs() < 1,
+            "Machine serialization too slow: {:?}",
+            elapsed
+        );
     }
 
     #[test]

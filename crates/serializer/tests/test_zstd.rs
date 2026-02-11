@@ -10,13 +10,17 @@ fn test_zstd_basic() {
     let decompressed = decompress_zstd(&compressed).expect("decompression failed");
 
     assert_eq!(decompressed, original);
-    println!("Zstd test passed: {} bytes -> {} bytes", original.len(), compressed.len());
+    println!(
+        "Zstd test passed: {} bytes -> {} bytes",
+        original.len(),
+        compressed.len()
+    );
 }
 
 #[cfg(feature = "compression")]
 #[test]
 fn test_zstd_levels() {
-    use serializer::machine::compress::{CompressionLevel, compress_zstd_level, decompress_zstd};
+    use serializer::machine::compress::{compress_zstd_level, decompress_zstd, CompressionLevel};
 
     let original: Vec<u8> = std::iter::repeat_n(b'A', 1000).collect();
 

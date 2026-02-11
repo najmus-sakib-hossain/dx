@@ -156,7 +156,10 @@ fn run_benchmarks(human: &str, llm: &str, machine: &[u8]) {
     println!("┌─────────────────┬───────────┬────────────┬──────────────┐");
     println!("│ Format          │ Bytes     │ % of Human │ Compression  │");
     println!("├─────────────────┼───────────┼────────────┼──────────────┤");
-    println!("│ Human (source)  │ {:>9} │ {:>9}% │ {:>11}  │", human_bytes, 100, "baseline");
+    println!(
+        "│ Human (source)  │ {:>9} │ {:>9}% │ {:>11}  │",
+        human_bytes, 100, "baseline"
+    );
     println!(
         "│ LLM (Dx Serializer)       │ {:>9} │ {:>9}% │ {:>10.1}× │",
         llm_bytes,
@@ -176,14 +179,20 @@ fn run_benchmarks(human: &str, llm: &str, machine: &[u8]) {
     println!("┌─────────────────┬───────────┬────────────┬──────────────┐");
     println!("│ Format          │ Tokens    │ % of Human │ Efficiency   │");
     println!("├─────────────────┼───────────┼────────────┼──────────────┤");
-    println!("│ Human (source)  │ {:>9} │ {:>9}% │ {:>11}  │", human_tokens, 100, "baseline");
+    println!(
+        "│ Human (source)  │ {:>9} │ {:>9}% │ {:>11}  │",
+        human_tokens, 100, "baseline"
+    );
     println!(
         "│ LLM (Dx Serializer)       │ {:>9} │ {:>9}% │ {:>10.1}× │",
         llm_tokens,
         (llm_tokens * 100) / human_tokens,
         human_tokens as f64 / llm_tokens as f64
     );
-    println!("│ Machine (Bin)   │ {:>9} │ {:>9}  │ {:>11}  │", "N/A", "N/A", "❌ FAILS");
+    println!(
+        "│ Machine (Bin)   │ {:>9} │ {:>9}  │ {:>11}  │",
+        "N/A", "N/A", "❌ FAILS"
+    );
     println!("└─────────────────┴───────────┴────────────┴──────────────┘\n");
 
     // Parse speed (simulated)
@@ -192,7 +201,11 @@ fn run_benchmarks(human: &str, llm: &str, machine: &[u8]) {
     println!("│ Format          │ Time (μs) │ vs Human     │");
     println!("├─────────────────┼───────────┼──────────────┤");
     println!("│ Human (source)  │ {:>9.1} │ {:>11}  │", 50.0, "baseline");
-    println!("│ LLM (Dx Serializer)       │ {:>9.1} │ {:>10.1}× │", 2.5, 50.0 / 2.5);
+    println!(
+        "│ LLM (Dx Serializer)       │ {:>9.1} │ {:>10.1}× │",
+        2.5,
+        50.0 / 2.5
+    );
     println!("│ Machine (Bin)   │ {:>9.1} │ {:>10.1}× │", 1.0, 50.0 / 1.0);
     println!("└─────────────────┴───────────┴──────────────┘\n");
 
@@ -225,13 +238,19 @@ fn verify_formats(human: &str, llm: &str, machine: &[u8]) {
         estimate_tokens(human) as f64 / estimate_tokens(llm) as f64
     );
     println!("   ✅ Parseable: LLMs can understand");
-    println!("   ✅ Compact: {}% of human format size", (llm.len() * 100) / human.len());
+    println!(
+        "   ✅ Compact: {}% of human format size",
+        (llm.len() * 100) / human.len()
+    );
 
     println!("   ✅ Round-trip: LLM format supports full round-trip\n");
 
     println!("🔍 Machine Format (machine.dx):");
     println!("   ✅ Binary: Raw bytes for speed");
-    println!("   ✅ Compact: {}% of human format size", (machine.len() * 100) / human.len());
+    println!(
+        "   ✅ Compact: {}% of human format size",
+        (machine.len() * 100) / human.len()
+    );
     println!("   ✅ Fast: Minimal parsing overhead");
     println!("   ❌ LLM-Incompatible: Cannot be tokenized by LLMs\n");
 }
@@ -311,6 +330,9 @@ database.host       : localhost
 // Helper function to estimate token count
 fn estimate_tokens(text: &str) -> usize {
     let words = text.split_whitespace().count();
-    let symbols = text.chars().filter(|c| !c.is_alphanumeric() && !c.is_whitespace()).count();
+    let symbols = text
+        .chars()
+        .filter(|c| !c.is_alphanumeric() && !c.is_whitespace())
+        .count();
     (words as f64 * 1.33) as usize + (symbols / 2)
 }

@@ -75,8 +75,10 @@ fn convert_object(
 
     // Output simple properties (inline if possible)
     if !simple_props.is_empty() {
-        let optimized_props: Vec<(String, String)> =
-            simple_props.iter().map(|(k, v)| (optimize_key(k), v.clone())).collect();
+        let optimized_props: Vec<(String, String)> = simple_props
+            .iter()
+            .map(|(k, v)| (optimize_key(k), v.clone()))
+            .collect();
 
         if should_inline(&optimized_props) {
             // Inline format: c.n:dx^v:0.0.1^t:Title

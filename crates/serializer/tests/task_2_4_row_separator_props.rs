@@ -586,13 +586,25 @@ fn verify_cell_value(
     match expected_value_str {
         "true" => {
             if let Some(b) = parsed_value.as_bool() {
-                prop_assert_eq!(b, true, "Boolean value mismatch at row {}, col {}", row, col);
+                prop_assert_eq!(
+                    b,
+                    true,
+                    "Boolean value mismatch at row {}, col {}",
+                    row,
+                    col
+                );
                 return Ok(());
             }
         }
         "false" => {
             if let Some(b) = parsed_value.as_bool() {
-                prop_assert_eq!(b, false, "Boolean value mismatch at row {}, col {}", row, col);
+                prop_assert_eq!(
+                    b,
+                    false,
+                    "Boolean value mismatch at row {}, col {}",
+                    row,
+                    col
+                );
                 return Ok(());
             }
         }
@@ -601,7 +613,13 @@ fn verify_cell_value(
 
     // Otherwise it's a string
     if let Some(s) = parsed_value.as_str() {
-        prop_assert_eq!(s, expected_value_str, "String value mismatch at row {}, col {}", row, col);
+        prop_assert_eq!(
+            s,
+            expected_value_str,
+            "String value mismatch at row {}, col {}",
+            row,
+            col
+        );
     } else {
         prop_assert!(
             false,

@@ -3,7 +3,7 @@
 //! These tests probe edge cases, boundary conditions, and potential weaknesses
 //! to ensure the serializer is production-ready and robust.
 
-use serializer::{Mappings, format_machine, parse};
+use serializer::{format_machine, parse, Mappings};
 
 /// Helper to parse string input
 fn parse_str(input: &str) -> serializer::Result<serializer::DxValue> {
@@ -54,7 +54,10 @@ mod parser_edge_cases {
     #[test]
     fn test_deeply_nested_keys() {
         // Test deeply nested dotted keys
-        let deep_key = (0..100).map(|i| format!("level{}", i)).collect::<Vec<_>>().join(".");
+        let deep_key = (0..100)
+            .map(|i| format!("level{}", i))
+            .collect::<Vec<_>>()
+            .join(".");
         let input = format!("{}:value", deep_key);
         let result = parse_str(&input);
         assert!(result.is_ok(), "Deeply nested keys should be handled");
@@ -159,7 +162,10 @@ mod compression_edge_cases {
     fn test_compress_empty_input() {
         let result = format_machine("");
         assert!(result.is_ok(), "Empty input should compress");
-        assert!(result.unwrap().is_empty(), "Empty input should produce empty output");
+        assert!(
+            result.unwrap().is_empty(),
+            "Empty input should produce empty output"
+        );
     }
 
     #[test]
@@ -174,8 +180,14 @@ mod compression_edge_cases {
         let result = format_machine(input).unwrap();
         let output = String::from_utf8(result).unwrap();
 
-        assert!(output.contains("value with spaces"), "Spaces in values should be preserved");
-        assert!(output.contains("https://example.com"), "URLs should be preserved");
+        assert!(
+            output.contains("value with spaces"),
+            "Spaces in values should be preserved"
+        );
+        assert!(
+            output.contains("https://example.com"),
+            "URLs should be preserved"
+        );
     }
 
     #[test]
@@ -276,7 +288,11 @@ mod mappings_edge_cases {
             assert_eq!(compressed, key, "Unknown key '{}' should be preserved", key);
 
             let expanded = mappings.expand_key(key);
-            assert_eq!(expanded, key, "Unknown key '{}' should be preserved on expand", key);
+            assert_eq!(
+                expanded, key,
+                "Unknown key '{}' should be preserved on expand",
+                key
+            );
         }
     }
 }
@@ -670,7 +686,10 @@ mod stress_tests {
 
         let compressed = result.unwrap();
         // Compressed should be smaller due to key abbreviation
-        assert!(compressed.len() < input.len(), "Compression should reduce size");
+        assert!(
+            compressed.len() < input.len(),
+            "Compression should reduce size"
+        );
     }
 }
 
@@ -781,7 +800,10 @@ mod security_tests {
     #[test]
     fn test_no_stack_overflow_deep_nesting() {
         // Ensure deeply nested structures don't cause stack overflow
-        let deep_key = (0..1000).map(|i| format!("level{}", i)).collect::<Vec<_>>().join(".");
+        let deep_key = (0..1000)
+            .map(|i| format!("level{}", i))
+            .collect::<Vec<_>>()
+            .join(".");
         let input = format!("{}:value", deep_key);
 
         // Should not panic
@@ -875,6 +897,9 @@ mod performance_tests {
         );
 
         // Verify key abbreviation happened
-        assert!(compressed_str.contains("c.n:"), "context.name should compress to c.n");
+        assert!(
+            compressed_str.contains("c.n:"),
+            "context.name should compress to c.n"
+        );
     }
 }

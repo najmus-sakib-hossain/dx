@@ -40,8 +40,17 @@ fn main() -> anyhow::Result<()> {
         let results = engine.search(query, usize::MAX); // Return ALL matching results
         let elapsed = start.elapsed();
 
-        let cache_status = if is_cached { "🔥 CACHED" } else { "❄️  COLD" };
-        println!("\n{} - Found {} results in {:?}:", cache_status, results.len(), elapsed);
+        let cache_status = if is_cached {
+            "🔥 CACHED"
+        } else {
+            "❄️  COLD"
+        };
+        println!(
+            "\n{} - Found {} results in {:?}:",
+            cache_status,
+            results.len(),
+            elapsed
+        );
         for (i, result) in results.iter().enumerate() {
             println!(
                 "  {}. {} ({}) - score: {:.2} [{:?}]",

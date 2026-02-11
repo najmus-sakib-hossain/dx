@@ -69,7 +69,7 @@ pub struct TokenInfo {
 
 impl TokenInfo {
     /// Create a new `TokenInfo`
-    #[must_use] 
+    #[must_use]
     pub fn new(count: usize, ids: Vec<u32>, tokens: Vec<String>, model: ModelType) -> Self {
         Self {
             count,
@@ -80,7 +80,7 @@ impl TokenInfo {
     }
 
     /// Create `TokenInfo` with just count (for models without ID access)
-    #[must_use] 
+    #[must_use]
     pub fn count_only(count: usize, model: ModelType) -> Self {
         Self {
             count,
@@ -103,7 +103,7 @@ pub struct TokenCounter {
 
 impl TokenCounter {
     /// Create a new token counter
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self {}
     }
@@ -116,7 +116,7 @@ impl TokenCounter {
     ///
     /// # Returns
     /// `TokenInfo` containing count, IDs, and decoded tokens
-    #[must_use] 
+    #[must_use]
     pub fn count(&self, text: &str, model: ModelType) -> TokenInfo {
         match model {
             ModelType::Gpt4o | ModelType::O1 => self.count_openai_o200k(text, model),
@@ -135,8 +135,10 @@ impl TokenCounter {
             use tiktoken_rs::o200k_base;
             if let Ok(bpe) = o200k_base() {
                 let tokens = bpe.encode_with_special_tokens(text);
-                let decoded: Vec<String> =
-                    tokens.iter().filter_map(|&id| bpe.decode(vec![id]).ok()).collect();
+                let decoded: Vec<String> = tokens
+                    .iter()
+                    .filter_map(|&id| bpe.decode(vec![id]).ok())
+                    .collect();
                 return TokenInfo::new(tokens.len(), tokens, decoded, model);
             }
         }
@@ -152,8 +154,10 @@ impl TokenCounter {
             use tiktoken_rs::cl100k_base;
             if let Ok(bpe) = cl100k_base() {
                 let tokens = bpe.encode_with_special_tokens(text);
-                let decoded: Vec<String> =
-                    tokens.iter().filter_map(|&id| bpe.decode(vec![id]).ok()).collect();
+                let decoded: Vec<String> = tokens
+                    .iter()
+                    .filter_map(|&id| bpe.decode(vec![id]).ok())
+                    .collect();
                 return TokenInfo::new(tokens.len(), tokens, decoded, model);
             }
         }
@@ -177,8 +181,7 @@ impl TokenCounter {
                 if let Ok(tokenizer) = Tokenizer::from_file(path) {
                     if let Ok(encoding) = tokenizer.encode(text, false) {
                         let ids: Vec<u32> = encoding.get_ids().to_vec();
-                        let tokens: Vec<String> =
-                            encoding.get_tokens().to_vec();
+                        let tokens: Vec<String> = encoding.get_tokens().to_vec();
                         return TokenInfo::new(ids.len(), ids, tokens, model);
                     }
                 }
@@ -206,8 +209,7 @@ impl TokenCounter {
                 if let Ok(tokenizer) = Tokenizer::from_file(path) {
                     if let Ok(encoding) = tokenizer.encode(text, false) {
                         let ids: Vec<u32> = encoding.get_ids().to_vec();
-                        let tokens: Vec<String> =
-                            encoding.get_tokens().to_vec();
+                        let tokens: Vec<String> = encoding.get_tokens().to_vec();
                         return TokenInfo::new(ids.len(), ids, tokens, model);
                     }
                 }
@@ -236,7 +238,7 @@ impl TokenCounter {
     }
 
     /// Count tokens for all supported models
-    #[must_use] 
+    #[must_use]
     pub fn count_all(&self, text: &str) -> HashMap<ModelType, TokenInfo> {
         let models = [
             ModelType::Gpt4o,
@@ -248,7 +250,10 @@ impl TokenCounter {
             ModelType::Other,
         ];
 
-        models.iter().map(|&model| (model, self.count(text, model))).collect()
+        models
+            .iter()
+            .map(|&model| (model, self.count(text, model)))
+            .collect()
     }
 
     /// Count tokens for the 4 primary models (`OpenAI`, Claude, Gemini, Other)
@@ -259,7 +264,7 @@ impl TokenCounter {
     /// - Claude (Sonnet 4)
     /// - Gemini (Gemini 3)
     /// - Other (generic model)
-    #[must_use] 
+    #[must_use]
     pub fn count_primary_models(&self, text: &str) -> HashMap<ModelType, TokenInfo> {
         let models = [
             ModelType::Gpt4o,         // OpenAI representative
@@ -268,11 +273,14 @@ impl TokenCounter {
             ModelType::Other,         // Generic model
         ];
 
-        models.iter().map(|&model| (model, self.count(text, model))).collect()
+        models
+            .iter()
+            .map(|&model| (model, self.count(text, model)))
+            .collect()
     }
 
     /// Get a summary of token counts for all models
-    #[must_use] 
+    #[must_use]
     pub fn summary(&self, text: &str) -> String {
         let counts = self.count_all(text);
         let mut lines = vec![format!("Token counts for {} chars:", text.len())];
@@ -309,7 +317,7 @@ pub struct TokenEfficiencyMeasurement {
 
 impl TokenEfficiencyMeasurement {
     /// Calculate token savings
-    #[must_use] 
+    #[must_use]
     pub fn calculate(original: TokenInfo, dx_format: TokenInfo) -> Self {
         let savings = if original.count > 0 {
             ((original.count as f64 - dx_format.count as f64) / original.count as f64) * 100.0

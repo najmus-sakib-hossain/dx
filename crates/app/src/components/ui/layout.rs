@@ -1,5 +1,5 @@
+use crate::theme::Theme;
 use gpui::{div, prelude::*, px, AnyElement, IntoElement};
-use crate::theme::{colors::Radius, Theme};
 
 // ─── Container ──────────────────────────────────────────────────────────────
 // A centered max-width container, like shadcn-ui's container utility.
@@ -192,11 +192,7 @@ impl Center {
     }
 
     pub fn render(self) -> impl IntoElement {
-        let mut center = div()
-            .flex()
-            .items_center()
-            .justify_center()
-            .size_full();
+        let mut center = div().flex().items_center().justify_center().size_full();
 
         for child in self.children {
             center = center.child(child);
@@ -232,10 +228,7 @@ pub struct AspectRatio {
 #[allow(dead_code)]
 impl AspectRatio {
     pub fn new(ratio: f32) -> Self {
-        Self {
-            ratio,
-            child: None,
-        }
+        Self { ratio, child: None }
     }
 
     pub fn square() -> Self {

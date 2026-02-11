@@ -31,12 +31,15 @@ impl TypeHint {
             b'b' => Ok(TypeHint::Bool),
             b'x' => Ok(TypeHint::Base62),
             b'#' => Ok(TypeHint::AutoIncrement),
-            _ => Err(DxError::InvalidTypeHint(format!("Unknown type hint: {}", b as char))),
+            _ => Err(DxError::InvalidTypeHint(format!(
+                "Unknown type hint: {}",
+                b as char
+            ))),
         }
     }
 
     /// Convert to byte for encoding
-    #[must_use] 
+    #[must_use]
     pub fn to_byte(self) -> u8 {
         match self {
             TypeHint::Int => b'i',
@@ -50,7 +53,7 @@ impl TypeHint {
     }
 
     /// Get type name for display
-    #[must_use] 
+    #[must_use]
     pub fn name(self) -> &'static str {
         match self {
             TypeHint::Int => "int",
@@ -72,13 +75,13 @@ pub struct Column {
 }
 
 impl Column {
-    #[must_use] 
+    #[must_use]
     pub fn new(name: String, type_hint: TypeHint) -> Self {
         Self { name, type_hint }
     }
 
     /// Check if this is an anonymous auto-increment column (#)
-    #[must_use] 
+    #[must_use]
     pub fn is_anonymous_auto_increment(&self) -> bool {
         self.name == "#" && self.type_hint == TypeHint::AutoIncrement
     }
@@ -92,7 +95,7 @@ pub struct Schema {
 }
 
 impl Schema {
-    #[must_use] 
+    #[must_use]
     pub fn new(name: String) -> Self {
         Self {
             name,
@@ -100,7 +103,7 @@ impl Schema {
         }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn with_columns(name: String, columns: Vec<Column>) -> Self {
         Self { name, columns }
     }
@@ -146,32 +149,34 @@ impl Schema {
         }
 
         if schema.columns.is_empty() {
-            return Err(DxError::SchemaError("Schema must have at least one column".to_string()));
+            return Err(DxError::SchemaError(
+                "Schema must have at least one column".to_string(),
+            ));
         }
 
         Ok(schema)
     }
 
     /// Get column index by name
-    #[must_use] 
+    #[must_use]
     pub fn column_index(&self, name: &str) -> Option<usize> {
         self.columns.iter().position(|c| c.name == name)
     }
 
     /// Get column by index
-    #[must_use] 
+    #[must_use]
     pub fn column(&self, idx: usize) -> Option<&Column> {
         self.columns.get(idx)
     }
 
     /// Number of columns
-    #[must_use] 
+    #[must_use]
     pub fn len(&self) -> usize {
         self.columns.len()
     }
 
     /// Check if schema is empty
-    #[must_use] 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.columns.is_empty()
     }

@@ -8,7 +8,7 @@
 //!
 //! Run with: cargo bench --bench `dx_machine_complete` -p dx-serializer
 
-use criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use rkyv::{Archive, Deserialize, Serialize};
 use serializer::machine::{deserialize_batch, serialize_batch};
 
@@ -179,7 +179,10 @@ fn print_size_comparison() {
             if dx_size == rkyv_size {
                 "0.0".to_string()
             } else {
-                format!("{:.1}", ((dx_size as f64 - rkyv_size as f64) / rkyv_size as f64) * 100.0)
+                format!(
+                    "{:.1}",
+                    ((dx_size as f64 - rkyv_size as f64) / rkyv_size as f64) * 100.0
+                )
             }
         );
         println!();

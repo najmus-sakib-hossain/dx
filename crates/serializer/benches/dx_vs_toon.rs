@@ -2,7 +2,7 @@
 //!
 //! Run with: cargo bench --bench dx_vs_toon
 
-use criterion::{Criterion, Throughput, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, Criterion, Throughput};
 use serializer::*;
 
 // Sample data for benchmarks
@@ -103,7 +103,9 @@ fn benchmark_parse_large(c: &mut Criterion) {
     group.sample_size(20);
 
     group.throughput(Throughput::Bytes(large_dx.len() as u64));
-    group.bench_function("dx_1000_rows", |b| b.iter(|| parse(black_box(&large_dx)).unwrap()));
+    group.bench_function("dx_1000_rows", |b| {
+        b.iter(|| parse(black_box(&large_dx)).unwrap())
+    });
 
     group.finish();
 }
@@ -113,7 +115,9 @@ fn benchmark_encode_round_trip(c: &mut Criterion) {
 
     let mut group = c.benchmark_group("encode");
 
-    group.bench_function("dx_encode", |b| b.iter(|| encode(black_box(&parsed)).unwrap()));
+    group.bench_function("dx_encode", |b| {
+        b.iter(|| encode(black_box(&parsed)).unwrap())
+    });
 
     group.finish();
 }

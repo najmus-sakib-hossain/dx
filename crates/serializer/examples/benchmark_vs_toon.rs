@@ -31,7 +31,10 @@ fn main() {
     // Benchmark each model
     for (model, model_name) in &models {
         println!("=== {model_name} ===");
-        println!("{:<18} {:>8} {:>8} {:>10}", "Test Case", "TOON", "DX", "Savings");
+        println!(
+            "{:<18} {:>8} {:>8} {:>10}",
+            "Test Case", "TOON", "DX", "Savings"
+        );
         println!("{}", "-".repeat(46));
 
         let mut total_toon = 0usize;
@@ -64,13 +67,19 @@ fn main() {
 
         println!("{}", "-".repeat(46));
         let total_savings = ((total_toon as f64 - total_dx as f64) / total_toon as f64) * 100.0;
-        println!("{:<18} {:>8} {:>8} {:>9.1}%", "TOTAL", total_toon, total_dx, total_savings);
+        println!(
+            "{:<18} {:>8} {:>8} {:>9.1}%",
+            "TOTAL", total_toon, total_dx, total_savings
+        );
         println!();
     }
 
     // Summary table
     println!("=== SUMMARY (All Models) ===\n");
-    println!("{:<12} {:>10} {:>10} {:>10}", "Model", "TOON", "DX", "Savings");
+    println!(
+        "{:<12} {:>10} {:>10} {:>10}",
+        "Model", "TOON", "DX", "Savings"
+    );
     println!("{}", "-".repeat(44));
 
     for (model, model_name) in &models {

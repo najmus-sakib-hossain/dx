@@ -40,7 +40,11 @@ fn arb_section() -> impl Strategy<Value = DxSection> {
     (2..5_usize, 2..5_usize).prop_flat_map(|(col_count, row_count)| {
         let schema: Vec<String> = (0..col_count).map(|i| format!("col{}", i)).collect();
         let rows = (0..row_count)
-            .map(|i| (0..col_count).map(|j| DxLlmValue::Str(format!("val{}_{}", i, j))).collect())
+            .map(|i| {
+                (0..col_count)
+                    .map(|j| DxLlmValue::Str(format!("val{}_{}", i, j)))
+                    .collect()
+            })
             .collect();
         Just(DxSection { schema, rows })
     })

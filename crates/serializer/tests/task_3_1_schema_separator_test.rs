@@ -20,7 +20,10 @@ fn test_space_separated_schema() {
     assert_eq!(section.rows[0].len(), 3);
     assert_eq!(section.rows[0][0], DxLlmValue::Num(1.0));
     assert_eq!(section.rows[0][1], DxLlmValue::Str("Alice".to_string()));
-    assert_eq!(section.rows[0][2], DxLlmValue::Str("alice@ex.com".to_string()));
+    assert_eq!(
+        section.rows[0][2],
+        DxLlmValue::Str("alice@ex.com".to_string())
+    );
 }
 
 #[test]
@@ -38,7 +41,10 @@ fn test_comma_separated_schema_backward_compat() {
     assert_eq!(section.rows[0].len(), 3);
     assert_eq!(section.rows[0][0], DxLlmValue::Num(1.0));
     assert_eq!(section.rows[0][1], DxLlmValue::Str("Alice".to_string()));
-    assert_eq!(section.rows[0][2], DxLlmValue::Str("alice@ex.com".to_string()));
+    assert_eq!(
+        section.rows[0][2],
+        DxLlmValue::Str("alice@ex.com".to_string())
+    );
 }
 
 #[test]

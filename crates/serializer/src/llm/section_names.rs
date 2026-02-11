@@ -19,7 +19,7 @@ pub struct SectionNameDict {
 
 impl SectionNameDict {
     /// Create dictionary with all standard section mappings
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         let mut name_to_id = HashMap::new();
         let mut id_to_name = HashMap::new();
@@ -57,40 +57,43 @@ impl SectionNameDict {
     /// Convert full section name to abbreviated ID
     ///
     /// Returns the original name if no mapping exists.
-    #[must_use] 
+    #[must_use]
     pub fn name_to_id(&self, name: &str) -> String {
         self.name_to_id
-            .get(name).map_or_else(|| name.to_string(), std::string::ToString::to_string)
+            .get(name)
+            .map_or_else(|| name.to_string(), std::string::ToString::to_string)
     }
 
     /// Convert abbreviated ID to full section name
     ///
     /// Returns the original ID if no mapping exists.
-    #[must_use] 
+    #[must_use]
     pub fn id_to_name(&self, id: &str) -> String {
-        self.id_to_name.get(id).map_or_else(|| id.to_string(), std::string::ToString::to_string)
+        self.id_to_name
+            .get(id)
+            .map_or_else(|| id.to_string(), std::string::ToString::to_string)
     }
 
     /// Check if a section name exists in the dictionary
-    #[must_use] 
+    #[must_use]
     pub fn has_name(&self, name: &str) -> bool {
         self.name_to_id.contains_key(name)
     }
 
     /// Check if a section ID exists in the dictionary
-    #[must_use] 
+    #[must_use]
     pub fn has_id(&self, id: &str) -> bool {
         self.id_to_name.contains_key(id)
     }
 
     /// Get the number of mappings
-    #[must_use] 
+    #[must_use]
     pub fn len(&self) -> usize {
         self.name_to_id.len()
     }
 
     /// Check if the dictionary is empty
-    #[must_use] 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.name_to_id.is_empty()
     }

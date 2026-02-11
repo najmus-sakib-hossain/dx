@@ -5,8 +5,8 @@ use console::Term;
 use owo_colors::OwoColorize;
 use std::io::{self, Write};
 use std::sync::{
-    Arc,
     atomic::{AtomicBool, Ordering},
+    Arc,
 };
 use std::thread;
 use std::time::Duration;
@@ -54,7 +54,10 @@ impl Spinner {
             let mut frame_idx = 0;
 
             while running.load(Ordering::SeqCst) {
-                let spinner = theme.primary.apply_to(SPINNER_FRAMES[frame_idx]).to_string();
+                let spinner = theme
+                    .primary
+                    .apply_to(SPINNER_FRAMES[frame_idx])
+                    .to_string();
 
                 let _ = term.clear_line();
                 let _ = write!(&term, "\r{} {} {}", spinner, message.bold(), bar);
@@ -87,8 +90,9 @@ impl Spinner {
         let msg = message.into();
 
         self.term.clear_line()?;
-        self.term.write_line(&format!("{} {}", symbol, msg.bold()))?;
-        
+        self.term
+            .write_line(&format!("{} {}", symbol, msg.bold()))?;
+
         // Show cursor again
         self.term.show_cursor()?;
 
@@ -109,8 +113,9 @@ impl Spinner {
         let msg = message.into();
 
         self.term.clear_line()?;
-        self.term.write_line(&format!("{} {}", symbol, theme.error.apply_to(msg)))?;
-        
+        self.term
+            .write_line(&format!("{} {}", symbol, theme.error.apply_to(msg)))?;
+
         // Show cursor again
         self.term.show_cursor()?;
 
@@ -126,10 +131,10 @@ impl Spinner {
         }
 
         self.term.clear_line()?;
-        
+
         // Show cursor again
         self.term.show_cursor()?;
-        
+
         Ok(())
     }
 }

@@ -1,4 +1,4 @@
-use criterion::{Criterion, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use rkyv::{Archive, Deserialize, Serialize};
 use serializer::machine::OptimizedRkyv;
 use std::sync::atomic::{AtomicU32, Ordering};
@@ -56,7 +56,7 @@ fn bench_parallel_batch(c: &mut Criterion) {
 
 #[cfg(feature = "compression")]
 fn bench_compressed(c: &mut Criterion) {
-    use serializer::machine::{CompressedRkyv, compress::CompressionLevel};
+    use serializer::machine::{compress::CompressionLevel, CompressedRkyv};
 
     let mut comp = CompressedRkyv::new(CompressionLevel::Fast);
     let data = TestData {
@@ -105,7 +105,12 @@ criterion_group!(compression_benches, bench_compressed);
 criterion_group!(arena_benches, bench_arena);
 
 #[cfg(all(feature = "parallel", feature = "compression", feature = "arena"))]
-criterion_main!(benches, parallel_benches, compression_benches, arena_benches);
+criterion_main!(
+    benches,
+    parallel_benches,
+    compression_benches,
+    arena_benches
+);
 
 #[cfg(all(feature = "parallel", feature = "compression", not(feature = "arena")))]
 criterion_main!(benches, parallel_benches, compression_benches);

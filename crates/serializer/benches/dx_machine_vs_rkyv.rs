@@ -1,4 +1,4 @@
-use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
+use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 use rkyv::{Archive, Deserialize, Serialize};
 use serde::{Deserialize as SerdeDeserialize, Serialize as SerdeSerialize};
 use serializer::machine::{from_bytes_serde as dx_from_bytes, to_bytes_serde as dx_to_bytes};
@@ -111,12 +111,16 @@ fn bench_serialize(c: &mut Criterion) {
             })
         });
 
-        group.bench_with_input(BenchmarkId::new("dx_machine_configs", size), size, |b, _| {
-            b.iter(|| {
-                let bytes = dx_to_bytes(&configs).unwrap();
-                hint_black_box(bytes)
-            })
-        });
+        group.bench_with_input(
+            BenchmarkId::new("dx_machine_configs", size),
+            size,
+            |b, _| {
+                b.iter(|| {
+                    let bytes = dx_to_bytes(&configs).unwrap();
+                    hint_black_box(bytes)
+                })
+            },
+        );
 
         // RKYV
         group.bench_with_input(BenchmarkId::new("rkyv_logs", size), size, |b, _| {
@@ -214,12 +218,16 @@ fn bench_deserialize(c: &mut Criterion) {
         });
 
         let dx_configs = dx_to_bytes(&configs).unwrap();
-        group.bench_with_input(BenchmarkId::new("dx_machine_configs", size), size, |b, _| {
-            b.iter(|| {
-                let decoded: Vec<Config> = dx_from_bytes(&dx_configs).unwrap();
-                hint_black_box(decoded)
-            })
-        });
+        group.bench_with_input(
+            BenchmarkId::new("dx_machine_configs", size),
+            size,
+            |b, _| {
+                b.iter(|| {
+                    let decoded: Vec<Config> = dx_from_bytes(&dx_configs).unwrap();
+                    hint_black_box(decoded)
+                })
+            },
+        );
 
         // RKYV - deserialize (not zero-copy access)
         let rkyv_logs = rkyv::to_bytes::<rkyv::rancor::Error>(&logs).unwrap();

@@ -179,7 +179,9 @@ impl StringCursor {
     /// Moves the cursor right by a word.
     pub fn move_right_by_word(&mut self) {
         let jumps = word_jump_indices(&self.value);
-        let ix = jumps.binary_search(&self.cursor).map_or_else(|i| i, |i| i + 1);
+        let ix = jumps
+            .binary_search(&self.cursor)
+            .map_or_else(|i| i, |i| i + 1);
         self.cursor = jumps[std::cmp::min(ix, jumps.len().saturating_sub(1))];
     }
 

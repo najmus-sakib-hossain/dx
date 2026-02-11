@@ -150,7 +150,9 @@ impl PromptInteraction for Slider {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("Use ← → arrows to adjust, Enter to confirm")
+                    theme
+                        .dim
+                        .apply_to("Use ← → arrows to adjust, Enter to confirm")
                 ))?;
                 lines += 1;
             }

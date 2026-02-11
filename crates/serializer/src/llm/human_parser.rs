@@ -64,7 +64,7 @@ pub struct HumanParser {
 impl HumanParser {
     #[allow(dead_code)] // Methods reserved for future table parsing features
     /// Create a new parser
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self {
             abbrev: AbbrevDict::new(),
@@ -185,7 +185,8 @@ impl HumanParser {
                     } else {
                         // First numbered section - store as object for now
                         if !context.is_empty() {
-                            doc.context.insert(base_name.to_string(), DxLlmValue::Obj(context));
+                            doc.context
+                                .insert(base_name.to_string(), DxLlmValue::Obj(context));
                         }
                     }
                     continue;
@@ -211,7 +212,8 @@ impl HumanParser {
                         // Add section data to context as nested object
                         if !context.is_empty() {
                             // Keep section name as-is (no compression)
-                            doc.context.insert(section_name.clone(), DxLlmValue::Obj(context));
+                            doc.context
+                                .insert(section_name.clone(), DxLlmValue::Obj(context));
                         }
                         i += consumed;
                     }
@@ -472,8 +474,10 @@ impl HumanParser {
             if inner.is_empty() {
                 return Ok(DxLlmValue::Arr(vec![]));
             }
-            let items: Result<Vec<DxLlmValue>, _> =
-                inner.split(',').map(|item| _self.parse_config_value(item.trim())).collect();
+            let items: Result<Vec<DxLlmValue>, _> = inner
+                .split(',')
+                .map(|item| _self.parse_config_value(item.trim()))
+                .collect();
             return Ok(DxLlmValue::Arr(items?));
         }
 
@@ -484,8 +488,10 @@ impl HumanParser {
 
         // V2: Comma-separated array without brackets (e.g., "frontend/www, frontend/mobile")
         if s.contains(", ") && !s.starts_with('"') {
-            let items: Vec<DxLlmValue> =
-                s.split(", ").map(|item| DxLlmValue::Str(item.trim().to_string())).collect();
+            let items: Vec<DxLlmValue> = s
+                .split(", ")
+                .map(|item| DxLlmValue::Str(item.trim().to_string()))
+                .collect();
             if items.len() > 1 {
                 return Ok(DxLlmValue::Arr(items));
             }
@@ -616,8 +622,7 @@ impl HumanParser {
 
             // Parse row with │ separators
             if line.starts_with('│') && line.ends_with('│') {
-                let cells: Vec<&str> =
-                    line[3..line.len() - 3].split('│').map(str::trim).collect();
+                let cells: Vec<&str> = line[3..line.len() - 3].split('│').map(str::trim).collect();
 
                 if !header_found {
                     // This is the header row - keep column names as-is
@@ -644,12 +649,15 @@ impl HumanParser {
                     } else {
                         // Finalize previous row if exists
                         if let Some(prev_cells) = current_row_cells.take() {
-                            let row: Vec<DxLlmValue> =
-                                prev_cells.iter().map(|cell| self.parse_cell_value(cell)).collect();
+                            let row: Vec<DxLlmValue> = prev_cells
+                                .iter()
+                                .map(|cell| self.parse_cell_value(cell))
+                                .collect();
                             rows.push(row);
                         }
                         // Start new row
-                        current_row_cells = Some(cells.iter().map(std::string::ToString::to_string).collect());
+                        current_row_cells =
+                            Some(cells.iter().map(std::string::ToString::to_string).collect());
                     }
                 }
             }
@@ -657,8 +665,10 @@ impl HumanParser {
 
         // Finalize last row
         if let Some(last_cells) = current_row_cells {
-            let row: Vec<DxLlmValue> =
-                last_cells.iter().map(|cell| self.parse_cell_value(cell)).collect();
+            let row: Vec<DxLlmValue> = last_cells
+                .iter()
+                .map(|cell| self.parse_cell_value(cell))
+                .collect();
             rows.push(row);
         }
 
@@ -688,15 +698,16 @@ impl HumanParser {
 
             // Parse row with | separators
             if line.starts_with('|') && line.ends_with('|') {
-                let cells: Vec<&str> =
-                    line[1..line.len() - 1].split('|').map(str::trim).collect();
+                let cells: Vec<&str> = line[1..line.len() - 1].split('|').map(str::trim).collect();
 
                 if !header_found {
                     schema = cells.iter().map(std::string::ToString::to_string).collect();
                     header_found = true;
                 } else if separator_count >= 2 {
-                    let row: Vec<DxLlmValue> =
-                        cells.iter().map(|cell| self.parse_cell_value(cell)).collect();
+                    let row: Vec<DxLlmValue> = cells
+                        .iter()
+                        .map(|cell| self.parse_cell_value(cell))
+                        .collect();
                     rows.push(row);
                 }
             }
@@ -728,15 +739,16 @@ impl HumanParser {
 
             // Parse row with | separators
             if line.starts_with('|') && line.ends_with('|') {
-                let cells: Vec<&str> =
-                    line[1..line.len() - 1].split('|').map(str::trim).collect();
+                let cells: Vec<&str> = line[1..line.len() - 1].split('|').map(str::trim).collect();
 
                 if !header_found {
                     schema = cells.iter().map(std::string::ToString::to_string).collect();
                     header_found = true;
                 } else if separator_found {
-                    let row: Vec<DxLlmValue> =
-                        cells.iter().map(|cell| self.parse_cell_value(cell)).collect();
+                    let row: Vec<DxLlmValue> = cells
+                        .iter()
+                        .map(|cell| self.parse_cell_value(cell))
+                        .collect();
                     rows.push(row);
                 }
             }
@@ -777,8 +789,10 @@ impl HumanParser {
             if inner.is_empty() {
                 return DxLlmValue::Arr(vec![]);
             }
-            let items: Vec<DxLlmValue> =
-                inner.split(',').map(|item| _self.parse_cell_value(item.trim())).collect();
+            let items: Vec<DxLlmValue> = inner
+                .split(',')
+                .map(|item| _self.parse_cell_value(item.trim()))
+                .collect();
             return DxLlmValue::Arr(items);
         }
 
@@ -829,7 +843,7 @@ impl HumanParser {
     }
 
     /// Get the abbreviation dictionary
-    #[must_use] 
+    #[must_use]
     pub fn abbrev(&self) -> &AbbrevDict {
         &self.abbrev
     }
@@ -855,8 +869,14 @@ mod tests {
     #[test]
     fn test_parse_section_header() {
         let parser = HumanParser::new();
-        assert_eq!(parser.parse_section_header("[config]"), Some("config".to_string()));
-        assert_eq!(parser.parse_section_header("[data]"), Some("data".to_string()));
+        assert_eq!(
+            parser.parse_section_header("[config]"),
+            Some("config".to_string())
+        );
+        assert_eq!(
+            parser.parse_section_header("[data]"),
+            Some("data".to_string())
+        );
         assert_eq!(parser.parse_section_header("not a header"), None);
     }
 
@@ -886,8 +906,14 @@ js.dependencies.react = 19.0.1
             doc.context.get("forge.repository").unwrap().as_str(),
             Some("https://example.com")
         );
-        assert_eq!(doc.context.get("style.path").unwrap().as_str(), Some("@/style"));
-        assert_eq!(doc.context.get("js.dependencies.react").unwrap().as_str(), Some("19.0.1"));
+        assert_eq!(
+            doc.context.get("style.path").unwrap().as_str(),
+            Some("@/style")
+        );
+        assert_eq!(
+            doc.context.get("js.dependencies.react").unwrap().as_str(),
+            Some("19.0.1")
+        );
     }
 
     #[test]
@@ -949,7 +975,10 @@ editors.default = neovim
             doc.context.get("forge.repository").unwrap().as_str(),
             Some("https://example.com")
         );
-        assert_eq!(doc.context.get("editors.default").unwrap().as_str(), Some("neovim"));
+        assert_eq!(
+            doc.context.get("editors.default").unwrap().as_str(),
+            Some("neovim")
+        );
 
         let paths = doc.context.get("workspace.paths").unwrap();
         if let DxLlmValue::Arr(arr) = paths {
@@ -969,7 +998,10 @@ editors.default = neovim
         assert_eq!(parser.parse_cell_value("✗"), DxLlmValue::Bool(false));
         assert_eq!(parser.parse_cell_value("—"), DxLlmValue::Null);
         assert_eq!(parser.parse_cell_value("42"), DxLlmValue::Num(42.0));
-        assert_eq!(parser.parse_cell_value("hello"), DxLlmValue::Str("hello".to_string()));
+        assert_eq!(
+            parser.parse_cell_value("hello"),
+            DxLlmValue::Str("hello".to_string())
+        );
     }
 
     #[test]

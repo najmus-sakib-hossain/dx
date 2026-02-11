@@ -35,12 +35,12 @@
 //! | WASM | (native) | Supported |
 
 pub mod compiler;
-pub mod runtime;
 pub mod module;
+pub mod runtime;
 
-pub use compiler::{WasmCompiler, CompilerConfig};
-pub use runtime::{WasmRuntime, RuntimeConfig};
-pub use module::{WasmModule, ModuleExports};
+pub use compiler::{CompilerConfig, WasmCompiler};
+pub use module::{ModuleExports, WasmModule};
+pub use runtime::{RuntimeConfig, WasmRuntime};
 
 use thiserror::Error;
 
@@ -49,22 +49,22 @@ use thiserror::Error;
 pub enum WasmError {
     #[error("Compilation failed: {0}")]
     CompilationFailed(String),
-    
+
     #[error("Runtime error: {0}")]
     RuntimeError(String),
-    
+
     #[error("Module not found: {0}")]
     ModuleNotFound(String),
-    
+
     #[error("Function not found: {0}")]
     FunctionNotFound(String),
-    
+
     #[error("Invalid WASM: {0}")]
     InvalidWasm(String),
-    
+
     #[error("Unsupported language: {0}")]
     UnsupportedLanguage(String),
-    
+
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
 }

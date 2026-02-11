@@ -168,8 +168,10 @@ impl LlmSerializer {
             .map(|(k, v)| {
                 // Handle nested arrays: key[count]=item1 item2 item3
                 if let DxLlmValue::Arr(items) = v {
-                    let items_str: Vec<String> =
-                        items.iter().map(|item| self.serialize_value(item)).collect();
+                    let items_str: Vec<String> = items
+                        .iter()
+                        .map(|item| self.serialize_value(item))
+                        .collect();
                     let arr_sep = if self.config.legacy_mode { "," } else { " " };
                     format!("{}[{}]={}", k, items.len(), items_str.join(arr_sep))
                 } else {
@@ -204,7 +206,8 @@ impl LlmSerializer {
 
         // Heuristic 3: Complex data (nested objects/arrays) uses semicolons
         let has_complex = section.rows.iter().any(|row| {
-            row.iter().any(|val| matches!(val, DxLlmValue::Obj(_) | DxLlmValue::Arr(_)))
+            row.iter()
+                .any(|val| matches!(val, DxLlmValue::Obj(_) | DxLlmValue::Arr(_)))
         });
         if has_complex {
             return ';';
@@ -298,7 +301,12 @@ impl LlmSerializer {
         // Schema: name:count(col1 col2 col3) or (col1,col2,col3) in legacy mode
         let schema_separator = if self.config.legacy_mode { "," } else { " " };
         let schema_str = section.schema.join(schema_separator);
-        output.push_str(&format!("{}:{}({})", section_name, section.rows.len(), schema_str));
+        output.push_str(&format!(
+            "{}:{}({})",
+            section_name,
+            section.rows.len(),
+            schema_str
+        ));
 
         // Output prefix markers
         for prefix in prefixes.iter().flatten() {
@@ -332,7 +340,10 @@ impl LlmSerializer {
                             .iter()
                             .enumerate()
                             .map(|(i, v)| {
-                                self.serialize_table_value_with_prefix_removed(v, prefixes[i].as_ref())
+                                self.serialize_table_value_with_prefix_removed(
+                                    v,
+                                    prefixes[i].as_ref(),
+                                )
                             })
                             .collect();
                         values.join(" ")
@@ -359,7 +370,12 @@ impl LlmSerializer {
         // or name:count(col1,col2,col3)[ in legacy mode
         let schema_separator = if self.config.legacy_mode { "," } else { " " };
         let schema_str = section.schema.join(schema_separator);
-        output.push_str(&format!("{}:{}({})[", section_name, section.rows.len(), schema_str));
+        output.push_str(&format!(
+            "{}:{}({})[",
+            section_name,
+            section.rows.len(),
+            schema_str
+        ));
 
         if !section.rows.is_empty() {
             if separator == '\n' {
@@ -472,8 +488,10 @@ impl LlmSerializer {
                 }
             }
             DxLlmValue::Arr(items) => {
-                let serialized: Vec<String> =
-                    items.iter().map(|item| _self.serialize_table_value(item)).collect();
+                let serialized: Vec<String> = items
+                    .iter()
+                    .map(|item| _self.serialize_table_value(item))
+                    .collect();
                 serialized.join(",")
             }
             DxLlmValue::Obj(fields) => {
@@ -512,8 +530,10 @@ impl LlmSerializer {
                 }
             }
             DxLlmValue::Arr(items) => {
-                let serialized: Vec<String> =
-                    items.iter().map(|item| _self.serialize_value(item)).collect();
+                let serialized: Vec<String> = items
+                    .iter()
+                    .map(|item| _self.serialize_value(item))
+                    .collect();
                 serialized.join(",")
             }
             DxLlmValue::Obj(fields) => {
@@ -557,8 +577,10 @@ mod tests {
     fn test_serialize_simple_values() {
         let serializer = LlmSerializer::new();
         let mut doc = DxDocument::new();
-        doc.context.insert("name".to_string(), DxLlmValue::Str("Test".to_string()));
-        doc.context.insert("count".to_string(), DxLlmValue::Num(42.0));
+        doc.context
+            .insert("name".to_string(), DxLlmValue::Str("Test".to_string()));
+        doc.context
+            .insert("count".to_string(), DxLlmValue::Num(42.0));
 
         let output = serializer.serialize(&doc);
         assert!(output.contains("count=42"), "Output was: {output}");
@@ -569,8 +591,10 @@ mod tests {
     fn test_serialize_booleans() {
         let serializer = LlmSerializer::new();
         let mut doc = DxDocument::new();
-        doc.context.insert("active".to_string(), DxLlmValue::Bool(true));
-        doc.context.insert("deleted".to_string(), DxLlmValue::Bool(false));
+        doc.context
+            .insert("active".to_string(), DxLlmValue::Bool(true));
+        doc.context
+            .insert("deleted".to_string(), DxLlmValue::Bool(false));
 
         let output = serializer.serialize(&doc);
         assert!(output.contains("active=true"), "Output was: {output}");
@@ -591,7 +615,10 @@ mod tests {
         );
 
         let output = serializer.serialize(&doc);
-        assert!(output.contains("friends:3=ana luis sam"), "Output was: {output}");
+        assert!(
+            output.contains("friends:3=ana luis sam"),
+            "Output was: {output}"
+        );
     }
 
     #[test]
@@ -599,8 +626,11 @@ mod tests {
         let serializer = LlmSerializer::new();
         let mut doc = DxDocument::new();
 
-        let mut section =
-            DxSection::new(vec!["id".to_string(), "name".to_string(), "active".to_string()]);
+        let mut section = DxSection::new(vec![
+            "id".to_string(),
+            "name".to_string(),
+            "active".to_string(),
+        ]);
         section.rows.push(vec![
             DxLlmValue::Num(1.0),
             DxLlmValue::Str("Alpha".to_string()),
@@ -615,7 +645,10 @@ mod tests {
 
         let output = serializer.serialize(&doc);
         // Space-separated format with section ID
-        assert!(output.contains("d:2(id name active)["), "Output was: {output}");
+        assert!(
+            output.contains("d:2(id name active)["),
+            "Output was: {output}"
+        );
         assert!(output.contains("1 Alpha true"), "Output was: {output}");
         assert!(output.contains("2 Beta false"), "Output was: {output}");
     }
@@ -625,8 +658,11 @@ mod tests {
         let serializer = LlmSerializer::new();
         let mut doc = DxDocument::new();
 
-        let mut section =
-            DxSection::new(vec!["id".to_string(), "name".to_string(), "dept".to_string()]);
+        let mut section = DxSection::new(vec![
+            "id".to_string(),
+            "name".to_string(),
+            "dept".to_string(),
+        ]);
         section.rows.push(vec![
             DxLlmValue::Num(1.0),
             DxLlmValue::Str("James Smith".to_string()),
@@ -641,7 +677,10 @@ mod tests {
 
         let output = serializer.serialize(&doc);
         // Spaces in text become underscores
-        assert!(output.contains("1 James_Smith Engineering"), "Output was: {output}");
+        assert!(
+            output.contains("1 James_Smith Engineering"),
+            "Output was: {output}"
+        );
         assert!(
             output.contains("2 Mary_Johnson Research_and_Development"),
             "Output was: {output}"
@@ -662,20 +701,27 @@ mod tests {
     fn test_serialize_quoted_string() {
         let serializer = LlmSerializer::new();
         let mut doc = DxDocument::new();
-        doc.context
-            .insert("task".to_string(), DxLlmValue::Str("Our favorite hikes together".to_string()));
+        doc.context.insert(
+            "task".to_string(),
+            DxLlmValue::Str("Our favorite hikes together".to_string()),
+        );
 
         let output = serializer.serialize(&doc);
         // Strings with spaces use underscores in LLM format
-        assert!(output.contains("task=Our_favorite_hikes_together"), "Output was: {output}");
+        assert!(
+            output.contains("task=Our_favorite_hikes_together"),
+            "Output was: {output}"
+        );
     }
 
     #[test]
     fn test_serialize_string_with_comma() {
         let serializer = LlmSerializer::new();
         let mut doc = DxDocument::new();
-        doc.context
-            .insert("desc".to_string(), DxLlmValue::Str("hello, world".to_string()));
+        doc.context.insert(
+            "desc".to_string(),
+            DxLlmValue::Str("hello, world".to_string()),
+        );
 
         let output = serializer.serialize(&doc);
         // Commas and spaces are replaced with underscores in LLM format
@@ -690,7 +736,8 @@ mod tests {
         let mut fields = IndexMap::new();
         fields.insert("host".to_string(), DxLlmValue::Str("localhost".to_string()));
         fields.insert("port".to_string(), DxLlmValue::Num(8080.0));
-        doc.context.insert("config".to_string(), DxLlmValue::Obj(fields));
+        doc.context
+            .insert("config".to_string(), DxLlmValue::Obj(fields));
 
         let output = serializer.serialize(&doc);
         // Should have count prefix and space separators
@@ -698,7 +745,10 @@ mod tests {
         assert!(output.contains("host=localhost"), "Output was: {output}");
         assert!(output.contains("port=8080"), "Output was: {output}");
         // Should use space separator, not comma
-        assert!(!output.contains("host=localhost,port=8080"), "Output was: {output}");
+        assert!(
+            !output.contains("host=localhost,port=8080"),
+            "Output was: {output}"
+        );
     }
 
     #[test]
@@ -715,7 +765,8 @@ mod tests {
                 DxLlmValue::Str("fast".to_string()),
             ]),
         );
-        doc.context.insert("item".to_string(), DxLlmValue::Obj(fields));
+        doc.context
+            .insert("item".to_string(), DxLlmValue::Obj(fields));
 
         let output = serializer.serialize(&doc);
         // Should have count prefix

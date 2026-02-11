@@ -89,7 +89,11 @@ impl AssetSource for DirectoryAssetSource {
         if let Ok(entries) = std::fs::read_dir(full_path) {
             Ok(entries
                 .filter_map(|e| e.ok())
-                .filter_map(|e| e.file_name().to_str().map(|s| SharedString::from(s.to_string())))
+                .filter_map(|e| {
+                    e.file_name()
+                        .to_str()
+                        .map(|s| SharedString::from(s.to_string()))
+                })
                 .collect())
         } else {
             Ok(Vec::new())

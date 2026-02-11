@@ -3,7 +3,7 @@
 //! This benchmark compares serialization and deserialization performance
 //! across multiple binary formats.
 
-use criterion::{Criterion, black_box, criterion_group, criterion_main};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use serializer::zero::{DxZeroBuilder, DxZeroSlot};
 
 /// Test data structure
@@ -194,8 +194,11 @@ fn bench_size_comparison(c: &mut Criterion) {
 
     // DX-Zero
     let mut dx_buffer = Vec::new();
-    let mut builder =
-        DxZeroBuilder::new(&mut dx_buffer, UserDxZero::FIXED_SIZE, UserDxZero::SLOT_COUNT);
+    let mut builder = DxZeroBuilder::new(
+        &mut dx_buffer,
+        UserDxZero::FIXED_SIZE,
+        UserDxZero::SLOT_COUNT,
+    );
     builder.write_u64(0, user.id);
     builder.write_u32(8, user.age);
     builder.write_bool(12, user.active);

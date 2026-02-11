@@ -269,7 +269,12 @@ fn dx_table_to_toon(
     let indent_str = "  ".repeat(indent);
 
     // Get column names
-    let fields: Vec<&str> = table.schema.columns.iter().map(|c| c.name.as_str()).collect();
+    let fields: Vec<&str> = table
+        .schema
+        .columns
+        .iter()
+        .map(|c| c.name.as_str())
+        .collect();
     let field_list = fields.join(",");
 
     // TOON structured array format

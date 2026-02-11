@@ -37,8 +37,11 @@ impl<T: Clone> MatrixSelect<T> {
     }
 
     fn toggle_current(&mut self) {
-        if self.cursor_row < self.selected.len() && self.cursor_col < self.selected[self.cursor_row].len() {
-            self.selected[self.cursor_row][self.cursor_col] = !self.selected[self.cursor_row][self.cursor_col];
+        if self.cursor_row < self.selected.len()
+            && self.cursor_col < self.selected[self.cursor_row].len()
+        {
+            self.selected[self.cursor_row][self.cursor_col] =
+                !self.selected[self.cursor_row][self.cursor_col];
         }
     }
 
@@ -46,7 +49,9 @@ impl<T: Clone> MatrixSelect<T> {
         let mut result = Vec::new();
         for (row_idx, row) in self.items.iter().enumerate() {
             for (col_idx, (value, _)) in row.iter().enumerate() {
-                if self.selected.get(row_idx)
+                if self
+                    .selected
+                    .get(row_idx)
                     .and_then(|r| r.get(col_idx))
                     .copied()
                     .unwrap_or(false)
@@ -127,10 +132,12 @@ impl<T: Clone> PromptInteraction for MatrixSelect<T> {
 
                 for (row_idx, row) in self.items.iter().enumerate() {
                     let mut row_line = String::from("  ");
-                    
+
                     for (col_idx, (_, label)) in row.iter().enumerate() {
                         let is_cursor = row_idx == self.cursor_row && col_idx == self.cursor_col;
-                        let is_selected = self.selected.get(row_idx)
+                        let is_selected = self
+                            .selected
+                            .get(row_idx)
                             .and_then(|r| r.get(col_idx))
                             .copied()
                             .unwrap_or(false);
@@ -164,7 +171,9 @@ impl<T: Clone> PromptInteraction for MatrixSelect<T> {
                 term.write_line(&format!(
                     "{}  {}",
                     bar,
-                    theme.dim.apply_to("Arrow keys: navigate, Space: toggle, Enter: confirm")
+                    theme
+                        .dim
+                        .apply_to("Arrow keys: navigate, Space: toggle, Enter: confirm")
                 ))?;
                 lines += 1;
             }

@@ -90,7 +90,10 @@ fn test_batch_file_operations() {
         })
         .collect();
 
-    let items_ref: Vec<_> = items.iter().map(|(d, p)| (d.clone(), p.as_path())).collect();
+    let items_ref: Vec<_> = items
+        .iter()
+        .map(|(d, p)| (d.clone(), p.as_path()))
+        .collect();
 
     // Write batch
     let results = opt.serialize_batch_to_files(&items_ref).unwrap();
@@ -99,7 +102,9 @@ fn test_batch_file_operations() {
 
     // Read batch
     let paths: Vec<_> = items.iter().map(|(_, p)| p.as_path()).collect();
-    let loaded = opt.deserialize_batch_from_files::<TestData>(&paths).unwrap();
+    let loaded = opt
+        .deserialize_batch_from_files::<TestData>(&paths)
+        .unwrap();
     assert_eq!(loaded.len(), 10);
 
     for (i, result) in loaded.iter().enumerate() {

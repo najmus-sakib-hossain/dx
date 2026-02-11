@@ -159,14 +159,20 @@ fn main() {
             "JSON compact",
         ),
         // TOON row (with schema assumed)
-        ("1,James Smith,james.smith@example.com,Engineering,95000,12,true", "TOON row"),
+        (
+            "1,James Smith,james.smith@example.com,Engineering,95000,12,true",
+            "TOON row",
+        ),
         // Current Dx Serializer
         (
             "1,James Smith,james.smith@example.com,Engineering,95000,12,true",
             "Dx Serializer row",
         ),
         // Space-separated
-        ("1 James Smith james.smith@example.com Engineering 95000 12 true", "Space-sep"),
+        (
+            "1 James Smith james.smith@example.com Engineering 95000 12 true",
+            "Space-sep",
+        ),
         // Natural language style
         (
             "James Smith (Engineering, 95k, 12yr) james.smith@example.com active",
@@ -178,9 +184,15 @@ fn main() {
             "Prose",
         ),
         // Ultra compact
-        ("1|James Smith|james.smith@example.com|Engineering|95000|12|+", "Pipe-sep"),
+        (
+            "1|James Smith|james.smith@example.com|Engineering|95000|12|+",
+            "Pipe-sep",
+        ),
         // With common abbreviations
-        ("1,James Smith,james.smith@ex.com,Eng,95k,12y,yes", "Abbreviated"),
+        (
+            "1,James Smith,james.smith@ex.com,Eng,95k,12y,yes",
+            "Abbreviated",
+        ),
     ];
 
     println!("  {:80} {:>8}", "Format", "Tokens");
@@ -264,9 +276,15 @@ Day 5: 2945 views, 147 clicks, 18 conversions, $2546.82 revenue, 41% bounce";
     for (table, desc) in &tables {
         let tokens = counter.count(table, ModelType::Gpt4o);
         let vs_toon = if tokens.count < toon_tokens {
-            format!("-{:.1}%", (1.0 - tokens.count as f64 / toon_tokens as f64) * 100.0)
+            format!(
+                "-{:.1}%",
+                (1.0 - tokens.count as f64 / toon_tokens as f64) * 100.0
+            )
         } else if tokens.count > toon_tokens {
-            format!("+{:.1}%", (tokens.count as f64 / toon_tokens as f64 - 1.0) * 100.0)
+            format!(
+                "+{:.1}%",
+                (tokens.count as f64 / toon_tokens as f64 - 1.0) * 100.0
+            )
         } else {
             "0%".to_string()
         };

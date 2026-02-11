@@ -41,20 +41,20 @@ impl CreditCardInput {
     fn format_card_number(&self) -> String {
         let digits: String = self.number.chars().filter(|c| c.is_ascii_digit()).collect();
         let mut formatted = String::new();
-        
+
         for (i, c) in digits.chars().enumerate() {
             if i > 0 && i % 4 == 0 {
                 formatted.push(' ');
             }
             formatted.push(c);
         }
-        
+
         formatted
     }
 
     fn format_expiry(&self) -> String {
         let digits: String = self.expiry.chars().filter(|c| c.is_ascii_digit()).collect();
-        
+
         if digits.len() <= 2 {
             digits
         } else {
@@ -64,54 +64,57 @@ impl CreditCardInput {
 
     fn validate_card(&self) -> Result<(), String> {
         let digits: String = self.number.chars().filter(|c| c.is_ascii_digit()).collect();
-        
+
         if digits.len() < 13 || digits.len() > 19 {
             return Err("Invalid card number length".to_string());
         }
-        
+
         // Luhn algorithm
         let mut sum = 0;
         let mut double = false;
-        
+
         for c in digits.chars().rev() {
             let mut digit = c.to_digit(10).unwrap();
-            
+
             if double {
                 digit *= 2;
                 if digit > 9 {
                     digit -= 9;
                 }
             }
-            
+
             sum += digit;
             double = !double;
         }
-        
+
         if sum % 10 != 0 {
             return Err("Invalid card number (failed Luhn check)".to_string());
         }
-        
+
         let expiry_digits: String = self.expiry.chars().filter(|c| c.is_ascii_digit()).collect();
         if expiry_digits.len() != 4 {
             return Err("Expiry must be MMYY format".to_string());
         }
-        
+
         let cvv_digits: String = self.cvv.chars().filter(|c| c.is_ascii_digit()).collect();
         if cvv_digits.len() < 3 || cvv_digits.len() > 4 {
             return Err("CVV must be 3 or 4 digits".to_string());
         }
-        
+
         Ok(())
     }
 
     fn detect_card_type(&self) -> &'static str {
         let digits: String = self.number.chars().filter(|c| c.is_ascii_digit()).collect();
-        
+
         if digits.starts_with('4') {
             "💳 Visa"
-        } else if digits.starts_with("51") || digits.starts_with("52") || 
-                  digits.starts_with("53") || digits.starts_with("54") || 
-                  digits.starts_with("55") {
+        } else if digits.starts_with("51")
+            || digits.starts_with("52")
+            || digits.starts_with("53")
+            || digits.starts_with("54")
+            || digits.starts_with("55")
+        {
             "💳 Mastercard"
         } else if digits.starts_with("34") || digits.starts_with("37") {
             "💳 Amex"
@@ -133,12 +136,10 @@ impl PromptInteraction for CreditCardInput {
     fn on(&mut self, event: Event) {
         match event {
             Event::Key(key) => match key {
-                console::Key::Enter => {
-                    match self.validate_card() {
-                        Ok(_) => self.state = State::Submit,
-                        Err(msg) => self.error_message = Some(msg),
-                    }
-                }
+                console::Key::Enter => match self.validate_card() {
+                    Ok(_) => self.state = State::Submit,
+                    Err(msg) => self.error_message = Some(msg),
+                },
                 console::Key::Escape => self.state = State::Cancel,
                 console::Key::Tab => {
                     self.active_field = match self.active_field {
@@ -150,9 +151,15 @@ impl PromptInteraction for CreditCardInput {
                 }
                 console::Key::Backspace => {
                     match self.active_field {
-                        CardField::Number => { self.number.pop(); }
-                        CardField::Expiry => { self.expiry.pop(); }
-                        CardField::CVV => { self.cvv.pop(); }
+                        CardField::Number => {
+                            self.number.pop();
+                        }
+                        CardField::Expiry => {
+                            self.expiry.pop();
+                        }
+                        CardField::CVV => {
+                            self.cvv.pop();
+                        }
                     }
                     self.error_message = None;
                 }
@@ -209,9 +216,21 @@ impl PromptInteraction for CreditCardInput {
                 term.write_line(&format!("{}", bar))?;
                 lines += 1;
 
-                let number_marker = if self.active_field == CardField::Number { "▸" } else { " " };
-                let expiry_marker = if self.active_field == CardField::Expiry { "▸" } else { " " };
-                let cvv_marker = if self.active_field == CardField::CVV { "▸" } else { " " };
+                let number_marker = if self.active_field == CardField::Number {
+                    "▸"
+                } else {
+                    " "
+                };
+                let expiry_marker = if self.active_field == CardField::Expiry {
+                    "▸"
+                } else {
+                    " "
+                };
+                let cvv_marker = if self.active_field == CardField::CVV {
+                    "▸"
+                } else {
+                    " "
+                };
 
                 let number_display = if self.format_card_number().is_empty() {
                     format!("█{}", theme.dim.apply_to("1234 5678 9012 3456"))
@@ -249,13 +268,22 @@ impl PromptInteraction for CreditCardInput {
                     "•".repeat(self.cvv.len())
                 };
 
-                term.write_line(&format!("{}  {} Card Number: {}", bar, number_marker, number_text))?;
+                term.write_line(&format!(
+                    "{}  {} Card Number: {}",
+                    bar, number_marker, number_text
+                ))?;
                 lines += 1;
 
-                term.write_line(&format!("{}  {} Expiry:      {}", bar, expiry_marker, expiry_text))?;
+                term.write_line(&format!(
+                    "{}  {} Expiry:      {}",
+                    bar, expiry_marker, expiry_text
+                ))?;
                 lines += 1;
 
-                term.write_line(&format!("{}  {} CVV:         {}", bar, cvv_marker, cvv_text))?;
+                term.write_line(&format!(
+                    "{}  {} CVV:         {}",
+                    bar, cvv_marker, cvv_text
+                ))?;
                 lines += 1;
 
                 if let Some(error) = &self.error_message {
@@ -272,7 +300,18 @@ impl PromptInteraction for CreditCardInput {
             }
             State::Submit => {
                 let checkmark = theme.success.apply_to("✓");
-                let masked = format!("**** **** **** {}", &self.format_card_number().chars().rev().take(4).collect::<String>().chars().rev().collect::<String>());
+                let masked = format!(
+                    "**** **** **** {}",
+                    &self
+                        .format_card_number()
+                        .chars()
+                        .rev()
+                        .take(4)
+                        .collect::<String>()
+                        .chars()
+                        .rev()
+                        .collect::<String>()
+                );
                 term.write_line(&format!(
                     "{} {}  {}",
                     checkmark,
