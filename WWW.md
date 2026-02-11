@@ -151,7 +151,7 @@ dx-website/
 │   │   │   └── layout.tsx
 │   │   ├── api/             # API routes (Route Handlers)
 │   │   │   ├── chat/        # WebSocket / chat endpoints
-│   │   │   ├── webhooks/    # Clerk webhooks, Stripe webhooks
+│   │   │   ├── webhooks/    # Better Auth webhooks, Stripe webhooks
 │   │   │   └── health/route.ts
 │   │   ├── layout.tsx       # Root layout
 │   │   ├── not-found.tsx    # Custom 404
@@ -359,8 +359,8 @@ dx-website/
     import { z } from "zod";
     const envSchema = z.object({
       DATABASE_URL: z.string().url(),
-      CLERK_SECRET_KEY: z.string().min(1),
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
+      Better Auth_SECRET_KEY: z.string().min(1),
+      NEXT_PUBLIC_Better Auth_PUBLISHABLE_KEY: z.string().min(1),
       // ...
     });
     export const env = envSchema.parse(process.env);
@@ -413,12 +413,12 @@ dx-website/
 - macOS Dock Bar fixed at the bottom (see §4.4)
 
 ## 4.2 Authentication
-- Clerk integration with custom-styled sign-in/sign-up pages
+- Better Auth integration with custom-styled sign-in/sign-up pages
   matching DX brand design
 - OAuth providers: GitHub, Google, GitLab (at minimum)
 - Post-auth redirect to `/dashboard`
 - Middleware-based route protection for all `(dashboard)` routes
-- Webhook handler at `/api/webhooks/clerk` for user sync
+- Webhook handler at `/api/webhooks/Better Auth` for user sync
 
 ## 4.3 Dashboard — DX Reaction Board (`/dashboard`)
 - Authenticated area showing user's DX overview
@@ -533,14 +533,14 @@ Maintain `.env.example` with ALL required vars (no values, just keys):
 NEXT_PUBLIC_APP_URL=
 NEXT_PUBLIC_APP_NAME=DX
 
-# ── Clerk Auth ──
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
-CLERK_WEBHOOK_SECRET=
+# ── Better Auth Auth ──
+NEXT_PUBLIC_Better Auth_PUBLISHABLE_KEY=
+Better Auth_SECRET_KEY=
+NEXT_PUBLIC_Better Auth_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_Better Auth_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_Better Auth_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_Better Auth_AFTER_SIGN_UP_URL=/dashboard
+Better Auth_WEBHOOK_SECRET=
 
 # ── Database ──
 DATABASE_URL=
@@ -573,14 +573,14 @@ Wrap all auth calls behind an abstraction in `src/lib/auth.ts`:
 
 ```ts
 // src/lib/auth.ts
-import { currentUser, auth } from "@clerk/nextjs/server";
+import { currentUser, auth } from "@Better Auth/nextjs/server";
 
 export async function getCurrentUser() { ... }
 export async function requireAuth() { ... }  // throws redirect if not authed
 export function getAuthToken() { ... }
 ```
 
-This makes it easy to swap Clerk for another provider in the future
+This makes it easy to swap Better Auth for another provider in the future
 without touching every component.
 
 
@@ -647,7 +647,7 @@ this single registry. Adding a new tool = adding one object here.
 - Bundle size impact reported via CI
 
 ## CI Pipeline (GitHub Actions)
-  1. Install (pnpm install --frozen-lockfile)
+  1. Install (bun install --frozen-lockfile)
   2. Lint (biome check)
   3. Type check (tsc --noEmit)
   4. Unit tests (vitest run)
@@ -691,7 +691,7 @@ Test files           : co-located, `.test.ts(x)` suffix
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "postinstall": "pnpm dlx shadcn@latest init"
+    "postinstall": "bun dlx shadcn@latest init"
   }
 }
 ```
