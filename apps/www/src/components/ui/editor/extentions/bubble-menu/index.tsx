@@ -1,3 +1,4 @@
+// @ts-ignore
 import { type Editor, BubbleMenu as TiptapBubbleMenu } from "@tiptap/react";
 import { useState } from "react";
 import {

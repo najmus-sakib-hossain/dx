@@ -1,0 +1,1 @@
+Please look at the crates style folder and give me a brutal truth: Is it production-ready, professional 10 out of 10 codebase or not? And actually, taste is a real functionality. Check if they work or not. Give me brutal truths.

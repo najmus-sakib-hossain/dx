@@ -441,7 +441,7 @@ const MultipleSelector = React.forwardRef<
       <Command
         ref={dropdownRef}
         {...commandProps}
-        onKeyDown={(e) => {
+        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
           handleKeyDown(e);
           commandProps?.onKeyDown?.(e);
         }}
@@ -597,7 +597,7 @@ const MultipleSelector = React.forwardRef<
                             className={cn(
                               "cursor-pointer w-full",
                               option.disable &&
-                                "cursor-default text-muted-foreground",
+                              "cursor-default text-muted-foreground",
                             )}
                           >
                             {renderOption ? renderOption(option) : option.label}
