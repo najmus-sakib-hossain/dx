@@ -1,8 +1,9 @@
 import { DockBar } from "@/components/dock/dock-bar";
+import { ActiveThemeProvider } from "@/components/providers/active-theme";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { fontMono, fontSans } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
-import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -10,7 +11,32 @@ export const metadata: Metadata = {
     default: "DX — Enhanced Development Experience",
     template: "%s | DX",
   },
-  description: "The all-in-one developer platform for the modern web.",
+  description:
+    "The all-in-one developer platform with 24/7 AI-powered CLI agents, 400+ integrations, and a rich ecosystem of developer tools.",
+  openGraph: {
+    title: "DX — Enhanced Development Experience",
+    description:
+      "The all-in-one developer platform with 24/7 AI-powered CLI agents, 400+ integrations, and a rich ecosystem of developer tools.",
+    siteName: "DX",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    title: "DX — Enhanced Development Experience",
+    description:
+      "The all-in-one developer platform with 24/7 AI-powered CLI agents, 400+ integrations, and a rich ecosystem of developer tools.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -33,8 +59,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <DockBar />
+          <ActiveThemeProvider>
+            {children}
+            <DockBar />
+          </ActiveThemeProvider>
         </ThemeProvider>
       </body>
     </html>

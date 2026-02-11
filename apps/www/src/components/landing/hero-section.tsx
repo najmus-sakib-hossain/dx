@@ -1,75 +1,148 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Spotlight } from "@/components/effects";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { ArrowRight, Terminal } from "lucide-react";
+import { ArrowRight, Terminal, Sparkles } from "lucide-react";
 import Link from "next/link";
 
+/**
+ * HeroSection — enhanced landing page hero with Spotlight effect,
+ * animated gradient mesh background, staggered entrance animations.
+ * DX brand copy with purple-to-green gradient headline.
+ */
 export function HeroSection() {
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-24 text-center">
-      {/* Background Gradient Mesh */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-900 via-black to-black opacity-80" />
-      <div className="absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-primary/20 blur-3xl filter" />
+    <section className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden px-4 py-32 text-center">
+      {/* Animated gradient mesh background */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/80" />
+        <div className="absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[128px]" />
+        <div className="absolute right-1/4 top-1/3 h-[400px] w-[400px] rounded-full bg-accent/10 blur-[128px]" />
+        <div className="absolute bottom-0 left-1/2 h-[300px] w-[600px] -translate-x-1/2 rounded-full bg-primary/5 blur-[100px]" />
+      </div>
 
+      {/* Spotlight effect */}
+      <Spotlight
+        className="-top-40 left-0 md:-top-20 md:left-60"
+        fill="oklch(0.588 0.243 264.376 / 0.3)"
+      />
+
+      {/* Grid pattern overlay */}
+      <div
+        className="absolute inset-0 -z-10 opacity-[3%]"
+        style={{
+          backgroundImage:
+            "linear-gradient(var(--foreground) 1px, transparent 1px), linear-gradient(90deg, var(--foreground) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Announcement badge */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="mb-6 flex items-center justify-center gap-2 rounded-full border border-neutral-800 bg-neutral-900/50 px-4 py-1.5 text-sm text-neutral-400 backdrop-blur-md"
+        className="mb-8 flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 text-sm text-muted-foreground backdrop-blur-md"
       >
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
-        </span>
-        DX Agent v2.0 is now live
+        <Sparkles className="size-3.5 text-accent" />
+        <span>DX Agent v2.0 — 24/7 AI Code Agent is live</span>
+        <ArrowRight className="size-3 text-muted-foreground" />
       </motion.div>
 
+      {/* Headline */}
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="max-w-4xl bg-gradient-to-br from-white to-neutral-500 bg-clip-text text-5xl font-bold tracking-tight text-transparent sm:text-7xl lg:text-8xl"
+        transition={{ duration: 0.6, delay: 0.1 }}
+        className="max-w-5xl text-5xl font-bold tracking-tight sm:text-7xl lg:text-8xl"
       >
-        Enhanced Development Experience
+        <span className="bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-transparent">
+          Enhanced
+        </span>
+        <br />
+        <span className="bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
+          Development Experience
+        </span>
       </motion.h1>
 
+      {/* Subheadline */}
       <motion.p
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="mt-6 max-w-2xl text-lg text-neutral-400 sm:text-xl"
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl"
       >
         The all-in-one platform for modern developers. AI-powered tools,
-        comprehensive documentation, and a rich ecosystem built for speed.
+        400+ integrations, and a rich ecosystem built for speed.
       </motion.p>
 
+      {/* CTA Buttons */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
         className="mt-10 flex flex-wrap items-center justify-center gap-4"
       >
-        <Button size="lg" className="h-12 rounded-full px-8 text-base" asChild>
+        <Button
+          size="lg"
+          className="h-12 rounded-full bg-primary px-8 text-base text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30"
+          asChild
+        >
           <Link href="/dashboard">
-            Get Started <ArrowRight className="ml-2 h-4 w-4" />
+            Get Started Free <ArrowRight className="ml-2 size-4" />
           </Link>
         </Button>
         <Button
           variant="outline"
           size="lg"
-          className="h-12 rounded-full px-8 text-base border-neutral-800 bg-neutral-900/50 hover:bg-neutral-900"
+          className="h-12 rounded-full border-border bg-card/50 px-8 text-base backdrop-blur-md hover:bg-card"
           asChild
         >
           <Link href="/docs/cli">
-            <Terminal className="mr-2 h-4 w-4" />
+            <Terminal className="mr-2 size-4" />
             Install CLI
           </Link>
         </Button>
       </motion.div>
 
-      {/* Mock Terminal / Demo would go here */}
+      {/* Terminal preview hint */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.5 }}
+        className="mt-20 w-full max-w-3xl"
+      >
+        <div className="overflow-hidden rounded-xl border border-border bg-card/80 shadow-2xl shadow-primary/5 backdrop-blur-md">
+          <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+            <div className="size-3 rounded-full bg-destructive/70" />
+            <div className="size-3 rounded-full bg-yellow-500/70" />
+            <div className="size-3 rounded-full bg-green-500/70" />
+            <span className="ml-2 text-xs text-muted-foreground font-mono">
+              terminal — dx
+            </span>
+          </div>
+          <div className="px-6 py-5 font-mono text-sm">
+            <p className="text-muted-foreground">
+              <span className="text-accent">$</span> npx dx init
+            </p>
+            <p className="mt-2 text-muted-foreground/80">
+              ✓ Initializing DX workspace...
+            </p>
+            <p className="text-muted-foreground/80">
+              ✓ 400+ integrations available
+            </p>
+            <p className="text-muted-foreground/80">
+              ✓ AI Agent connected
+            </p>
+            <p className="mt-2 text-accent">
+              Ready. Welcome to DX. 🚀
+            </p>
+          </div>
+        </div>
+      </motion.div>
     </section>
   );
 }
