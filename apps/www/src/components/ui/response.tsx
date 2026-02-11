@@ -73,10 +73,10 @@ export const Response = memo(
         className,
       )}
       components={{
-        ul: (props) => <CustomUnorderedList {...props} />,
-        ol: (props) => <CustomOrderedList {...props} />,
-        li: (props) => <CustomListItem {...props} />,
-        h2: ({ children, node, ...props }) => (
+        ul: (props: any) => <CustomUnorderedList {...props} />,
+        ol: (props: any) => <CustomOrderedList {...props} />,
+        li: (props: any) => <CustomListItem {...props} />,
+        h2: ({ children, node, ...props }: any) => (
           <h3
             className="font-medium text-sm text-primary tracking-wide"
             {...props}
@@ -84,7 +84,7 @@ export const Response = memo(
             {children}
           </h3>
         ),
-        h3: ({ children, node, ...props }) => (
+        h3: ({ children, node, ...props }: any) => (
           <h3
             className="font-medium text-sm text-primary tracking-wide"
             {...props}
@@ -92,7 +92,7 @@ export const Response = memo(
             {children}
           </h3>
         ),
-        h4: ({ children, node, ...props }) => (
+        h4: ({ children, node, ...props }: any) => (
           <h4
             className="font-medium text-sm text-primary tracking-wide"
             {...props}
@@ -100,17 +100,17 @@ export const Response = memo(
             {children}
           </h4>
         ),
-        p: ({ children, ...props }) => (
+        p: ({ children, ...props }: any) => (
           <p className="leading-relaxed" {...props}>
             {children}
           </p>
         ),
-        table: (props) => (
+        table: (props: any) => (
           <div className="relative overflow-x-auto">
             <Table {...props} className="border" />
           </div>
         ),
-        a: (props) => {
+        a: (props: any) => {
           // if the href starts with the app url, open in the same window
           if (props.href?.startsWith(getAppUrl())) {
             return (

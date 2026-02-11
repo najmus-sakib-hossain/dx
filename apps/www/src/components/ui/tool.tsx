@@ -40,6 +40,7 @@ const getStatusBadge = (status: ToolUIPart["state"]) => {
     "input-available": "Running",
     "output-available": "Completed",
     "output-error": "Error",
+    "approval-requested": "Approval Requested",
   } as const;
 
   const icons = {
@@ -47,12 +48,13 @@ const getStatusBadge = (status: ToolUIPart["state"]) => {
     "input-available": <ClockIcon className="size-4 animate-pulse" />,
     "output-available": <CheckCircleIcon className="size-4 text-green-600" />,
     "output-error": <XCircleIcon className="size-4 text-red-600" />,
+    "approval-requested": <ClockIcon className="size-4 text-amber-500" />,
   } as const;
 
   return (
     <Badge className="gap-1.5 rounded-full text-xs" variant="secondary">
-      {icons[status]}
-      {labels[status]}
+      {icons[status as keyof typeof icons] || icons["input-available"]}
+      {labels[status as keyof typeof labels] || status}
     </Badge>
   );
 };

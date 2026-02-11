@@ -3,7 +3,6 @@ import {
   type ComponentPropsWithoutRef,
   type PropsWithChildren,
   forwardRef,
-  useRef,
 } from "react";
 import { useResizeObserver } from "@/hooks/use-resize-observer";
 import { cn } from "@/lib/utils";
@@ -32,28 +31,21 @@ const AnimatedSizeContainer = forwardRef<
     }: AnimatedSizeContainerProps,
     forwardedRef,
   ) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const resizeObserverEntry = useResizeObserver(
-      containerRef as React.RefObject<Element>,
-    );
+    const { ref, width: observedWidth, height: observedHeight } = useResizeObserver<HTMLDivElement>();
 
     return (
       <motion.div
         ref={forwardedRef}
         className={cn("overflow-hidden", className)}
         animate={{
-          width: width
-            ? (resizeObserverEntry?.contentRect?.width ?? "auto")
-            : "auto",
-          height: height
-            ? (resizeObserverEntry?.contentRect?.height ?? "auto")
-            : "auto",
+          width: width && observedWidth ? observedWidth : "auto",
+          height: height && observedHeight ? observedHeight : "auto",
         }}
         transition={transition ?? { type: "spring", duration: 0.3 }}
         {...rest}
       >
         <div
-          ref={containerRef}
+          ref={ref}
           className={cn(height && "h-max", width && "w-max")}
         >
           {children}
