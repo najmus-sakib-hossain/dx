@@ -128,7 +128,7 @@ export function FeaturesSection() {
                     className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
                 >
                     {FEATURES.map((feature) => (
-                        <motion.div key={feature.title} variants={itemVariants}>
+                        <motion.div key={feature.title} variants={itemVariants as any}>
                             <Link
                                 href={feature.href}
                                 className="group relative flex flex-col rounded-xl border border-border bg-card/50 p-6 transition-all duration-300 hover:border-primary/30 hover:bg-card hover:shadow-lg hover:shadow-primary/5"
