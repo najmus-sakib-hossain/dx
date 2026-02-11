@@ -1,6 +1,6 @@
 pub mod colors;
 
-pub use colors::Theme;
+pub use colors::{Radius, Spacing, Theme};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[allow(dead_code)]
