@@ -1,0 +1,87 @@
+"use client";
+
+import { useUserQuery } from "@/hooks/use-user";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ForesightLink } from "./foresight-link";
+import { SignOut } from "./sign-out";
+import { ThemeSwitch } from "./theme-switch";
+
+type Props = {
+  onlySignOut?: boolean;
+};
+
+export function UserMenu({ onlySignOut }: Props) {
+  const { data: user } = useUserQuery();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Avatar className="rounded-full w-8 h-8 cursor-pointer bg-accent">
+          {user?.avatarUrl && (
+            <AvatarImage
+              src={user?.avatarUrl || ""}
+              alt={user?.fullName ?? ""}
+            />
+          )}
+          <AvatarFallback>
+            <span className="text-xs">
+              {user?.fullName?.charAt(0)?.toUpperCase()}
+            </span>
+          </AvatarFallback>
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-[240px]" sideOffset={10} align="end">
+        {!onlySignOut && (
+          <>
+            <DropdownMenuLabel>
+              <div className="flex justify-between items-center">
+                <div className="flex flex-col">
+                  <span className="truncate line-clamp-1 max-w-[155px] block text-xs">
+                    {user?.fullName}
+                  </span>
+                  <span className="truncate text-xs text-[#606060] font-normal">
+                    {user?.email}
+                  </span>
+                </div>
+              </div>
+            </DropdownMenuLabel>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuGroup>
+              <ForesightLink href="/account" name="user-menu-account">
+                <DropdownMenuItem className="text-xs">Account</DropdownMenuItem>
+              </ForesightLink>
+
+              <ForesightLink href="/account/support" name="user-menu-support">
+                <DropdownMenuItem className="text-xs">Support</DropdownMenuItem>
+              </ForesightLink>
+
+              <ForesightLink href="/account/teams" name="user-menu-teams">
+                <DropdownMenuItem className="text-xs">Teams</DropdownMenuItem>
+              </ForesightLink>
+            </DropdownMenuGroup>
+
+            <DropdownMenuSeparator />
+            <div className="flex flex-row justify-between items-center p-2">
+              <p className="text-xs">Theme</p>
+              <ThemeSwitch />
+            </div>
+            <DropdownMenuSeparator />
+          </>
+        )}
+
+        <SignOut />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}

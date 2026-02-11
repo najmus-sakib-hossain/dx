@@ -1,3 +1,17 @@
+Good, now please look at the apps folder and our dx apps/www project is in nextjs typescript framework and all these folders are in apps folder are also in nextjs typescript framework. So, please copy thier components and code and use them in our dx apps/www project. Use them as fllows:
+1. For whole website ui layouts and components use apps/midday folder code and copy files straight into our main apps/www project and use them.
+2. For Docs and other components, charts, blocks use apps/shadcn-ui/apps/v4 folder code copy files straight into our main apps/www project and use them.
+3. For landing page animations please use apps/www-react-beats folder code and components.
+4. For theme system please use apps/themux and for the more varity themes use all themes of apps/tweackcn folder themes
+5. Fix this "⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy" + ## Error Type
+Runtime Error
+
+## Error Message
+Publishable key not valid.
+
+Next.js version: 16.1.6 (Turbopack)
+" And use bun instead of pnpm and use better-auth instead of clerk for authentication.
+
 At apps/www folder please do these:
 
 ```markdown
