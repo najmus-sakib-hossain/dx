@@ -15,8 +15,12 @@ import {
   applyAuthProfileConfig,
   applyCloudflareAiGatewayConfig,
   applyCloudflareAiGatewayProviderConfig,
+  applyQianfanConfig,
+  applyQianfanProviderConfig,
   applyKimiCodeConfig,
   applyKimiCodeProviderConfig,
+  applyLitellmConfig,
+  applyLitellmProviderConfig,
   applyMoonshotConfig,
   applyMoonshotConfigCn,
   applyMoonshotProviderConfig,
@@ -27,6 +31,8 @@ import {
   applyOpenrouterProviderConfig,
   applySyntheticConfig,
   applySyntheticProviderConfig,
+  applyTogetherConfig,
+  applyTogetherProviderConfig,
   applyVeniceConfig,
   applyVeniceProviderConfig,
   applyVercelAiGatewayConfig,
@@ -34,21 +40,28 @@ import {
   applyXiaomiConfig,
   applyXiaomiProviderConfig,
   applyZaiConfig,
+  applyZaiProviderConfig,
   CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF,
+  LITELLM_DEFAULT_MODEL_REF,
+  QIANFAN_DEFAULT_MODEL_REF,
   KIMI_CODING_MODEL_REF,
   MOONSHOT_DEFAULT_MODEL_REF,
   OPENROUTER_DEFAULT_MODEL_REF,
   SYNTHETIC_DEFAULT_MODEL_REF,
+  TOGETHER_DEFAULT_MODEL_REF,
   VENICE_DEFAULT_MODEL_REF,
   VERCEL_AI_GATEWAY_DEFAULT_MODEL_REF,
   XIAOMI_DEFAULT_MODEL_REF,
   setCloudflareAiGatewayConfig,
+  setQianfanApiKey,
   setGeminiApiKey,
+  setLitellmApiKey,
   setKimiCodingApiKey,
   setMoonshotApiKey,
   setOpencodeZenApiKey,
   setOpenrouterApiKey,
   setSyntheticApiKey,
+  setTogetherApiKey,
   setVeniceApiKey,
   setVercelAiGatewayApiKey,
   setXiaomiApiKey,
@@ -56,6 +69,7 @@ import {
   ZAI_DEFAULT_MODEL_REF,
 } from "./onboard-auth.js";
 import { OPENCODE_ZEN_DEFAULT_MODEL } from "./opencode-zen-model-default.js";
+import { detectZaiEndpoint } from "./zai-endpoint-detect.js";
 
 export async function applyAuthChoiceApiProviders(
   params: ApplyAuthChoiceParams,
@@ -81,6 +95,8 @@ export async function applyAuthChoiceApiProviders(
   ) {
     if (params.opts.tokenProvider === "openrouter") {
       authChoice = "openrouter-api-key";
+    } else if (params.opts.tokenProvider === "litellm") {
+      authChoice = "litellm-api-key";
     } else if (params.opts.tokenProvider === "vercel-ai-gateway") {
       authChoice = "ai-gateway-api-key";
     } else if (params.opts.tokenProvider === "cloudflare-ai-gateway") {
@@ -102,8 +118,12 @@ export async function applyAuthChoiceApiProviders(
       authChoice = "synthetic-api-key";
     } else if (params.opts.tokenProvider === "venice") {
       authChoice = "venice-api-key";
+    } else if (params.opts.tokenProvider === "together") {
+      authChoice = "together-api-key";
     } else if (params.opts.tokenProvider === "opencode") {
       authChoice = "opencode-zen";
+    } else if (params.opts.tokenProvider === "qianfan") {
+      authChoice = "qianfan-api-key";
     }
   }
 
@@ -182,6 +202,69 @@ export async function applyAuthChoiceApiProviders(
       nextConfig = applied.config;
       agentModelOverride = applied.agentModelOverride ?? agentModelOverride;
     }
+    return { config: nextConfig, agentModelOverride };
+  }
+
+  if (authChoice === "litellm-api-key") {
+    const store = ensureAuthProfileStore(params.agentDir, { allowKeychainPrompt: false });
+    const profileOrder = resolveAuthProfileOrder({ cfg: nextConfig, store, provider: "litellm" });
+    const existingProfileId = profileOrder.find((profileId) => Boolean(store.profiles[profileId]));
+    const existingCred = existingProfileId ? store.profiles[existingProfileId] : undefined;
+    let profileId = "litellm:default";
+    let hasCredential = false;
+
+    if (existingProfileId && existingCred?.type === "api_key") {
+      profileId = existingProfileId;
+      hasCredential = true;
+    }
+    if (!hasCredential && params.opts?.token && params.opts?.tokenProvider === "litellm") {
+      await setLitellmApiKey(normalizeApiKeyInput(params.opts.token), params.agentDir);
+      hasCredential = true;
+    }
+    if (!hasCredential) {
+      await params.prompter.note(
+        "LiteLLM provides a unified API to 100+ LLM providers.\nGet your API key from your LiteLLM proxy or https://litellm.ai\nDefault proxy runs on http://localhost:4000",
+        "LiteLLM",
+      );
+      const envKey = resolveEnvApiKey("litellm");
+      if (envKey) {
+        const useExisting = await params.prompter.confirm({
+          message: `Use existing LITELLM_API_KEY (${envKey.source}, ${formatApiKeyPreview(envKey.apiKey)})?`,
+          initialValue: true,
+        });
+        if (useExisting) {
+          await setLitellmApiKey(envKey.apiKey, params.agentDir);
+          hasCredential = true;
+        }
+      }
+      if (!hasCredential) {
+        const key = await params.prompter.text({
+          message: "Enter LiteLLM API key",
+          validate: validateApiKeyInput,
+        });
+        await setLitellmApiKey(normalizeApiKeyInput(String(key)), params.agentDir);
+        hasCredential = true;
+      }
+    }
+    if (hasCredential) {
+      nextConfig = applyAuthProfileConfig(nextConfig, {
+        profileId,
+        provider: "litellm",
+        mode: "api_key",
+      });
+    }
+    const applied = await applyDefaultModelChoice({
+      config: nextConfig,
+      setDefaultModel: params.setDefaultModel,
+      defaultModel: LITELLM_DEFAULT_MODEL_REF,
+      applyDefaultConfig: applyLitellmConfig,
+      applyProviderConfig: applyLitellmProviderConfig,
+      noteDefault: LITELLM_DEFAULT_MODEL_REF,
+      noteAgentModel,
+      prompter: params.prompter,
+    });
+    nextConfig = applied.config;
+    agentModelOverride = applied.agentModelOverride ?? agentModelOverride;
     return { config: nextConfig, agentModelOverride };
   }
 
@@ -538,11 +621,31 @@ export async function applyAuthChoiceApiProviders(
     return { config: nextConfig, agentModelOverride };
   }
 
-  if (authChoice === "zai-api-key") {
+  if (
+    authChoice === "zai-api-key" ||
+    authChoice === "zai-coding-global" ||
+    authChoice === "zai-coding-cn" ||
+    authChoice === "zai-global" ||
+    authChoice === "zai-cn"
+  ) {
+    let endpoint: "global" | "cn" | "coding-global" | "coding-cn" | undefined;
+    if (authChoice === "zai-coding-global") {
+      endpoint = "coding-global";
+    } else if (authChoice === "zai-coding-cn") {
+      endpoint = "coding-cn";
+    } else if (authChoice === "zai-global") {
+      endpoint = "global";
+    } else if (authChoice === "zai-cn") {
+      endpoint = "cn";
+    }
+
+    // Input API key
     let hasCredential = false;
+    let apiKey = "";
 
     if (!hasCredential && params.opts?.token && params.opts?.tokenProvider === "zai") {
-      await setZaiApiKey(normalizeApiKeyInput(params.opts.token), params.agentDir);
+      apiKey = normalizeApiKeyInput(params.opts.token);
+      await setZaiApiKey(apiKey, params.agentDir);
       hasCredential = true;
     }
 
@@ -553,7 +656,8 @@ export async function applyAuthChoiceApiProviders(
         initialValue: true,
       });
       if (useExisting) {
-        await setZaiApiKey(envKey.apiKey, params.agentDir);
+        apiKey = envKey.apiKey;
+        await setZaiApiKey(apiKey, params.agentDir);
         hasCredential = true;
       }
     }
@@ -562,42 +666,76 @@ export async function applyAuthChoiceApiProviders(
         message: "Enter Z.AI API key",
         validate: validateApiKeyInput,
       });
-      await setZaiApiKey(normalizeApiKeyInput(String(key)), params.agentDir);
+      apiKey = normalizeApiKeyInput(String(key));
+      await setZaiApiKey(apiKey, params.agentDir);
     }
+
+    // zai-api-key: auto-detect endpoint + choose a working default model.
+    let modelIdOverride: string | undefined;
+    if (!endpoint) {
+      const detected = await detectZaiEndpoint({ apiKey });
+      if (detected) {
+        endpoint = detected.endpoint;
+        modelIdOverride = detected.modelId;
+        await params.prompter.note(detected.note, "Z.AI endpoint");
+      } else {
+        endpoint = await params.prompter.select({
+          message: "Select Z.AI endpoint",
+          options: [
+            {
+              value: "coding-global",
+              label: "Coding-Plan-Global",
+              hint: "GLM Coding Plan Global (api.z.ai)",
+            },
+            {
+              value: "coding-cn",
+              label: "Coding-Plan-CN",
+              hint: "GLM Coding Plan CN (open.bigmodel.cn)",
+            },
+            {
+              value: "global",
+              label: "Global",
+              hint: "Z.AI Global (api.z.ai)",
+            },
+            {
+              value: "cn",
+              label: "CN",
+              hint: "Z.AI CN (open.bigmodel.cn)",
+            },
+          ],
+          initialValue: "global",
+        });
+      }
+    }
+
     nextConfig = applyAuthProfileConfig(nextConfig, {
       profileId: "zai:default",
       provider: "zai",
       mode: "api_key",
     });
-    {
-      const applied = await applyDefaultModelChoice({
-        config: nextConfig,
-        setDefaultModel: params.setDefaultModel,
-        defaultModel: ZAI_DEFAULT_MODEL_REF,
-        applyDefaultConfig: applyZaiConfig,
-        applyProviderConfig: (config) => ({
-          ...config,
-          agents: {
-            ...config.agents,
-            defaults: {
-              ...config.agents?.defaults,
-              models: {
-                ...config.agents?.defaults?.models,
-                [ZAI_DEFAULT_MODEL_REF]: {
-                  ...config.agents?.defaults?.models?.[ZAI_DEFAULT_MODEL_REF],
-                  alias: config.agents?.defaults?.models?.[ZAI_DEFAULT_MODEL_REF]?.alias ?? "GLM",
-                },
-              },
-            },
-          },
+
+    const defaultModel = modelIdOverride ? `zai/${modelIdOverride}` : ZAI_DEFAULT_MODEL_REF;
+    const applied = await applyDefaultModelChoice({
+      config: nextConfig,
+      setDefaultModel: params.setDefaultModel,
+      defaultModel,
+      applyDefaultConfig: (config) =>
+        applyZaiConfig(config, {
+          endpoint,
+          ...(modelIdOverride ? { modelId: modelIdOverride } : {}),
         }),
-        noteDefault: ZAI_DEFAULT_MODEL_REF,
-        noteAgentModel,
-        prompter: params.prompter,
-      });
-      nextConfig = applied.config;
-      agentModelOverride = applied.agentModelOverride ?? agentModelOverride;
-    }
+      applyProviderConfig: (config) =>
+        applyZaiProviderConfig(config, {
+          endpoint,
+          ...(modelIdOverride ? { modelId: modelIdOverride } : {}),
+        }),
+      noteDefault: defaultModel,
+      noteAgentModel,
+      prompter: params.prompter,
+    });
+    nextConfig = applied.config;
+    agentModelOverride = applied.agentModelOverride ?? agentModelOverride;
+
     return { config: nextConfig, agentModelOverride };
   }
 
@@ -752,7 +890,7 @@ export async function applyAuthChoiceApiProviders(
         [
           "OpenCode Zen provides access to Claude, GPT, Gemini, and more models.",
           "Get your API key at: https://opencode.ai/auth",
-          "Requires an active OpenCode Zen subscription.",
+          "OpenCode Zen bills per request. Check your OpenCode dashboard for details.",
         ].join("\n"),
         "OpenCode Zen",
       );
@@ -788,6 +926,120 @@ export async function applyAuthChoiceApiProviders(
         applyDefaultConfig: applyOpencodeZenConfig,
         applyProviderConfig: applyOpencodeZenProviderConfig,
         noteDefault: OPENCODE_ZEN_DEFAULT_MODEL,
+        noteAgentModel,
+        prompter: params.prompter,
+      });
+      nextConfig = applied.config;
+      agentModelOverride = applied.agentModelOverride ?? agentModelOverride;
+    }
+    return { config: nextConfig, agentModelOverride };
+  }
+
+  if (authChoice === "together-api-key") {
+    let hasCredential = false;
+
+    if (!hasCredential && params.opts?.token && params.opts?.tokenProvider === "together") {
+      await setTogetherApiKey(normalizeApiKeyInput(params.opts.token), params.agentDir);
+      hasCredential = true;
+    }
+
+    if (!hasCredential) {
+      await params.prompter.note(
+        [
+          "Together AI provides access to leading open-source models including Llama, DeepSeek, Qwen, and more.",
+          "Get your API key at: https://api.together.xyz/settings/api-keys",
+        ].join("\n"),
+        "Together AI",
+      );
+    }
+
+    const envKey = resolveEnvApiKey("together");
+    if (envKey) {
+      const useExisting = await params.prompter.confirm({
+        message: `Use existing TOGETHER_API_KEY (${envKey.source}, ${formatApiKeyPreview(envKey.apiKey)})?`,
+        initialValue: true,
+      });
+      if (useExisting) {
+        await setTogetherApiKey(envKey.apiKey, params.agentDir);
+        hasCredential = true;
+      }
+    }
+    if (!hasCredential) {
+      const key = await params.prompter.text({
+        message: "Enter Together AI API key",
+        validate: validateApiKeyInput,
+      });
+      await setTogetherApiKey(normalizeApiKeyInput(String(key)), params.agentDir);
+    }
+    nextConfig = applyAuthProfileConfig(nextConfig, {
+      profileId: "together:default",
+      provider: "together",
+      mode: "api_key",
+    });
+    {
+      const applied = await applyDefaultModelChoice({
+        config: nextConfig,
+        setDefaultModel: params.setDefaultModel,
+        defaultModel: TOGETHER_DEFAULT_MODEL_REF,
+        applyDefaultConfig: applyTogetherConfig,
+        applyProviderConfig: applyTogetherProviderConfig,
+        noteDefault: TOGETHER_DEFAULT_MODEL_REF,
+        noteAgentModel,
+        prompter: params.prompter,
+      });
+      nextConfig = applied.config;
+      agentModelOverride = applied.agentModelOverride ?? agentModelOverride;
+    }
+    return { config: nextConfig, agentModelOverride };
+  }
+
+  if (authChoice === "qianfan-api-key") {
+    let hasCredential = false;
+    if (!hasCredential && params.opts?.token && params.opts?.tokenProvider === "qianfan") {
+      setQianfanApiKey(normalizeApiKeyInput(params.opts.token), params.agentDir);
+      hasCredential = true;
+    }
+
+    if (!hasCredential) {
+      await params.prompter.note(
+        [
+          "Get your API key at: https://console.bce.baidu.com/qianfan/ais/console/apiKey",
+          "API key format: bce-v3/ALTAK-...",
+        ].join("\n"),
+        "QIANFAN",
+      );
+    }
+    const envKey = resolveEnvApiKey("qianfan");
+    if (envKey) {
+      const useExisting = await params.prompter.confirm({
+        message: `Use existing QIANFAN_API_KEY (${envKey.source}, ${formatApiKeyPreview(envKey.apiKey)})?`,
+        initialValue: true,
+      });
+      if (useExisting) {
+        setQianfanApiKey(envKey.apiKey, params.agentDir);
+        hasCredential = true;
+      }
+    }
+    if (!hasCredential) {
+      const key = await params.prompter.text({
+        message: "Enter QIANFAN API key",
+        validate: validateApiKeyInput,
+      });
+      setQianfanApiKey(normalizeApiKeyInput(String(key)), params.agentDir);
+    }
+    nextConfig = applyAuthProfileConfig(nextConfig, {
+      profileId: "qianfan:default",
+      provider: "qianfan",
+      mode: "api_key",
+    });
+    {
+      const applied = await applyDefaultModelChoice({
+        config: nextConfig,
+        setDefaultModel: params.setDefaultModel,
+        defaultModel: QIANFAN_DEFAULT_MODEL_REF,
+        applyDefaultConfig: applyQianfanConfig,
+        applyProviderConfig: applyQianfanProviderConfig,
+        noteDefault: QIANFAN_DEFAULT_MODEL_REF,
         noteAgentModel,
         prompter: params.prompter,
       });
